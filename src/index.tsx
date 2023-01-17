@@ -3,6 +3,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { BlackBox } from './black-box/BlackBox';
+import { IBlackBox } from './black-box/interface';
+
+// init black box.
+// In practice this would already be done by the engine,
+// But for this proof of concept I've made my own in javascript.
+declare global {
+  interface Window { blackBox: IBlackBox}
+}
+window.blackBox = new BlackBox();
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

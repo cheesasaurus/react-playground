@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { DebugBlackBox } from './components/DebugBlackBox';
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
         >
           Learn React
         </a>
+        <p>hello</p>
+        <DebugBlackBox />
       </header>
     </div>
   );
