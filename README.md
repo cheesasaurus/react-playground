@@ -1,3 +1,20 @@
+# React Playground
+
+Playing around with react. I read most of [the react docs](https://reactjs.org/docs/getting-started.html) and did the [tic-tac-toe tutorial](https://reactjs.org/tutorial/tutorial.html); now its time to build something.
+
+The goal is to get familiar with react.
+- Not going to spend time on aesthetics.
+- Not going to waste too much time thinking about the app architecture; react is just a library for making components.
+    - But should use some mock async services persisting to localstorage.
+
+Might bring in [react-redux](https://react-redux.js.org/) later and refactor.
+
+Other things to look into after core stuff:
+- formik for forms. https://formik.org/docs/overview
+- storybook. https://storybook.js.org/
+- testing. https://reactjs.org/docs/testing.html
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
