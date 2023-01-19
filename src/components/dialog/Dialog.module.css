@@ -1,0 +1,49 @@
+
+.dialog {
+    position: absolute;
+    top: 10%;
+    transform: translateY(-10%);
+    background-color: rgb(32, 30, 30);
+    vertical-align: middle;
+    min-width: 300px;
+    min-height: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid rgb(54, 50, 50);
+    color: rgb(211, 202, 196);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(90% - 30px);
+    max-width: calc(100% - 40px);
+    overflow: hidden;
+}
+
+.dialog-header {
+    background-color: rgb(83, 76, 76);
+    font-size: 24px;
+    color: rgb(235, 235, 235);
+    display: flex;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.dialog-title {
+    display: inline-block;
+    padding: 0 3px 5px 10px;
+    cursor: default;
+}
+
+.dialog-close {
+    display: inline-block;
+    width: 38px;
+    text-align: center;
+    cursor: default;
+}
+.dialog-close:hover {
+    background-color: darkred;
+}
+
+.dialog-content {
+    overflow: auto;
+    max-height: 100%;
+}

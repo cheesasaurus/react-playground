@@ -1,5 +1,6 @@
 import React from "react";
 import { Message, MessageHandlerHandle } from "../black-box/interface";
+import { DialogContext } from "./dialog/DialogContext";
 
 
 interface IProps {
@@ -14,6 +15,9 @@ interface IState {
 
 
 export class DebugBlackBox extends React.Component<IProps, IState> {
+    public static contextType = DialogContext;
+    declare context: React.ContextType<typeof DialogContext>;
+
     constructor(props: any) {
         super(props);
         this.state = {
@@ -43,15 +47,24 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
         this.setState({counter: this.state.counter + 1});
     };
 
+    openDebugDialog = () => {
+        this.context.control.open((<>hello</>));
+    };
+
     handleTestMessage = (message: Message) => {
         console.log(`received message from black box: ${JSON.stringify(message)}`);
     };
     
     render(): React.ReactNode {
         return (
-            <button onClick={this.requestBlackBoxToEmitTestMessage}>
-                emit message from black box
-            </button>
+            <>
+                <button onClick={this.requestBlackBoxToEmitTestMessage}>
+                    emit message from black box
+                </button>
+                <button onClick={this.openDebugDialog}>
+                    open dialog
+                </button>
+            </>
         )
     }
 

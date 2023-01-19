@@ -9,6 +9,7 @@
 }
 
 .main {
+    position: relative;
     overflow-y: hidden;
     flex-grow: 1000;
     background-color: black;

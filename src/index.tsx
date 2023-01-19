@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BlackBox } from './black-box/BlackBox';
 import { IBlackBox } from './black-box/interface';
+import { App } from './App';
 
 // init black box.
 // In practice this would already be done by the engine,
