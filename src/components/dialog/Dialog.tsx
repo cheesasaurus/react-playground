@@ -4,8 +4,9 @@ import { DialogContext } from "./DialogContext";
 
 
 interface Props {
+    id: string;
     title?: string;
-    children?: React.ReactNode;
+    children: React.ReactNode;
 }
 
 interface State {
@@ -17,16 +18,20 @@ export class Dialog extends React.Component<Props, State> {
     public static contextType = DialogContext;
     declare context: React.ContextType<typeof DialogContext>;
 
+    private close = () => {
+        this.context.control.close(this.props.id);
+    }
+
     public render(): React.ReactNode {
         return (
-            <div className={styles['dialog']}>
+            <div className={styles['dialog']} data-dialog-id={this.props.id}>
                 <header className={styles['dialog-header']}>
                     <div className={styles['dialog-title']}>
                         {this.props.title}
                     </div>
                     <div
                         className={styles['dialog-close']}
-                        onClick={this.context.control.close}
+                        onClick={this.close}
                     >
                         x
                     </div>

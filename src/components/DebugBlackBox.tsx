@@ -47,8 +47,12 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
         this.setState({counter: this.state.counter + 1});
     };
 
-    openDebugDialog = () => {
-        this.context.control.open('This is a Dialog', <>hello</>);
+    openDebugDialogA = () => {
+        this.context.control.open('DebugA', 'This is a Dialog', <>AAAAAAA</>);
+    };
+
+    openDebugDialogB = () => {
+        this.context.control.open('DebugB', 'This is a Dialog', <>BBBBBBB</>);
     };
 
     handleTestMessage = (message: Message) => {
@@ -61,8 +65,11 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
                 <button onClick={this.requestBlackBoxToEmitTestMessage}>
                     emit message from black box
                 </button>
-                <button onClick={this.openDebugDialog}>
-                    open dialog
+                <button onClick={this.openDebugDialogA}>
+                    open dialog A
+                </button>
+                <button onClick={this.openDebugDialogB}>
+                    open dialog B
                 </button>
             </>
         )

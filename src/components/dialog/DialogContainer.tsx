@@ -8,8 +8,14 @@ interface Props {
 }
 
 interface State {
-    dialogTitle: string|undefined;
-    dialogContents: ReactNode;
+    activeDialogs: {
+        [dialogId: string]: {
+            id: string,
+            title: string|undefined,
+            content: ReactNode,
+        }
+    }
+    
 }
 
 
@@ -20,19 +26,32 @@ export class DialogContainer extends React.Component<Props, State> {
     public constructor(props: Props) {
         super(props);
         this.state = {
-            dialogTitle: undefined,
-            dialogContents: undefined,
+            activeDialogs: {},
         };
     }
 
     public componentDidMount(): void {
-        this.context.control.onOpenRequested((title, jsx) => this.setState({
-            dialogTitle: title,
-            dialogContents: jsx,
-        }));
-        this.context.control.onCloseRequested(() => this.setState({
-            dialogContents: undefined,
-        }));
+        this.context.control.onOpenRequested((dialogId, title, jsx) => {
+            const dialog = {
+                id: dialogId,
+                title: title,
+                content: jsx,
+            };
+            this.setState({
+                activeDialogs: {
+                    ...this.state.activeDialogs,
+                    [dialog.id]: dialog,
+                },
+            });
+        });
+
+        this.context.control.onCloseRequested((dialogId) => {
+            const copy = {...this.state.activeDialogs};
+            delete copy[dialogId];
+            this.setState({
+                activeDialogs: copy,
+            })
+        });
     }
 
     public componentWillUnmount(): void {
@@ -41,18 +60,16 @@ export class DialogContainer extends React.Component<Props, State> {
     }
 
     public render(): React.ReactNode {
-        const dialogs = [];
-        if (this.state.dialogContents !== undefined) {
-            dialogs.push(
-                // todo: multiple dialogs with keys
+        const dialogs = Object.values(this.state.activeDialogs)
+            .map((dialog) => (
                 <Dialog
-                    key={23}
-                    title={this.state.dialogTitle}
+                    key={dialog.id}
+                    id={dialog.id}
+                    title={dialog.title}
                 >
-                    {this.state.dialogContents}
+                    {dialog.content}
                 </Dialog>
-            );
-        }
+            ));
 
         return <>{dialogs}</>;
     }
