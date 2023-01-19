@@ -1,29 +1,28 @@
 
 
-type OpenCallback = (content: React.ReactNode) => void;
+type OpenCallback = (title: string, content: React.ReactNode) => void;
 type CloseCallback = () => void;
 
 
 export interface IDialogControl {
-    open(content: React.ReactNode): void;
+    open(title: string, content: React.ReactNode): void;
     close(): void;
     onOpenRequested(callback: OpenCallback): void
     onCloseRequested(callback: CloseCallback): void
 }
 
 
-export class DialogControl {
+export class DialogControl implements IDialogControl {
     private openCallback: OpenCallback | undefined;
     private closeCallback: CloseCallback | undefined;
 
-    public open = (content: React.ReactNode) => {
+    public open = (title: string, content: React.ReactNode) => {
         if (this.openCallback) {
-            this.openCallback(content);
+            this.openCallback(title, content);
         }
     };
 
     public close = () => {
-        console.log('closing...');
         if (this.closeCallback) {
             this.closeCallback();
         }

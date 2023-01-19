@@ -4,6 +4,7 @@ import { DialogContext } from "./DialogContext";
 
 
 interface Props {
+    title?: string;
     children?: React.ReactNode;
 }
 
@@ -20,7 +21,9 @@ export class Dialog extends React.Component<Props, State> {
         return (
             <div className={styles['dialog']}>
                 <header className={styles['dialog-header']}>
-                    <div className={styles['dialog-title']}>This is a Dialog</div>
+                    <div className={styles['dialog-title']}>
+                        {this.props.title}
+                    </div>
                     <div
                         className={styles['dialog-close']}
                         onClick={this.context.control.close}

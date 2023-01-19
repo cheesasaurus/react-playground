@@ -48,7 +48,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
     };
 
     openDebugDialog = () => {
-        this.context.control.open((<>hello</>));
+        this.context.control.open('This is a Dialog', <>hello</>);
     };
 
     handleTestMessage = (message: Message) => {

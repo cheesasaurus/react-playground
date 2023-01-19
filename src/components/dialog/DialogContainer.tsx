@@ -8,6 +8,7 @@ interface Props {
 }
 
 interface State {
+    dialogTitle: string|undefined;
     dialogContents: ReactNode;
 }
 
@@ -19,12 +20,14 @@ export class DialogContainer extends React.Component<Props, State> {
     public constructor(props: Props) {
         super(props);
         this.state = {
+            dialogTitle: undefined,
             dialogContents: undefined,
         };
     }
 
     public componentDidMount(): void {
-        this.context.control.onOpenRequested((jsx) => this.setState({
+        this.context.control.onOpenRequested((title, jsx) => this.setState({
+            dialogTitle: title,
             dialogContents: jsx,
         }));
         this.context.control.onCloseRequested(() => this.setState({
@@ -38,14 +41,20 @@ export class DialogContainer extends React.Component<Props, State> {
     }
 
     public render(): React.ReactNode {
-        const showDialog = this.state.dialogContents !== undefined;
+        const dialogs = [];
+        if (this.state.dialogContents !== undefined) {
+            dialogs.push(
+                // todo: multiple dialogs with keys
+                <Dialog
+                    key={23}
+                    title={this.state.dialogTitle}
+                >
+                    {this.state.dialogContents}
+                </Dialog>
+            );
+        }
 
-        return (
-            <>
-                {showDialog ? <Dialog>{this.state.dialogContents}</Dialog> : undefined}
-                {/* todo: might do multiple dialogs later */}
-            </>
-        );
+        return <>{dialogs}</>;
     }
     
 }
