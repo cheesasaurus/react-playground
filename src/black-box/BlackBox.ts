@@ -1,3 +1,4 @@
+import { DudeService } from "./DudeService";
 import { IApi, IBlackBox, IDebugService, ISocket, Message, MessageHandler, MessageHandlerHandle, MessageQueue } from "./interface";
 
 // In practice, the black box would be [native code] and already available via some global variable.
@@ -55,9 +56,11 @@ class Socket implements ISocket {
 
 class Api implements IApi {
     debug: DebugService;
+    dudes: DudeService;
 
     constructor(messageQueue: MessageQueue) {
         this.debug = new DebugService(messageQueue);
+        this.dudes = new DudeService();
     }
 
 }

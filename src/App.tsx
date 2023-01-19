@@ -1,27 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import styles from './App.module.css';
 import { DebugBlackBox } from './components/DebugBlackBox';
+import { ToDudeList } from './components/to-dude-list/DudeList';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <p>hello</p>
+    <div className={styles['app']}>
+      <main className={styles['main']}>
+        <ToDudeList />
+      </main>
+      <footer className={styles['footer']}>
+        debug &nbsp;
         <DebugBlackBox />
-      </header>
+      </footer>
     </div>
   );
 }

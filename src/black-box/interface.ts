@@ -1,3 +1,4 @@
+import { Dude, DudeMap, WeaponType } from "./models";
 
 /**
  * Some black box (for example, a game engine providing the webview),
@@ -36,7 +37,7 @@ export interface ISocket {
 
 export interface IApi {
     debug: IDebugService;
-
+    dudes: IDudeService;
 }
 
 
@@ -60,11 +61,48 @@ export interface Message {
 }
 
 
+export interface ServiceError {
+    code: string;
+    message: string;
+    detail?: string;
+}
+
+
 export interface IDebugService {
     emitMessageFromBlackBox(message: Message): Promise<void>;
 }
 
 
+// Dude service ///////////////////////////////////////////////////////////////////////
+
 export interface IDudeService {
-    // todo
+    createDude(name: string): Promise<ResponseCreateDude>;
+    getDudes(): Promise<ResponseGetDudes>;
+    updateDude(dude: RequestUpdateDude): Promise<ResponseUpdateDude>;
 }
+
+export interface ResponseCreateDude {
+    errors?: Array<ServiceError>;
+    data?: Dude; 
+}
+
+export interface RequestUpdateDude {
+    id: number,
+    name?: string,
+    luckyNumber?: number,
+    starterWeapon?: WeaponType,
+}
+
+export interface ResponseUpdateDude {
+    errors?: Array<ServiceError>;
+    data?: Dude;
+}
+
+export interface ResponseGetDudes {
+    errors?: Array<ServiceError>;
+    data?: DudeMap;
+}
+
+
+
+
