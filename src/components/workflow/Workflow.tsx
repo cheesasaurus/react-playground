@@ -1,7 +1,7 @@
 import styles from './workflow.module.css';
 
 
-interface NavButtonProps {
+export interface NavButtonProps {
     visible: boolean,
     disabled: boolean,
     text: string,

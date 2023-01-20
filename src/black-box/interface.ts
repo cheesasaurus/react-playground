@@ -26,12 +26,12 @@ export interface ISocket {
      * @param messageHandler Will be called every time that type of message comes through.
      * @returns A handle that can be passed to the `off` method to unsubscribe.
      */
-    on: (messageType: string, messageHandler: MessageHandler) => MessageHandlerHandle;
+    on: (messageType: string, messageHandler: SocketMessageHandler) => SocketMessageHandlerHandle;
 
     /**
      * Unsubscribe
      */
-    off: (handle: MessageHandlerHandle) => void;
+    off: (handle: SocketMessageHandlerHandle) => void;
 }
 
 
@@ -41,23 +41,27 @@ export interface IApi {
 }
 
 
-export interface MessageHandler {
-    (message: Message): void;
+export interface SocketMessageHandler {
+    (message: SocketMessage): void;
 }
 
 
-export interface MessageHandlerHandle {
+export interface SocketMessageHandlerHandle {
     messageType: string;
-    handler: MessageHandler;
+    handler: SocketMessageHandler;
 }
 
 
-export type MessageQueue = Array<Message>;
+export type MessageQueue = Array<SocketMessage>;
 
 
-export interface Message {
+export interface SocketMessage {
     type: string;
     data: Object;
+}
+
+export enum SocketMessageType {
+    DudeCreated = 'DudeCreated',
 }
 
 
@@ -69,7 +73,7 @@ export interface ServiceError {
 
 
 export interface IDebugService {
-    emitMessageFromBlackBox(message: Message): Promise<void>;
+    emitMessageFromBlackBox(message: SocketMessage): Promise<void>;
 }
 
 
@@ -78,6 +82,7 @@ export interface IDebugService {
 export interface IDudeService {
     createDude(name: string): Promise<ResponseCreateDude>;
     getDudes(): Promise<ResponseGetDudes>;
+    getDude(dudeId: number): Promise<ResponseGetDude>;
     updateDude(dude: RequestUpdateDude): Promise<ResponseUpdateDude>;
 }
 
@@ -103,6 +108,10 @@ export interface ResponseGetDudes {
     data?: DudeMap;
 }
 
+export interface ResponseGetDude {
+    errors?: Array<ServiceError>;
+    data?: Dude;
+}
 
 
 

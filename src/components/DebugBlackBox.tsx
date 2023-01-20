@@ -1,5 +1,5 @@
 import React from "react";
-import { Message, MessageHandlerHandle } from "../black-box/interface";
+import { SocketMessage, SocketMessageHandlerHandle } from "../black-box/interface";
 import { DialogContext } from "./dialog/DialogContext";
 import { ToDudeList } from "./to-dude-list/DudeList";
 import { Workflow } from "./workflow/Workflow";
@@ -11,7 +11,7 @@ interface IProps {
 
 
 interface IState {
-    handle?: MessageHandlerHandle;
+    handle?: SocketMessageHandlerHandle;
     counter: number;
 }
 
@@ -94,7 +94,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
         this.context.control!.open('DebugDudes', 'This is a Dialog', content, true);
     };
 
-    handleTestMessage = (message: Message) => {
+    handleTestMessage = (message: SocketMessage) => {
         console.log(`received message from black box: ${JSON.stringify(message)}`);
     };
     

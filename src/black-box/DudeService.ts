@@ -1,6 +1,6 @@
 import { DudeStatTypes } from "./DudeStats";
 import { EquipmentService } from "./EquipmentService";
-import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDudes, ResponseUpdateDude, ServiceError } from "./interface";
+import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseUpdateDude, ServiceError, SocketMessageType } from "./interface";
 import { Dude, DudeMap, DudeStatMap, iterateModelMap, WeaponType } from "./models";
 import { delayedResponse } from "./service-utils";
 
@@ -48,7 +48,23 @@ export class DudeService implements IDudeService {
         const dude = this.newDude(name);
         this.dudes[dude.id] = dude;
         this.save();
-        return delayedResponse<ResponseCreateDude>({data: structuredClone(dude)});
+        const dudeCopy = structuredClone(dude);
+        this.messageQueue.push({
+            type: SocketMessageType.DudeCreated,
+            data: dudeCopy,
+        });
+        return delayedResponse<ResponseCreateDude>({data: dudeCopy});
+    }
+
+    public getDude(dudeId: number): Promise<ResponseGetDude> {
+        if (!(dudeId in this.dudes)) {
+            const errors = [{
+                code: 'DoesNotExist',
+                message: 'The Dude does not exist.'
+            }];
+            return delayedResponse<ResponseGetDude>({errors});
+        }
+        return delayedResponse<ResponseGetDude>({data: structuredClone(this.dudes[dudeId])});
     }
 
     public getDudes(): Promise<ResponseGetDudes> {

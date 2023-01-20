@@ -1,8 +1,11 @@
 import styles from './DudeList.module.css';
 import './DudeList.module.css';
-import React, { ChangeEvent, KeyboardEvent } from "react";
+import React from "react";
 import { Dude, DudeMap } from "../../black-box/models";
 import { DudeListItem } from "./DudeListItem";
+import { SocketMessageHandlerHandle, SocketMessageType } from '../../black-box/interface';
+import { WorkflowCreateDude } from '../workflow-create-dude/WorkflowCreateDude';
+import { DialogContext } from '../dialog/DialogContext';
 
 
 interface Props {
@@ -18,6 +21,10 @@ interface State {
 
 
 export class ToDudeList extends React.Component<Props, State> {
+    public static contextType = DialogContext;
+    declare context: React.ContextType<typeof DialogContext>;
+
+    private socketHandles = Array<SocketMessageHandlerHandle>();
 
     constructor(props: Props) {
         super(props);
@@ -29,6 +36,16 @@ export class ToDudeList extends React.Component<Props, State> {
     }
 
     public async componentDidMount(): Promise<void> {
+        const handle = window.blackBox.socket.on(SocketMessageType.DudeCreated, (message) => {
+            const dude = message.data as Dude;
+            this.setState({
+                dudes: {
+                    ...this.state.dudes,
+                    [dude.id]: dude,
+                }
+            });
+        });
+        this.socketHandles.push(handle);
         const response = await window.blackBox.api.dudes.getDudes();
         if (response.errors) {
             response.errors.forEach(console.error)
@@ -36,38 +53,22 @@ export class ToDudeList extends React.Component<Props, State> {
         }
         this.setState({dudes: response.data!});
     }
-    
-    private pendingDudeNameChanged = (e: ChangeEvent<HTMLInputElement>) => {
-        this.setState({pendingDudeName: e.target.value});
-    };
 
-    private nameFillerKeyPressed = (e: KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            this.createDude();
+    public componentWillUnmount(): void {
+        for (const handle of this.socketHandles) {
+            window.blackBox.socket.off(handle);
         }
-    };
+        this.socketHandles = [];
+    }
 
     private createDude = () => {
-        this.setState({creatingDude: true});
-        window.blackBox.api.dudes.createDude(this.state.pendingDudeName)
-            .then((result) => {
-                this.setState({creatingDude: false});
-                if (result.errors) {
-                    console.warn(result.errors);
-                    // todo: error message(s)
-                    // going to move dude creation workflow to a popup so don't bother with it now
-                }
-                else {
-                    const dude = result.data!;
-                    this.setState({
-                        pendingDudeName: '',
-                        dudes: {
-                            ...this.state.dudes,
-                            [dude.id]: dude,
-                        }
-                    });
-                }
-            });
+        const dialogControl = this.context.control!;
+        const dialogId = 'WorkflowCreateDude';
+        const onWorkflowCompleted = () => {
+            dialogControl.close(dialogId);
+        };
+        const content = <WorkflowCreateDude onWorkflowCompleted={onWorkflowCompleted}></WorkflowCreateDude>;
+        dialogControl.open(dialogId, 'Create a Dude', content, true);
     }
 
     public render(): React.ReactNode {
@@ -87,15 +88,7 @@ export class ToDudeList extends React.Component<Props, State> {
                 <header className={styles['header']}>
                     <div style={{fontSize: '30px', fontWeight: 'bold'}}>My Dudes</div>
                     <div>
-                        <label>
-                            name: <input
-                                type='text'
-                                value={this.state.pendingDudeName}
-                                onChange={this.pendingDudeNameChanged}
-                                onKeyDown={this.nameFillerKeyPressed}
-                            />
-                        </label>
-                        <button onClick={this.createDude} disabled={this.state.creatingDude}>
+                        <button onClick={this.createDude}>
                             Create Dude
                         </button>
                     </div>

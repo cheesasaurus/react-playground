@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Dialog } from "./Dialog";
 import { DialogContext } from "./DialogContext";
 import { UpdateHandlerHandle } from "./DialogControl";

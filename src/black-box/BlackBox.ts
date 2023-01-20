@@ -1,14 +1,14 @@
 import { MessageBus } from "../utils";
 import { DudeService } from "./DudeService";
 import { EquipmentService } from "./EquipmentService";
-import { IApi, IBlackBox, IDebugService, ISocket, Message, MessageHandler, MessageHandlerHandle, MessageQueue } from "./interface";
+import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler, SocketMessageHandlerHandle, MessageQueue } from "./interface";
 
 // In practice, the black box would be [native code] and already available via some global variable.
 // But for this proof of concept I'm making my own in javascript.
 
 
 export class BlackBox implements IBlackBox {
-    private messageQueue = new Array<Message>();
+    private messageQueue = new Array<SocketMessage>();
     public socket = new Socket(this.messageQueue);
     public api = new Api(this.messageQueue);
 }
@@ -16,7 +16,7 @@ export class BlackBox implements IBlackBox {
 
 class Socket implements ISocket {
     private messageQueue: MessageQueue;
-    private bus = new MessageBus<Message>();
+    private bus = new MessageBus<SocketMessage>();
 
     constructor(messageQueue: MessageQueue) {
         this.messageQueue = messageQueue;
@@ -32,11 +32,11 @@ class Socket implements ISocket {
         }
     };
 
-    public on = (messageType: string, messageHandler: MessageHandler): MessageHandlerHandle => {
+    public on = (messageType: string, messageHandler: SocketMessageHandler): SocketMessageHandlerHandle => {
         return this.bus.on(messageType, messageHandler);
     };
 
-    public off = (handle: MessageHandlerHandle): void => {
+    public off = (handle: SocketMessageHandlerHandle): void => {
         this.bus.off(handle);
     };
 
@@ -63,7 +63,7 @@ class DebugService implements IDebugService {
         this.messageQueue = messageQueue;
     }
 
-    public async emitMessageFromBlackBox(message: Message): Promise<void> {
+    public async emitMessageFromBlackBox(message: SocketMessage): Promise<void> {
         this.messageQueue.push(message);
     }
 
