@@ -2,7 +2,7 @@ import React from "react";
 import { DialogControl } from "./DialogControl";
 
 
-interface IDialogContext {
+export interface IDialogContext {
     control: DialogControl | undefined;
 }
 
