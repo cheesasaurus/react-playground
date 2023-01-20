@@ -6,6 +6,7 @@ interface DialogConfig {
     id: string,
     title: string|undefined,
     content: ReactNode,
+    useRawContent: boolean, // if true, no extra preparation of the content will be done. e.g. overflow handling, background, text styling...
 }
 
 interface UpdateMessage {
@@ -25,7 +26,7 @@ export class DialogManager {
         this.bus = bus;
     }
 
-    public openDialog(dialogId: string, title: string, jsx: ReactNode): void {
+    public openDialog(dialogId: string, title: string, jsx: ReactNode, useRawContent = false): void {
         if (dialogId in this.activeDialogs) {
             this._bringToFront(dialogId);
         }
@@ -36,6 +37,7 @@ export class DialogManager {
             id: dialogId,
             title: title,
             content: jsx,
+            useRawContent: useRawContent, 
         };
         this.triggerUpdate();
     }
@@ -95,7 +97,7 @@ export class DialogManager {
 
 
 export class DialogControl {
-    public open: (dialogId: string, title: string, content: React.ReactNode) => void;
+    public open: (dialogId: string, title: string, content: React.ReactNode, useRawContent?: boolean) => void;
     public close: (dialogId: string) => void;
     public bringToFront: (dialogId: string) => void;
     public getOrder: () => Array<string>;
@@ -106,8 +108,8 @@ export class DialogControl {
     public constructor(bus: MessageBus<UpdateMessage>, manager: DialogManager) {
         // The control is intended to be used in react context.
         // Closures are used to avoid [unwanted react updates due to manager properties changing].
-        this.open = (dialogId: string, title: string, content: React.ReactNode) => {
-            manager.openDialog(dialogId, title, content);
+        this.open = (dialogId: string, title: string, content: React.ReactNode, useRawContent: boolean = false) => {
+            manager.openDialog(dialogId, title, content, useRawContent);
         };
         this.close = (dialogId: string) => manager.closeDialog(dialogId);
         this.bringToFront = (dialogId: string) => manager.bringToFront(dialogId);

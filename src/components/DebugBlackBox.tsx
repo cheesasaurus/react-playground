@@ -1,6 +1,8 @@
 import React from "react";
 import { Message, MessageHandlerHandle } from "../black-box/interface";
 import { DialogContext } from "./dialog/DialogContext";
+import { ToDudeList } from "./to-dude-list/DudeList";
+import { Workflow } from "./workflow/Workflow";
 
 
 interface IProps {
@@ -56,6 +58,42 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
         this.context.control!.open('DebugB', 'This is a Dialog', <>BBBBBBB</>);
     };
 
+    openWorkflowInDialog = () => {
+        const nav = {
+            prev: {
+                visible: true,
+                disabled: false,
+                text: 'Back',
+                onPressed: () => console.log('pressed prev'),
+            },
+            next: {
+                visible: true,
+                disabled: false,
+                text: 'Next',
+                onPressed: () => console.log('pressed next')
+            },
+        };
+        const bingbong = {
+            backgroundColor: 'magenta',
+            width: '1000px',
+            height: '1000px',
+        };
+        const workflow = (
+            <Workflow nav={nav}>
+                <p>Hi hello howdy</p>
+                <div style={bingbong}>
+                    bing bong bing bing bong
+                </div>
+            </Workflow>
+        );
+        this.context.control!.open('DebugWorkflow', 'This is a Dialog', workflow, true);
+    };
+
+    openDudesInDialog = () => {
+        const content = <ToDudeList></ToDudeList>
+        this.context.control!.open('DebugDudes', 'This is a Dialog', content, true);
+    };
+
     handleTestMessage = (message: Message) => {
         console.log(`received message from black box: ${JSON.stringify(message)}`);
     };
@@ -71,6 +109,12 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
                 </button>
                 <button onClick={this.openDebugDialogB}>
                     open dialog B
+                </button>
+                <button onClick={this.openWorkflowInDialog}>
+                    open workflow A
+                </button>
+                <button onClick={this.openDudesInDialog}>
+                    dudes in dialog
                 </button>
             </>
         )

@@ -7,6 +7,7 @@ interface Props {
     id: string;
     title?: string;
     dragBoundary?: React.RefObject<HTMLElement>;
+    useRawContent: boolean;
     children: React.ReactNode;
 }
 
@@ -138,10 +139,19 @@ export class Dialog extends React.Component<Props, State> {
                         x
                     </div>
                 </header>
-                <section className={styles['dialog-content']}>
-                    {this.props.children}
-                </section>
+                {this.renderContent()}
             </div>
+        );
+    }
+
+    private renderContent(): React.ReactNode {
+        if (this.props.useRawContent) {
+            return this.props.children;
+        }
+        return (
+            <section className={styles['dialog-content']}>
+                {this.props.children}
+            </section>
         );
     }
 }

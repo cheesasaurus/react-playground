@@ -1,0 +1,17 @@
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.content {
+    overflow: auto;
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+}
