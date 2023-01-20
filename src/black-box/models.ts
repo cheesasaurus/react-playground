@@ -1,3 +1,4 @@
+import { DudeStatType } from "./DudeStats";
 
 export interface ModelMap<Model> {
     [key: number|string]: Model;
@@ -22,7 +23,20 @@ export interface Dude {
     equipment: {
         weapon: Weapon | undefined,
     },
+    stats: DudeStatMap,
 }
+
+export interface DudeStat {
+    level: {
+        actual: number,
+        boosted: number,
+    },
+    xp: number,
+}
+
+export type DudeStatMap = {
+    [key in DudeStatType]: DudeStat;
+};
 
 export interface HP {
     max: number,

@@ -1,5 +1,6 @@
+import { DudeStatType, DudeStatTypes } from "./DudeStats";
 import { IDudeService, RequestUpdateDude, ResponseCreateDude, ResponseGetDudes, ResponseUpdateDude, ServiceError } from "./interface";
-import { Dude, DudeMap, iterateModelMap, WeaponType } from "./models";
+import { Dude, DudeMap, DudeStat, DudeStatMap, iterateModelMap, WeaponType } from "./models";
 import { delayedResponse } from "./service-utils";
 
 
@@ -134,8 +135,23 @@ export class DudeService implements IDudeService {
             creationCompleted: false,
             equipment: {
                 weapon: undefined,
-            }
+            },
+            stats: this.newDudeStats(),
         };
+    }
+
+    private newDudeStats(): DudeStatMap {
+        const stats = {} as DudeStatMap;
+        for (const type of DudeStatTypes) {
+            stats[type] = {
+                level: {
+                    actual: 1,
+                    boosted: 1,
+                },
+                xp: 0,
+            };
+        }
+        return stats;
     }
 
 }
