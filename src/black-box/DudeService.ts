@@ -135,6 +135,11 @@ export class DudeService implements IDudeService {
             creationCompleted: false,
             equipment: {
                 weapon: undefined,
+                hat: undefined,
+                shirt: undefined,
+                gloves: undefined,
+                pants: undefined,
+                boots: undefined,
             },
             stats: this.newDudeStats(),
         };

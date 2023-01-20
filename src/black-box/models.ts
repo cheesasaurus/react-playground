@@ -21,7 +21,12 @@ export interface Dude {
     starterWeapon: WeaponType,
     creationCompleted: boolean,
     equipment: {
-        weapon: Weapon | undefined,
+        [EquipmentSlot.Weapon]: Weapon | undefined,
+        [EquipmentSlot.Hat]: Armor | undefined,
+        [EquipmentSlot.Shirt]: Armor | undefined,
+        [EquipmentSlot.Gloves]: Armor | undefined,
+        [EquipmentSlot.Pants]: Armor | undefined,
+        [EquipmentSlot.Boots]: Armor | undefined,
     },
     stats: DudeStatMap,
 }
@@ -57,9 +62,16 @@ export enum DamageType {
 
 
 export enum WeaponType {
+    Unarmed = 'unarmed',
     Sword = 'sword',
-    Bow = 'bow',
+    Axe = 'axe',
+    Hammer = 'hammer',
+    Dagger = 'dagger',
     Staff = 'staff',
+    Throwing = 'throwing',
+    Whip = 'whip',
+    Bow = 'bow',
+    Crossbow = 'crossbow',
 }
 
 
@@ -77,3 +89,65 @@ export interface Weapon {
     template: WeaponTemplate,
     crafterId?: number,
 }
+
+
+export enum EquipmentSlot {
+    Weapon = 'weapon',
+    Hat = 'hat',
+    Shirt = 'shirt',
+    Gloves = 'gloves',
+    Pants = 'pants',
+    Boots = 'boots',
+}
+
+
+export interface ArmorTemplate {
+    id: number,
+    slot: EquipmentSlot,
+    name: string,
+    defense: number,
+    agilityPenalty: number, // percentage of agility lost
+    effectiveness: {
+        [key in DamageType]: number; // percentage of `defense` that applies vs that damage type
+    },
+    coverage: {
+        [BodyPart.Head]?: number;
+        [BodyPart.Chest]?: number;
+        [BodyPart.Torso]?: number;
+        [BodyPart.LeftArm]?: number;
+        [BodyPart.RightArm]?: number;
+        [BodyPart.LeftLeg]?: number,
+        [BodyPart.RightLeg]?: number;
+    },
+
+}
+
+
+export interface Armor {
+    id: number,
+    template: ArmorTemplate,
+    crafterId?: number,
+}
+
+
+export enum BodyPart {
+    Head = 'head',
+    Chest = 'chest',
+    Torso = 'torso',
+    LeftArm = 'leftArm',
+    RightArm = 'rightArm',
+    LeftLeg = 'leftLeg',
+    RightLeg = 'rightLeg',
+}
+
+
+/**
+ * Equipment that is not currently equipped
+ */
+export interface LooseEquipment {
+    id: number,
+    slot: EquipmentSlot,
+    instance: Weapon | Armor,
+}
+
+
