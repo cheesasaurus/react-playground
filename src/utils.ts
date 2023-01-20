@@ -10,9 +10,9 @@ export function docReady(fn: () => void): void {
 }
 
 
-type MessageHandler<Message> = (message: Message) => void;
+export type MessageHandler<Message> = (message: Message) => void;
 
-interface MessageHandlerHandle<handler> {
+export interface MessageHandlerHandle<handler> {
     messageType: string;
     handler: handler;
 }

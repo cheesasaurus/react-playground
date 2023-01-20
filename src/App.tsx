@@ -9,11 +9,11 @@ import { ToDudeList } from './components/to-dude-list/DudeList';
 
 
 interface Props {
-
+  dialogControl: DialogControl;
 }
 
 interface State {
-  dialogControl: DialogControl;
+  
 }
 
 export class App extends React.Component<Props, State> {
@@ -21,16 +21,13 @@ export class App extends React.Component<Props, State> {
 
   public constructor(props: Props) {
     super(props);
-    this.state = {
-      dialogControl: new DialogControl(),
-    };
     this.mainRef = React.createRef();
   }
 
   public render(): React.ReactNode {
     return (
       <div className={styles['app']}>
-        <DialogContext.Provider value={{control: this.state.dialogControl}}>
+        <DialogContext.Provider value={{control: this.props.dialogControl}}>
           <main className={styles['main']} ref={this.mainRef}>
             <ToDudeList />
             <DialogContainer dragBoundary={this.mainRef}/>

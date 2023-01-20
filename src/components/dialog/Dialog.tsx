@@ -36,11 +36,11 @@ export class Dialog extends React.Component<Props, State> {
 
     private close = (e: React.MouseEvent) => {
         e.stopPropagation();
-        this.context.control.close(this.props.id);
+        this.context.control!.close(this.props.id);
     };
 
     private bringToFront = () => {
-        this.context.control.bringToFront(this.props.id);
+        this.context.control!.bringToFront(this.props.id);
     };
 
     private onCloseButtonMouseDown = (e: React.MouseEvent) => {

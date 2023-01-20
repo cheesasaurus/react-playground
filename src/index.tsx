@@ -5,6 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { BlackBox } from './black-box/BlackBox';
 import { IBlackBox } from './black-box/interface';
 import { App } from './App';
+import { factoryDialogControl } from './components/dialog/DialogControl';
 
 // init black box.
 // In practice this would already be done by the engine,
@@ -14,13 +15,16 @@ declare global {
 }
 window.blackBox = new BlackBox();
 
+// init mediators, managers, etc
+const dialogControl = factoryDialogControl();
 
+// init view
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <App dialogControl={dialogControl}/>
   </React.StrictMode>
 );
 

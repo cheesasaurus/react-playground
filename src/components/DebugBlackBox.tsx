@@ -49,11 +49,11 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
 
     openDebugDialogA = () => {
         const content = <div style={{width: '1000px', height: '500px'}}>AAAAA</div>
-        this.context.control.open('DebugA', 'This is a Dialog', content);
+        this.context.control!.open('DebugA', 'This is a Dialog', content);
     };
 
     openDebugDialogB = () => {
-        this.context.control.open('DebugB', 'This is a Dialog', <>BBBBBBB</>);
+        this.context.control!.open('DebugB', 'This is a Dialog', <>BBBBBBB</>);
     };
 
     handleTestMessage = (message: Message) => {
