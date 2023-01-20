@@ -48,12 +48,7 @@ export class DialogContainer extends React.Component<Props, State> {
         });
 
         this.context.control.onCloseRequested((dialogId) => {
-            const copy = {...this.state.activeDialogs};
-            delete copy[dialogId];
-            this.setState({
-                order: this.state.order.filter(id => id !== dialogId),
-                activeDialogs: copy,
-            })
+            this.closeDialog(dialogId);
         });
 
         this.context.control.onBringToFrontRequested((dialogId) => {
@@ -65,18 +60,37 @@ export class DialogContainer extends React.Component<Props, State> {
                 order: this.newOrder(dialogId),
             });
         });
+
+        document.addEventListener('keydown', this.onGlobalKeyDown);
+    }
+
+    public componentWillUnmount(): void {
+        this.context.control.onOpenRequested(undefined);
+        this.context.control.onCloseRequested(undefined);
+        this.context.control.onBringToFrontRequested(undefined);
+        document.removeEventListener('keydown', this.onGlobalKeyDown);
+    }
+
+    private onGlobalKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && this.state.order.length > 0) {
+            const frontmostDialogId = this.state.order[this.state.order.length - 1];
+            this.closeDialog(frontmostDialogId);
+        }
     }
 
     private newOrder(frontmostDialogId: string) {
         const newOrder = this.state.order.filter(id => id !== frontmostDialogId);
         newOrder.push(frontmostDialogId);
         return newOrder;
-    };
-
-    public componentWillUnmount(): void {
-        this.context.control.onOpenRequested(undefined);
-        this.context.control.onCloseRequested(undefined);
-        this.context.control.onBringToFrontRequested(undefined);
+    }
+    
+    private closeDialog(dialogId: string) {
+        const copy = {...this.state.activeDialogs};
+        delete copy[dialogId];
+        this.setState({
+            order: this.state.order.filter(id => id !== dialogId),
+            activeDialogs: copy,
+        });
     }
 
     public render(): React.ReactNode {
