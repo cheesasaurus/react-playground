@@ -1,6 +1,7 @@
-import { DudeStatType, DudeStatTypes } from "./DudeStats";
-import { IDudeService, RequestUpdateDude, ResponseCreateDude, ResponseGetDudes, ResponseUpdateDude, ServiceError } from "./interface";
-import { Dude, DudeMap, DudeStat, DudeStatMap, iterateModelMap, WeaponType } from "./models";
+import { DudeStatTypes } from "./DudeStats";
+import { EquipmentService } from "./EquipmentService";
+import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDudes, ResponseUpdateDude, ServiceError } from "./interface";
+import { Dude, DudeMap, DudeStatMap, iterateModelMap, WeaponType } from "./models";
 import { delayedResponse } from "./service-utils";
 
 
@@ -10,8 +11,12 @@ export class DudeService implements IDudeService {
     private autoIncrement = 1;
     private dudes: DudeMap = {};
     private localStorageKey = 'db.dudes';
+    private equipmentService: EquipmentService;
+    private messageQueue: MessageQueue;
 
-    constructor() {
+    constructor(messageQueue: MessageQueue, equipmentService: EquipmentService) {
+        this.messageQueue = messageQueue;
+        this.equipmentService = equipmentService;
         this.load();
     }
 

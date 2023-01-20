@@ -57,7 +57,6 @@ export enum DamageType {
     bash = 'bash',
     slash = 'slash',
     pierce = 'pierce',
-    magic = 'magic',
 }
 
 
@@ -111,7 +110,7 @@ export interface ArmorTemplate {
         [key in DamageType]: number; // percentage of `defense` that applies vs that damage type
     },
     coverage: {
-        [BodyPart.Head]?: number;
+        [BodyPart.Head]?: number; // percentage of body part covered
         [BodyPart.Chest]?: number;
         [BodyPart.Torso]?: number;
         [BodyPart.LeftArm]?: number;
