@@ -17,21 +17,23 @@ interface State {
 }
 
 export class App extends React.Component<Props, State> {
+  mainRef: React.RefObject<HTMLElement>;
 
   public constructor(props: Props) {
     super(props);
     this.state = {
       dialogControl: new DialogControl(),
     };
+    this.mainRef = React.createRef();
   }
 
   public render(): React.ReactNode {
     return (
       <div className={styles['app']}>
         <DialogContext.Provider value={{control: this.state.dialogControl}}>
-          <main className={styles['main']}>
+          <main className={styles['main']} ref={this.mainRef}>
             <ToDudeList />
-            <DialogContainer />
+            <DialogContainer dragBoundary={this.mainRef}/>
           </main>
           <footer className={styles['footer']}>
             debug &nbsp;

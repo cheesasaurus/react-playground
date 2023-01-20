@@ -4,7 +4,7 @@ import { DialogContext } from "./DialogContext";
 
 
 interface Props {
-
+    dragBoundary?: React.RefObject<HTMLElement>;
 }
 
 interface State {
@@ -87,6 +87,7 @@ export class DialogContainer extends React.Component<Props, State> {
                     key={dialog.id}
                     id={dialog.id}
                     title={dialog.title}
+                    dragBoundary={this.props.dragBoundary}
                 >
                     {dialog.content}
                 </Dialog>
