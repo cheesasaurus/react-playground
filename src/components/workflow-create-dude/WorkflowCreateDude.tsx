@@ -13,10 +13,11 @@ interface State {
     dudeId: number | undefined,
     step: number,
     dude: Dude | undefined,
-    pendingDudeName: string,
     loading: boolean,
     proceeding: boolean,
     backtracking: boolean,
+    errors: Array<string>,
+    pendingDudeName: string,
 }
 
 interface Nav {
@@ -32,11 +33,12 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         this.state = {
             dudeId: props.dudeId,
             step: 1,
-            pendingDudeName: '',
+            dude: undefined,
             loading: true,
             proceeding: false,
             backtracking: false,
-            dude: undefined,
+            errors: Array<string>(),
+            pendingDudeName: '',
         };
     }
 
@@ -68,7 +70,15 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             await this.completeStep();
         }
         catch (e) {
-            this.setState({proceeding: false});
+            const errors = new Array<string>();
+            if (e instanceof Error) {
+                errors.push(e.message);
+            }
+
+            this.setState({
+                proceeding: false,
+                errors: errors,
+            });
         }
     }
 
@@ -80,6 +90,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         this.setState((state) => ({
             proceeding: false,
             step: state.step + 1,
+            errors: [],
         }));
     }
 
@@ -135,6 +146,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                 return (
                     <Step1
                         pendingDudeName={this.state.pendingDudeName}
+                        errors={this.state.errors}
                         onUpdate={this.onStep1Update}
                     />
                 );

@@ -1,3 +1,4 @@
+import styles from './WorkflowCreateDude.module.css';
 import React, { ChangeEvent } from "react";
 
 
@@ -7,6 +8,7 @@ export interface Step1UpdateInfo {
 
 interface Props {
     pendingDudeName: string;
+    errors: Array<string>;
     onUpdate: (info: Step1UpdateInfo) => void;
 }
 
@@ -23,15 +25,22 @@ export class Step1 extends React.Component<Props, State> {
     };
 
     render(): React.ReactNode {
+
+        const errors = this.props.errors.map(errorMessage => <div key={errorMessage}>{errorMessage}</div>);
+
         return(
-            <div>
-                <label>
+            <div className={styles['step-1-container']}>
+                <div>
                     name: <input
                         type='text'
                         value={this.props.pendingDudeName}
                         onChange={this.pendingDudeNameChanged}
+                        size={30}
                     />
-                </label>
+                </div>
+                <div className={styles['errors']}>
+                    {errors}
+                </div>
             </div>
         );
         
