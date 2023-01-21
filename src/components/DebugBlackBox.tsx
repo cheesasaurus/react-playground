@@ -1,6 +1,6 @@
 import React from "react";
 import { SocketMessage } from "../black-box/interface";
-import { Subscription } from "../utils";
+import { Subscription, Subscriptions } from "../utils";
 import { DialogControlContext } from "./Dialog/DialogContext";
 import { ToDudeList } from "./ToDudeList/DudeList";
 import { Workflow } from "./Workflow/Workflow";
@@ -20,7 +20,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
     public static contextType = DialogControlContext;
     declare context: React.ContextType<typeof DialogControlContext>;
 
-    private subscriptions = new Array<Subscription>();
+    private subscriptions = new Subscriptions();
 
     constructor(props: any) {
         super(props);
@@ -31,14 +31,11 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
 
     componentDidMount() {
         const subscription = window.blackBox.socket.on('testtest', this.handleTestMessage);
-        this.subscriptions.push(subscription);
+        this.subscriptions.add(subscription);
     }
 
     componentWillUnmount() {
-        for (const subscription of this.subscriptions) {
-            subscription.unsubscribe();
-        }
-        this.subscriptions = [];
+        this.subscriptions.unsubscribe();
     }
 
     requestBlackBoxToEmitTestMessage = () => {

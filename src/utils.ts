@@ -13,6 +13,22 @@ export interface Subscription {
     unsubscribe(): void;
 }
 
+export class Subscriptions implements Subscription {
+    private subscriptions = new Array<Subscription>();
+
+    public add(subscription: Subscription): void {
+        this.subscriptions.push(subscription);
+    }
+
+    public unsubscribe(): void {
+        for (let i = this.subscriptions.length - 1; i >= 0; i--) {
+            this.subscriptions[i].unsubscribe();
+            // in case there was an error unsubscribing, the subscription should not be removed from the array
+            this.subscriptions.pop();
+        }
+    }
+}
+
 
 export type MessageHandler<Message> = (message: Message) => void;
 

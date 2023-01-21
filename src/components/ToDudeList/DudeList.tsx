@@ -6,7 +6,7 @@ import { DudeListItem } from "./DudeListItem";
 import { SocketMessageType } from '../../black-box/interface';
 import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
 import { DialogControlContext } from '../Dialog/DialogContext';
-import { Subscription } from '../../utils';
+import { Subscription, Subscriptions } from '../../utils';
 
 
 interface Props {
@@ -25,7 +25,7 @@ export class ToDudeList extends React.Component<Props, State> {
     public static contextType = DialogControlContext;
     declare context: React.ContextType<typeof DialogControlContext>;
 
-    private subscriptions = Array<Subscription>();
+    private subscriptions = new Subscriptions();
 
     constructor(props: Props) {
         super(props);
@@ -46,7 +46,7 @@ export class ToDudeList extends React.Component<Props, State> {
                 }
             });
         });
-        this.subscriptions.push(subscription);
+        this.subscriptions.add(subscription);
         const response = await window.blackBox.api.dudes.getDudes();
         if (response.errors) {
             response.errors.forEach(console.error)
@@ -56,10 +56,7 @@ export class ToDudeList extends React.Component<Props, State> {
     }
 
     public componentWillUnmount(): void {
-        for (const subscription of this.subscriptions) {
-            subscription.unsubscribe();
-        }
-        this.subscriptions = [];
+        this.subscriptions.unsubscribe();
     }
 
     private createDude = () => {
