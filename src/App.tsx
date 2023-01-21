@@ -37,8 +37,21 @@ export class App extends React.Component<Props, State> {
       <div className={styles['app']}>
         <DialogControlContext.Provider value={this.providing.dialogContext}>
           <main className={styles['main']} ref={this.mainRef}>
+
             <ToDudeList />
-            <DialogContainer dragBoundary={this.mainRef}/>
+           
+            <DialogControlContext.Consumer>
+              {/*
+                  This consumer is just being used for practice.
+                  It would be senseless to use it like this in the real world,
+                  Since the provider is obviously right there above it.
+              */}
+
+              {(dialogControl) => (
+                <DialogContainer dialogControl={dialogControl!} dragBoundary={this.mainRef}/>
+              )}
+            </DialogControlContext.Consumer>
+            
           </main>
           <footer className={styles['footer']}>
             debug &nbsp;
