@@ -27,19 +27,27 @@ export class DialogManager {
         this.bus = bus;
     }
 
-    public openDialog(dialogId: string, jsx: ReactNode, config: DialogConfig): void {
-        if (dialogId in this.activeDialogs) {
-            this._bringToFront(dialogId);
-        }
-        else {
-            this.order.push(dialogId);
-        }
-        this.activeDialogs[dialogId] = {
-            id: dialogId,
-            content: jsx,
-            config: config,
-        };
-        this.triggerUpdate();
+    public async openDialog(dialogId: string, jsx: ReactNode, config: DialogConfig): Promise<void> {
+        // Allow any event propagation to complete before actually opening the dialog.
+        // E.g. In case this dialog is being opened due to the user clicking something from another semi-active dialog:
+        // That dialog should be brought to the foreground, and then this dialog should be opened above it.
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (dialogId in this.activeDialogs) {
+                    this._bringToFront(dialogId);
+                }
+                else {
+                    this.order.push(dialogId);
+                }
+                this.activeDialogs[dialogId] = {
+                    id: dialogId,
+                    content: jsx,
+                    config: config,
+                };
+                this.triggerUpdate();
+                resolve();
+            }, 0);
+        });
     }
 
     public closeDialog(dialogId: string): void {
