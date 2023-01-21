@@ -8,12 +8,15 @@
 }
 
 .content {
+    flex-grow: 1;
     overflow: auto;
     min-width: 400px;
     min-height: 200px;
 }
 
 .nav-bar {
+    flex-grow: 0;
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
 }
