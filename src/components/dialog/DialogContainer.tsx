@@ -1,6 +1,6 @@
 import React from "react";
 import { Dialog } from "./Dialog";
-import { DialogContext } from "./DialogContext";
+import { DialogControlContext } from "./DialogContext";
 import { UpdateHandlerHandle } from "./DialogControl";
 
 
@@ -14,8 +14,8 @@ interface State {
 
 
 export class DialogContainer extends React.Component<Props, State> {
-    public static contextType = DialogContext;
-    declare context: React.ContextType<typeof DialogContext>;
+    public static contextType = DialogControlContext;
+    declare context: React.ContextType<typeof DialogControlContext>;
 
     private updateHandle: UpdateHandlerHandle | undefined;
 
@@ -27,19 +27,19 @@ export class DialogContainer extends React.Component<Props, State> {
     }
 
     public componentDidMount(): void {
-        this.updateHandle = this.context.control?.onUpdate((m) => {
+        this.updateHandle = this.context!.onUpdate((m) => {
             this.setState({order: m.order});
         });
     }
 
     public componentWillUnmount(): void {
         if (this.updateHandle) {
-            this.context.control?.offUpdate(this.updateHandle);
+            this.context!.offUpdate(this.updateHandle);
         }
     }
 
     public render(): React.ReactNode {
-        const control = this.context.control!;
+        const control = this.context!;
         const dialogs = control.getOrder().map(dialogId => {
             const dialog = control.getDialog(dialogId);
             return (

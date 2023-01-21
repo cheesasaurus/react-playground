@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './App.module.css';
 import { DebugBlackBox } from './components/DebugBlackBox';
 import { DialogContainer } from './components/Dialog/DialogContainer';
-import { DialogContext, IDialogContext } from './components/Dialog/DialogContext';
+import { DialogControlContext, IDialogControlContext } from './components/Dialog/DialogContext';
 import { DialogControl } from './components/Dialog/DialogControl';
 import { ToDudeList } from './components/ToDudeList/DudeList';
 
@@ -16,28 +16,26 @@ interface State {
 }
 
 interface Providing {
-  dialogContext: IDialogContext;
+  dialogContext: IDialogControlContext;
 }
 
 export class App extends React.Component<Props, State> {
   mainRef: React.RefObject<HTMLElement>;
 
   providing: Providing = {
-    dialogContext: {
-      control: undefined,
-    }
+    dialogContext: undefined,
   };
 
   public constructor(props: Props) {
     super(props);
     this.mainRef = React.createRef();
-    this.providing.dialogContext = {control: this.props.dialogControl};
+    this.providing.dialogContext = this.props.dialogControl;
   }
 
   public render(): React.ReactNode {
     return (
       <div className={styles['app']}>
-        <DialogContext.Provider value={this.providing.dialogContext}>
+        <DialogControlContext.Provider value={this.providing.dialogContext}>
           <main className={styles['main']} ref={this.mainRef}>
             <ToDudeList />
             <DialogContainer dragBoundary={this.mainRef}/>
@@ -46,7 +44,7 @@ export class App extends React.Component<Props, State> {
             debug &nbsp;
             <DebugBlackBox />
           </footer>
-        </DialogContext.Provider>
+        </DialogControlContext.Provider>
       </div>
     );
   }

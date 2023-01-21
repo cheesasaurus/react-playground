@@ -1,6 +1,6 @@
 import React from "react";
 import { SocketMessage, SocketMessageHandlerHandle } from "../black-box/interface";
-import { DialogContext } from "./Dialog/DialogContext";
+import { DialogControlContext } from "./Dialog/DialogContext";
 import { ToDudeList } from "./ToDudeList/DudeList";
 import { Workflow } from "./Workflow/Workflow";
 
@@ -17,8 +17,8 @@ interface IState {
 
 
 export class DebugBlackBox extends React.Component<IProps, IState> {
-    public static contextType = DialogContext;
-    declare context: React.ContextType<typeof DialogContext>;
+    public static contextType = DialogControlContext;
+    declare context: React.ContextType<typeof DialogControlContext>;
 
     constructor(props: any) {
         super(props);
@@ -51,13 +51,13 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
 
     openDebugDialogA = () => {
         const content = <div style={{width: '1000px', height: '500px'}}>AAAAA</div>
-        this.context.control!.open('DebugA', content, {
+        this.context!.open('DebugA', content, {
             title: 'This is dialog A',
         });
     };
 
     openDebugDialogB = () => {
-        this.context.control!.open('DebugB', <>BBBBBBB</>, {
+        this.context!.open('DebugB', <>BBBBBBB</>, {
             title: 'This is dialog B',
         });
     };
@@ -90,7 +90,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
                 </div>
             </Workflow>
         );
-        this.context.control!.open('DebugWorkflow', workflow, {
+        this.context!.open('DebugWorkflow', workflow, {
             title: 'debug workflow dialog',
             useRawContent: true,
         });
@@ -98,7 +98,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
 
     openDudesInDialog = () => {
         const content = <ToDudeList></ToDudeList>
-        this.context.control!.open('DebugDudes', content, {
+        this.context!.open('DebugDudes', content, {
             title: 'Dudes in a Dialog',
             useRawContent: true,
         });

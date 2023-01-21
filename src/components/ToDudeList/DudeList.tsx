@@ -5,7 +5,7 @@ import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
 import { SocketMessageHandlerHandle, SocketMessageType } from '../../black-box/interface';
 import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
-import { DialogContext } from '../Dialog/DialogContext';
+import { DialogControlContext } from '../Dialog/DialogContext';
 
 
 interface Props {
@@ -21,8 +21,8 @@ interface State {
 
 
 export class ToDudeList extends React.Component<Props, State> {
-    public static contextType = DialogContext;
-    declare context: React.ContextType<typeof DialogContext>;
+    public static contextType = DialogControlContext;
+    declare context: React.ContextType<typeof DialogControlContext>;
 
     private socketHandles = Array<SocketMessageHandlerHandle>();
 
@@ -62,7 +62,7 @@ export class ToDudeList extends React.Component<Props, State> {
     }
 
     private createDude = () => {
-        const dialogControl = this.context.control!;
+        const dialogControl = this.context!;
         const dialogId = 'WorkflowCreateDude';
         const onWorkflowCompleted = () => {
             dialogControl.close(dialogId);

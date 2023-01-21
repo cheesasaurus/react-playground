@@ -1,11 +1,6 @@
 import React from "react";
 import { DialogControl } from "./DialogControl";
 
+export type IDialogControlContext = DialogControl | undefined;
 
-export interface IDialogContext {
-    control: DialogControl | undefined;
-}
-
-export const DialogContext = React.createContext<IDialogContext>({
-    control: undefined,
-});
+export const DialogControlContext = React.createContext<IDialogControlContext>(undefined);

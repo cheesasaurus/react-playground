@@ -1,7 +1,7 @@
 import React from "react";
 import styles from './Dialog.module.css';
 import { DialogConfig } from "./DialogConfig";
-import { DialogContext } from "./DialogContext";
+import { DialogControlContext } from "./DialogContext";
 
 
 interface Props {
@@ -20,8 +20,8 @@ interface State {
 }
 
 export class Dialog extends React.Component<Props, State> {
-    public static contextType = DialogContext;
-    declare context: React.ContextType<typeof DialogContext>;
+    public static contextType = DialogControlContext;
+    declare context: React.ContextType<typeof DialogControlContext>;
 
     public constructor(props: Props) {
         super(props);
@@ -36,11 +36,11 @@ export class Dialog extends React.Component<Props, State> {
 
     private close = (e: React.MouseEvent) => {
         e.stopPropagation();
-        this.context.control!.close(this.props.id);
+        this.context!.close(this.props.id);
     };
 
     private bringToFront = () => {
-        this.context.control!.bringToFront(this.props.id);
+        this.context!.bringToFront(this.props.id);
     };
 
     private onCloseButtonMouseDown = (e: React.MouseEvent) => {
