@@ -103,8 +103,10 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         }
 
         const isLastStep = this.state.step === this.steps;
-        if (isLastStep && this.props.onWorkflowCompleted) {
-            this.props?.onWorkflowCompleted();
+        if (isLastStep) {
+            if (this.props.onWorkflowCompleted) {
+                this.props.onWorkflowCompleted();
+            }
             return;
         }
 
@@ -135,6 +137,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             dude = response.data!;
         }
         this.setState({
+            dudeId: dude.id,
             dude: dude,
         });        
     }
