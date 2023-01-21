@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { docReady, MessageBus, MessageHandler, MessageHandlerHandle } from "../../utils";
+import { docReady, MessageBus, MessageHandler, Subscription } from "../../utils";
 import { DialogConfig } from "./DialogConfig";
 
 
@@ -14,7 +14,6 @@ interface UpdateMessage {
     order: Array<string>
 };
 
-export type UpdateHandlerHandle = MessageHandlerHandle<MessageHandler<UpdateMessage>>;
 
 export class DialogManager {
     private order = Array<string>();
@@ -110,8 +109,7 @@ export class DialogControl {
     public bringToFront: (dialogId: string) => void;
     public getOrder: () => Array<string>;
     public getDialog: (dialogId: string) => ActiveDialog;
-    public onUpdate: (handler: MessageHandler<UpdateMessage>) => UpdateHandlerHandle;
-    public offUpdate: (handle: UpdateHandlerHandle) => void;
+    public onUpdate: (handler: MessageHandler<UpdateMessage>) => Subscription;
 
     public constructor(bus: MessageBus<UpdateMessage>, manager: DialogManager) {
         // The control is intended to be used in react context.
@@ -123,11 +121,8 @@ export class DialogControl {
         this.bringToFront = (dialogId: string) => manager.bringToFront(dialogId);
         this.getOrder = () => manager.getOrder();
         this.getDialog = (dialogId: string) => manager.getDialog(dialogId);
-        this.onUpdate = (handler: MessageHandler<UpdateMessage>): UpdateHandlerHandle => {
+        this.onUpdate = (handler: MessageHandler<UpdateMessage>): Subscription => {
             return bus.on('updated', handler);
-        }
-        this.offUpdate = (handle: UpdateHandlerHandle): void => {
-            bus.off(handle);
         }
     }
 

@@ -1,7 +1,7 @@
-import { MessageBus } from "../utils";
+import { MessageBus, Subscription } from "../utils";
 import { DudeService } from "./internal/DudeService";
 import { EquipmentService } from "./internal/EquipmentService";
-import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler, SocketMessageHandlerHandle, MessageQueue } from "./interface";
+import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler, MessageQueue } from "./interface";
 
 // In practice, the black box would be [native code] and already available via some global variable.
 // But for this proof of concept I'm making my own in javascript.
@@ -32,12 +32,8 @@ class Socket implements ISocket {
         }
     };
 
-    public on = (messageType: string, messageHandler: SocketMessageHandler): SocketMessageHandlerHandle => {
+    public on = (messageType: string, messageHandler: SocketMessageHandler): Subscription => {
         return this.bus.on(messageType, messageHandler);
-    };
-
-    public off = (handle: SocketMessageHandlerHandle): void => {
-        this.bus.off(handle);
     };
 
 }

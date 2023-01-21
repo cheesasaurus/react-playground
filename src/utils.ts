@@ -9,13 +9,12 @@ export function docReady(fn: () => void): void {
     }
 }
 
+export interface Subscription {
+    unsubscribe(): void;
+}
+
 
 export type MessageHandler<Message> = (message: Message) => void;
-
-export interface MessageHandlerHandle<handler> {
-    messageType: string;
-    handler: handler;
-}
 
 
 export class MessageBus<Message> {
@@ -25,7 +24,7 @@ export class MessageBus<Message> {
         this.handlersByType = {};
     }
 
-    public on = (messageType: string, messageHandler: MessageHandler<Message>): MessageHandlerHandle<MessageHandler<Message>> => {
+    public on = (messageType: string, messageHandler: MessageHandler<Message>): Subscription => {
         if (!(messageType in this.handlersByType)) {
             this.handlersByType[messageType] = new Set([messageHandler]);
         }
@@ -33,14 +32,16 @@ export class MessageBus<Message> {
             this.handlersByType[messageType].add(messageHandler);
         }
 
+        // build Subsription
+        let subscribed = true;
         return {
-            messageType: messageType,
-            handler: messageHandler
+            unsubscribe: () => {
+                if (subscribed) {
+                    this.handlersByType[messageType].delete(messageHandler);
+                    subscribed = false;
+                }
+            }
         };
-    };
-
-    public off = (handle: MessageHandlerHandle<MessageHandler<Message>>): void => {
-        this.handlersByType[handle.messageType].delete(handle.handler);
     };
 
     public emit = (messageType: string, message: Message) => {

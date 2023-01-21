@@ -1,7 +1,7 @@
 import React from "react";
+import { Subscription } from "../../utils";
 import { Dialog } from "./Dialog";
-import { DialogControlContext } from "./DialogContext";
-import { DialogControl, UpdateHandlerHandle } from "./DialogControl";
+import { DialogControl } from "./DialogControl";
 
 
 interface Props {
@@ -15,7 +15,7 @@ interface State {
 
 
 export class DialogContainer extends React.Component<Props, State> {
-    private updateHandle: UpdateHandlerHandle | undefined;
+    private subscriptions = new Array<Subscription>();
 
     public constructor(props: Props) {
         super(props);
@@ -25,15 +25,17 @@ export class DialogContainer extends React.Component<Props, State> {
     }
 
     public componentDidMount(): void {
-        this.updateHandle = this.props.dialogControl.onUpdate((m) => {
+        const subscription = this.props.dialogControl.onUpdate((m) => {
             this.setState({order: m.order});
         });
+        this.subscriptions.push(subscription);
     }
 
     public componentWillUnmount(): void {
-        if (this.updateHandle) {
-            this.props.dialogControl.offUpdate(this.updateHandle);
+        for (const subscription of this.subscriptions) {
+            subscription.unsubscribe();
         }
+        this.subscriptions = [];
     }
 
     public render(): React.ReactNode {

@@ -3,9 +3,10 @@ import './DudeList.module.css';
 import React from "react";
 import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
-import { SocketMessageHandlerHandle, SocketMessageType } from '../../black-box/interface';
+import { SocketMessageType } from '../../black-box/interface';
 import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
 import { DialogControlContext } from '../Dialog/DialogContext';
+import { Subscription } from '../../utils';
 
 
 interface Props {
@@ -24,7 +25,7 @@ export class ToDudeList extends React.Component<Props, State> {
     public static contextType = DialogControlContext;
     declare context: React.ContextType<typeof DialogControlContext>;
 
-    private socketHandles = Array<SocketMessageHandlerHandle>();
+    private subscriptions = Array<Subscription>();
 
     constructor(props: Props) {
         super(props);
@@ -36,7 +37,7 @@ export class ToDudeList extends React.Component<Props, State> {
     }
 
     public async componentDidMount(): Promise<void> {
-        const handle = window.blackBox.socket.on(SocketMessageType.DudeCreated, (message) => {
+        const subscription = window.blackBox.socket.on(SocketMessageType.DudeCreated, (message) => {
             const dude = message.data as Dude;
             this.setState({
                 dudes: {
@@ -45,7 +46,7 @@ export class ToDudeList extends React.Component<Props, State> {
                 }
             });
         });
-        this.socketHandles.push(handle);
+        this.subscriptions.push(subscription);
         const response = await window.blackBox.api.dudes.getDudes();
         if (response.errors) {
             response.errors.forEach(console.error)
@@ -55,10 +56,10 @@ export class ToDudeList extends React.Component<Props, State> {
     }
 
     public componentWillUnmount(): void {
-        for (const handle of this.socketHandles) {
-            window.blackBox.socket.off(handle);
+        for (const subscription of this.subscriptions) {
+            subscription.unsubscribe();
         }
-        this.socketHandles = [];
+        this.subscriptions = [];
     }
 
     private createDude = () => {

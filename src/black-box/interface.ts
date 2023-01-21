@@ -1,3 +1,4 @@
+import { Subscription } from "../utils";
 import { Dude, DudeMap, WeaponType } from "./exposed/models";
 
 /**
@@ -26,12 +27,7 @@ export interface ISocket {
      * @param messageHandler Will be called every time that type of message comes through.
      * @returns A handle that can be passed to the `off` method to unsubscribe.
      */
-    on: (messageType: string, messageHandler: SocketMessageHandler) => SocketMessageHandlerHandle;
-
-    /**
-     * Unsubscribe
-     */
-    off: (handle: SocketMessageHandlerHandle) => void;
+    on: (messageType: string, messageHandler: SocketMessageHandler) => Subscription;
 }
 
 
@@ -43,12 +39,6 @@ export interface IApi {
 
 export interface SocketMessageHandler {
     (message: SocketMessage): void;
-}
-
-
-export interface SocketMessageHandlerHandle {
-    messageType: string;
-    handler: SocketMessageHandler;
 }
 
 
