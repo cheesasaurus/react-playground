@@ -1,8 +1,8 @@
 import React from "react";
 import { SocketMessage, SocketMessageHandlerHandle } from "../black-box/interface";
-import { DialogContext } from "./dialog/DialogContext";
-import { ToDudeList } from "./to-dude-list/DudeList";
-import { Workflow } from "./workflow/Workflow";
+import { DialogContext } from "./Dialog/DialogContext";
+import { ToDudeList } from "./ToDudeList/DudeList";
+import { Workflow } from "./Workflow/Workflow";
 
 
 interface IProps {

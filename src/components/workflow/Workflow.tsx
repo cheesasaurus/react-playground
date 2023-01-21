@@ -1,4 +1,4 @@
-import styles from './workflow.module.css';
+import styles from './Workflow.module.css';
 
 
 export interface NavButtonProps {

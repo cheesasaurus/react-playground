@@ -4,8 +4,8 @@ import React from "react";
 import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
 import { SocketMessageHandlerHandle, SocketMessageType } from '../../black-box/interface';
-import { WorkflowCreateDude } from '../workflow-create-dude/WorkflowCreateDude';
-import { DialogContext } from '../dialog/DialogContext';
+import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
+import { DialogContext } from '../Dialog/DialogContext';
 
 
 interface Props {

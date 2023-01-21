@@ -1,10 +1,10 @@
 import React from 'react';
 import styles from './App.module.css';
 import { DebugBlackBox } from './components/DebugBlackBox';
-import { DialogContainer } from './components/dialog/DialogContainer';
-import { DialogContext, IDialogContext } from './components/dialog/DialogContext';
-import { DialogControl } from './components/dialog/DialogControl';
-import { ToDudeList } from './components/to-dude-list/DudeList';
+import { DialogContainer } from './components/Dialog/DialogContainer';
+import { DialogContext, IDialogContext } from './components/Dialog/DialogContext';
+import { DialogControl } from './components/Dialog/DialogControl';
+import { ToDudeList } from './components/ToDudeList/DudeList';
 
 
 interface Props {

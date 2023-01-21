@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { BlackBox } from './black-box/BlackBox';
 import { IBlackBox } from './black-box/interface';
 import { App } from './App';
-import { factoryDialogControl } from './components/dialog/DialogControl';
+import { factoryDialogControl } from './components/Dialog/DialogControl';
 
 // init black box.
 // In practice this would already be done by the engine,
