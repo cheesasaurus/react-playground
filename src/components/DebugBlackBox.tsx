@@ -11,7 +11,6 @@ interface IProps {
 
 
 interface IState {
-    handle?: SocketMessageHandlerHandle;
     counter: number;
 }
 
@@ -19,6 +18,8 @@ interface IState {
 export class DebugBlackBox extends React.Component<IProps, IState> {
     public static contextType = DialogControlContext;
     declare context: React.ContextType<typeof DialogControlContext>;
+
+    private socketHandles = new Array<SocketMessageHandlerHandle>();
 
     constructor(props: any) {
         super(props);
@@ -29,13 +30,14 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
 
     componentDidMount() {
         const handle = window.blackBox.socket.on('testtest', this.handleTestMessage);
-        this.setState({handle: handle});
+        this.socketHandles.push(handle);
     }
 
     componentWillUnmount() {
-        if (this.state.handle) {
-            window.blackBox.socket.off(this.state.handle);
+        for (const handle of this.socketHandles) {
+            window.blackBox.socket.off(handle);
         }
+        this.socketHandles = [];
     }
 
     requestBlackBoxToEmitTestMessage = () => {
