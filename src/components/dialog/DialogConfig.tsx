@@ -11,4 +11,14 @@ export interface DialogConfig {
      */
     useRawContent?: boolean;
 
+    /**
+     * Width of the dialog, in pixels
+     */
+    width?: number;
+
+    /**
+     * Height of the dialog, in pixels
+     */
+    height?: number;
+    
 }

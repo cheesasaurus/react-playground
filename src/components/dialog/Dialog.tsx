@@ -17,6 +17,8 @@ interface State {
     lastDragUpdateY: number,
     offsetLeft: number;
     offsetTop: number;
+    width: string;
+    height: string;
 }
 
 export class Dialog extends React.Component<Props, State> {
@@ -25,12 +27,15 @@ export class Dialog extends React.Component<Props, State> {
 
     public constructor(props: Props) {
         super(props);
+        const cfg = props.config;
         this.state = {
             dragging: false,
             lastDragUpdateX: NaN,
             lastDragUpdateY: NaN,
             offsetLeft: 0,
             offsetTop: 0,
+            width: cfg.width ? `${cfg.width}px` : '',
+            height: cfg.height ? `${cfg.height}px` : '',
         };
     }
 
@@ -124,6 +129,8 @@ export class Dialog extends React.Component<Props, State> {
                 style={{
                     marginLeft: -this.state.offsetLeft,
                     marginTop: -this.state.offsetTop,
+                    width: this.state.width,
+                    height: this.state.height,
                 }}
             >
                 <header className={styles['dialog-header']} onMouseDown={this.onHeaderMouseDown}>

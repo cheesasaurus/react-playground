@@ -78,6 +78,8 @@ export class ToDudeList extends React.Component<Props, State> {
         dialogControl.open(dialogId, content, {
             title: 'Create a Dude',
             useRawContent: true,
+            width: 1000,
+            height: 500,
         });
     }
 
