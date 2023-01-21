@@ -1,4 +1,4 @@
-import { BodyPart, DamageType, EquipmentSlot } from "../models";
+import { BodyPart, DamageType, EquipmentSlot } from "../../exposed/models";
 
 export const ArmorTemplates = {
     starterSet: {

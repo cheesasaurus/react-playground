@@ -1,5 +1,5 @@
 import React from "react";
-import { Dude } from "../../black-box/models";
+import { Dude } from "../../black-box/exposed/models";
 import { NavButtonProps, Workflow } from "../workflow/Workflow";
 import { Step1, Step1UpdateInfo } from "./Step1";
 

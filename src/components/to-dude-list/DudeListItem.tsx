@@ -1,5 +1,5 @@
 import styles from './DudeList.module.css';
-import { Dude } from "../../black-box/models";
+import { Dude } from "../../black-box/exposed/models";
 import { HitPoints } from './HitPoints';
 
 

@@ -1,7 +1,7 @@
 import styles from './DudeList.module.css';
 import './DudeList.module.css';
 import React from "react";
-import { Dude, DudeMap } from "../../black-box/models";
+import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
 import { SocketMessageHandlerHandle, SocketMessageType } from '../../black-box/interface';
 import { WorkflowCreateDude } from '../workflow-create-dude/WorkflowCreateDude';

@@ -1,6 +1,6 @@
 import { MessageBus } from "../utils";
-import { DudeService } from "./DudeService";
-import { EquipmentService } from "./EquipmentService";
+import { DudeService } from "./internal/DudeService";
+import { EquipmentService } from "./internal/EquipmentService";
 import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler, SocketMessageHandlerHandle, MessageQueue } from "./interface";
 
 // In practice, the black box would be [native code] and already available via some global variable.

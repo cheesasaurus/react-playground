@@ -1,4 +1,4 @@
-import { DamageType, WeaponType } from "../models";
+import { DamageType, WeaponType } from "../../exposed/models";
 
 export const WeaponTemplates = {
     starterSet: {

@@ -1,4 +1,4 @@
-import { HP } from '../../black-box/models';
+import { HP } from '../../black-box/exposed/models';
 import styles from './DudeList.module.css';
 
 interface Props {

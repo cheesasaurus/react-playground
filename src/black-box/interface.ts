@@ -1,4 +1,4 @@
-import { Dude, DudeMap, WeaponType } from "./models";
+import { Dude, DudeMap, WeaponType } from "./exposed/models";
 
 /**
  * Some black box (for example, a game engine providing the webview),

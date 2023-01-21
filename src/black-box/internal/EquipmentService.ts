@@ -1,4 +1,4 @@
-import { Armor, ArmorTemplate, Weapon, WeaponTemplate } from "./models";
+import { Armor, ArmorTemplate, Weapon, WeaponTemplate } from "../exposed/models";
 
 
 export class EquipmentService {
