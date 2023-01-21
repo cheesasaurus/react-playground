@@ -1,23 +1,40 @@
 import styles from './DudeList.module.css';
 import { Dude } from "../../black-box/exposed/models";
 import { HitPoints } from './HitPoints';
+import React from 'react';
 
 
 interface Props {
     dude: Dude;
+    resumeDudeCreation: (dudeId: number) => void;
+}
+
+interface State {
+
 }
 
 
-export function DudeListItem(props: Props) {
-    const dude = props.dude;
-    return (
-        <div className={styles['dude']}>
-            <div className={styles['dude-name']} title={dude.name}>{dude.name}</div>
-            <div className={styles['dude-hp']}>
-                <HitPoints hp={dude.hp}></HitPoints>
+export class DudeListItem extends React.Component<Props, State> {
+
+    onClick = () => {
+        const dude = this.props.dude;
+        if (!dude.creation.completed) {
+            this.props.resumeDudeCreation(dude.id);
+        }
+    };
+
+    public render(): React.ReactNode {
+        const dude = this.props.dude;
+        return (
+            <div className={styles['dude']} onClick={this.onClick}>
+                <div className={styles['dude-name']} title={dude.name}>{dude.name}</div>
+                <div className={styles['dude-hp']}>
+                    <HitPoints hp={dude.hp}></HitPoints>
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
+    
 }
 
 

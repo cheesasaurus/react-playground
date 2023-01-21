@@ -35,7 +35,7 @@ export const DudeStatTypes = [
     DudeStatType.WeaponCrossbow,
 ];
 
-const weaponSkillDescription = 'Increases [frequencey of attacks] and [chance to hit] with this type of weapon.';
+const weaponSkillDescription = 'Increases [frequency of attacks] and [chance to hit] with this type of weapon.';
 
 export const DudeStatInfo = {
     [DudeStatType.Strength]: {
@@ -113,4 +113,9 @@ export const DudeStatInfo = {
         name: 'Crossbow',
         description: weaponSkillDescription,
     },
+}
+
+export interface DudeStatModifier {
+    type: DudeStatType,
+    magnitude: number,
 }

@@ -9,6 +9,34 @@ export function docReady(fn: () => void): void {
     }
 }
 
+
+type cssClassNamesConfig = {
+    [className: string]: boolean
+};
+
+/**
+ * Helper to use multiple css classes.
+ * 
+ * example:
+ * 
+ *  cssClassNames({
+ *      aaa: true,
+ *      bbb: false,
+ *      ccc: true
+ *  });
+ *  // returns the string 'aaa ccc'
+ */
+export function cssClassNames(cfg: cssClassNamesConfig): string {
+    const classNames = [];
+    for (const className in cfg) {
+        if (cfg.hasOwnProperty(className) && cfg[className]) {
+            classNames.push(className);
+        }
+    }
+    return classNames.join(' ');
+}
+
+
 export interface Subscription {
     unsubscribe(): void;
 }

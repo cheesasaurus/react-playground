@@ -59,13 +59,22 @@ export class ToDudeList extends React.Component<Props, State> {
         this.subscriptions.unsubscribe();
     }
 
-    private createDude = () => {
+    private beginDudeCreation = () => this.openDudeCreationDialog();
+
+    private resumeDudeCreation = (dudeId?: number) => this.openDudeCreationDialog(dudeId);
+
+    private openDudeCreationDialog(dudeId?: number): void {
         const dialogControl = this.context!;
         const dialogId = 'WorkflowCreateDude';
         const onWorkflowCompleted = () => {
             dialogControl.close(dialogId);
         };
-        const content = <WorkflowCreateDude onWorkflowCompleted={onWorkflowCompleted}></WorkflowCreateDude>;
+        const content = (
+            <WorkflowCreateDude
+                onWorkflowCompleted={onWorkflowCompleted}
+                dudeId={dudeId}
+            />
+        );
         dialogControl.open(dialogId, content, {
             title: 'Create a Dude',
             useRawContent: true,
@@ -89,13 +98,19 @@ export class ToDudeList extends React.Component<Props, State> {
                 <header className={styles['header']}>
                     <div style={{fontSize: '30px', fontWeight: 'bold'}}>My Dudes</div>
                     <div>
-                        <button onClick={this.createDude}>
+                        <button onClick={this.beginDudeCreation}>
                             Create Dude
                         </button>
                     </div>
                 </header>
                 <section className={styles['dude-list']}>
-                    {dudes.map(dude => <DudeListItem key={dude.id} dude={dude}/>)}
+                    {dudes.map(dude => (
+                        <DudeListItem
+                            key={dude.id}
+                            dude={dude}
+                            resumeDudeCreation={this.resumeDudeCreation}
+                        />
+                    ))}
                     {dudelessMessage}
                 </section>
             </div>

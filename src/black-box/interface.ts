@@ -1,4 +1,5 @@
 import { Subscription } from "../utils";
+import { Race } from "./exposed/DudeModifierPresets/Races";
 import { Dude, DudeMap, WeaponType } from "./exposed/models";
 
 /**
@@ -78,13 +79,13 @@ export interface IDudeService {
 
 export interface ResponseCreateDude {
     errors?: Array<ServiceError>;
-    data?: Dude; 
+    data?: Dude;
 }
 
 export interface RequestUpdateDude {
     id: number,
     name?: string,
-    luckyNumber?: number,
+    race?: Race,
     starterWeapon?: WeaponType,
 }
 

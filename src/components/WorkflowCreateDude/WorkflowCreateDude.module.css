@@ -8,3 +8,64 @@
     text-align: center;
     padding-top: 30px;
 }
+
+.step-2-container {
+    display: flex;
+}
+
+.stats {
+    flex-grow: 1;
+}
+
+.preset-label {
+    white-space: nowrap;
+    font-size: 40px;
+}
+
+.preset-options {
+    flex-basis: 300px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: rgb(41, 32, 28);
+    border: 1px solid rgb(77, 47, 35);
+}
+
+.preset-option {
+    cursor: default;
+    user-select: none;
+    text-align: center;
+    border: 1px solid rgb(58, 45, 40);
+    border-radius: 7px;
+    background-image: linear-gradient(
+        to bottom,
+        rgb(71, 55, 48),
+        rgb(58, 45, 40)
+    );
+    margin: 5px;
+}
+.preset-option:hover {
+    background-image: linear-gradient(
+        to bottom,
+        rgb(77, 62, 55),
+        rgb(56, 47, 44)
+    );
+}
+.preset-option.selected {
+    background-image: linear-gradient(
+        to bottom,
+        rgb(100, 85, 16),
+        rgb(73, 62, 13)
+    );
+    border: 1px solid rgb(73, 62, 13);
+}
+
+.preset-option-name {
+    font-size: 20px;
+    padding: 5px;
+}
+
+.preset-option-description {
+    font-style: italic;
+    padding: 10px;
+}
+

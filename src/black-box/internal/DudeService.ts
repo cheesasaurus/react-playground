@@ -3,6 +3,7 @@ import { EquipmentService } from "./EquipmentService";
 import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
 import { Dude, DudeMap, DudeStatMap, iterateModelMap, WeaponType } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
+import { Race } from "../exposed/DudeModifierPresets/Races";
 
 
 
@@ -90,8 +91,8 @@ export class DudeService implements IDudeService {
         if (pendingDude.name !== undefined) {
             dude.name = pendingDude.name;
         }
-        if (pendingDude.luckyNumber) {
-            dude.luckyNumber = pendingDude.luckyNumber;
+        if (pendingDude.race) {
+            dude.race = pendingDude.race;
         }
         if (pendingDude.starterWeapon) {
             dude.starterWeapon = pendingDude.starterWeapon;
@@ -151,9 +152,12 @@ export class DudeService implements IDudeService {
                 max: 100,
                 current: 100,
             },
-            luckyNumber: undefined,
+            race: Race.Human,
             starterWeapon: WeaponType.Sword,
-            creationCompleted: false,
+            creation: {
+                completed: false,
+                step: 2,
+            },
             equipment: {
                 weapon: undefined,
                 hat: undefined,

@@ -1,4 +1,5 @@
-import { DudeStatType } from "./DudeStats";
+import { Race } from "./DudeModifierPresets/Races";
+import { DudeStatModifier, DudeStatType } from "./DudeStats";
 
 export interface ModelMap<Model> {
     [key: number|string]: Model;
@@ -17,9 +18,12 @@ export interface Dude {
     id: number,
     name: string,
     hp: HP,
-    luckyNumber: number | undefined,
+    race: Race,
     starterWeapon: WeaponType,
-    creationCompleted: boolean,
+    creation: {
+        completed: boolean,
+        step: number,
+    },
     equipment: {
         [EquipmentSlot.Weapon]: Weapon | undefined,
         [EquipmentSlot.Hat]: Armor | undefined,
@@ -50,6 +54,13 @@ export interface HP {
 
 export interface DudeMap extends ModelMap<Dude> {
     [id: number]: Dude;
+}
+
+export interface DudeModifierPreset<IdType extends string> {
+    id: IdType;
+    name: string;
+    description: string;
+    statModifiers: Array<DudeStatModifier>;
 }
 
 
@@ -148,5 +159,4 @@ export interface LooseEquipment {
     slot: EquipmentSlot,
     instance: Weapon | Armor,
 }
-
 

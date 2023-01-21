@@ -1,6 +1,8 @@
 import React from "react";
 import { Dude } from "../../black-box/exposed/models";
+import { Race } from "../../black-box/exposed/DudeModifierPresets/Races";
 import { NavButtonProps, Workflow } from "../Workflow/Workflow";
+import { RaceSelection, RaceSelectionUpdateInfo } from "./RaceSelection";
 import { Step1, Step1UpdateInfo } from "./Step1";
 
 
@@ -18,6 +20,7 @@ interface State {
     backtracking: boolean,
     errors: Array<string>,
     pendingDudeName: string,
+    pendingRace: Race,
 }
 
 interface Nav {
@@ -27,6 +30,7 @@ interface Nav {
 
 
 export class WorkflowCreateDude extends React.Component<Props, State> {
+    private steps = 3;
 
     public constructor(props: Props) {
         super(props);
@@ -39,6 +43,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             backtracking: false,
             errors: Array<string>(),
             pendingDudeName: '',
+            pendingRace: Race.Human,
         };
     }
 
@@ -52,10 +57,15 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         window.blackBox.api.dudes.getDude(this.props.dudeId).then(response => {
             if (response.errors) {
                 console.error(response.errors);
+                return;
             }
+            const dude = response.data!;
             this.setState({
                 loading: false,
-                dude: response.data
+                dude: dude,
+                pendingDudeName: dude.name,
+                pendingRace: dude.race,
+                step: dude.creation.step,
             });
         });
     }
@@ -86,7 +96,18 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         switch (this.state.step) {
             case 1:
                 await this.completeStep1();
+                break;
+            case 2:
+                await this.completeStep2();
+                break;
         }
+
+        const isLastStep = this.state.step === this.steps;
+        if (isLastStep && this.props.onWorkflowCompleted) {
+            this.props?.onWorkflowCompleted();
+            return;
+        }
+
         this.setState((state) => ({
             proceeding: false,
             step: state.step + 1,
@@ -115,15 +136,17 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         }
         this.setState({
             dude: dude,
-        });
-        // todo: more steps
-        if (this.props.onWorkflowCompleted) {
-            this.props?.onWorkflowCompleted();
-        }
+        });        
+    }
+
+    private async completeStep2() {
+        // todo
     }
 
     private startTransitionPrev = () => {
-        // todo
+        this.setState((state) => ({
+            step: state.step - 1
+        }));
     };
 
     private onStep1Update = (info: Step1UpdateInfo): void => {
@@ -131,6 +154,12 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             pendingDudeName: info.dudeName,
         });
     };
+
+    private onStep2Update = (info: RaceSelectionUpdateInfo): void => {
+        this.setState({
+            pendingRace: info.selectedRace,
+        });
+    }
 
     public render(): React.ReactNode {
         return (
@@ -141,6 +170,10 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
     }
 
     private renderContent(): React.ReactNode {
+        if (this.state.loading) {
+            return <span>loading...</span>
+        }
+
         switch (this.state.step) {
             case 1:
                 return (
@@ -149,6 +182,14 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                         errors={this.state.errors}
                         onUpdate={this.onStep1Update}
                         onStepCompletionRequested={this.startTransitionNext}
+                    />
+                );
+            case 2:
+                return (
+                    <RaceSelection
+                        selectedRace={this.state.pendingRace}
+                        dude={this.state.dude!}
+                        onUpdate={this.onStep2Update}
                     />
                 );
             default:
@@ -168,7 +209,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             next: {
                 visible: true,
                 disabled: state.loading || state.proceeding || state.backtracking,
-                text: state.step === 3 ? 'Finish' : 'Next',
+                text: state.step === this.steps ? 'Finish' : 'Next',
                 onPressed: this.startTransitionNext,
             },
         };
