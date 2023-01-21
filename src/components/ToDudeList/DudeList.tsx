@@ -68,7 +68,10 @@ export class ToDudeList extends React.Component<Props, State> {
             dialogControl.close(dialogId);
         };
         const content = <WorkflowCreateDude onWorkflowCompleted={onWorkflowCompleted}></WorkflowCreateDude>;
-        dialogControl.open(dialogId, 'Create a Dude', content, true);
+        dialogControl.open(dialogId, content, {
+            title: 'Create a Dude',
+            useRawContent: true,
+        });
     }
 
     public render(): React.ReactNode {

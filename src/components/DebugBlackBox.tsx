@@ -51,11 +51,15 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
 
     openDebugDialogA = () => {
         const content = <div style={{width: '1000px', height: '500px'}}>AAAAA</div>
-        this.context.control!.open('DebugA', 'This is a Dialog', content);
+        this.context.control!.open('DebugA', content, {
+            title: 'This is dialog A',
+        });
     };
 
     openDebugDialogB = () => {
-        this.context.control!.open('DebugB', 'This is a Dialog', <>BBBBBBB</>);
+        this.context.control!.open('DebugB', <>BBBBBBB</>, {
+            title: 'This is dialog B',
+        });
     };
 
     openWorkflowInDialog = () => {
@@ -86,12 +90,18 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
                 </div>
             </Workflow>
         );
-        this.context.control!.open('DebugWorkflow', 'This is a Dialog', workflow, true);
+        this.context.control!.open('DebugWorkflow', workflow, {
+            title: 'debug workflow dialog',
+            useRawContent: true,
+        });
     };
 
     openDudesInDialog = () => {
         const content = <ToDudeList></ToDudeList>
-        this.context.control!.open('DebugDudes', 'This is a Dialog', content, true);
+        this.context.control!.open('DebugDudes', content, {
+            title: 'Dudes in a Dialog',
+            useRawContent: true,
+        });
     };
 
     handleTestMessage = (message: SocketMessage) => {

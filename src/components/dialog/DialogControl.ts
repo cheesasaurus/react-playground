@@ -1,12 +1,13 @@
 import { ReactNode } from "react";
 import { docReady, MessageBus, MessageHandler, MessageHandlerHandle } from "../../utils";
+import { DialogConfig } from "./DialogConfig";
 
 
-interface DialogConfig {
+interface ActiveDialog {
     id: string,
-    title: string|undefined,
     content: ReactNode,
-    useRawContent: boolean, // if true, no extra preparation of the content will be done. e.g. overflow handling, background, text styling...
+    config: DialogConfig,
+    
 }
 
 interface UpdateMessage {
@@ -18,7 +19,7 @@ export type UpdateHandlerHandle = MessageHandlerHandle<MessageHandler<UpdateMess
 export class DialogManager {
     private order = Array<string>();
     private activeDialogs: {
-        [dialogId: string]: DialogConfig;
+        [dialogId: string]: ActiveDialog;
     } = {};
     private bus: MessageBus<UpdateMessage>;
 
@@ -26,7 +27,7 @@ export class DialogManager {
         this.bus = bus;
     }
 
-    public openDialog(dialogId: string, title: string, jsx: ReactNode, useRawContent = false): void {
+    public openDialog(dialogId: string, jsx: ReactNode, config: DialogConfig): void {
         if (dialogId in this.activeDialogs) {
             this._bringToFront(dialogId);
         }
@@ -35,9 +36,8 @@ export class DialogManager {
         }
         this.activeDialogs[dialogId] = {
             id: dialogId,
-            title: title,
             content: jsx,
-            useRawContent: useRawContent, 
+            config: config,
         };
         this.triggerUpdate();
     }
@@ -60,7 +60,7 @@ export class DialogManager {
         this.triggerUpdate();
     }
 
-    public _bringToFront(dialogId: string): void {
+    private _bringToFront(dialogId: string): void {
         if (!(dialogId in this.activeDialogs)) {
             return;
         }
@@ -97,19 +97,19 @@ export class DialogManager {
 
 
 export class DialogControl {
-    public open: (dialogId: string, title: string, content: React.ReactNode, useRawContent?: boolean) => void;
+    public open: (dialogId: string, content: React.ReactNode, config: DialogConfig) => void;
     public close: (dialogId: string) => void;
     public bringToFront: (dialogId: string) => void;
     public getOrder: () => Array<string>;
-    public getDialog: (dialogId: string) => DialogConfig;
+    public getDialog: (dialogId: string) => ActiveDialog;
     public onUpdate: (handler: MessageHandler<UpdateMessage>) => UpdateHandlerHandle;
     public offUpdate: (handle: UpdateHandlerHandle) => void;
 
     public constructor(bus: MessageBus<UpdateMessage>, manager: DialogManager) {
         // The control is intended to be used in react context.
         // Closures are used to avoid [unwanted react updates due to manager properties changing].
-        this.open = (dialogId: string, title: string, content: React.ReactNode, useRawContent: boolean = false) => {
-            manager.openDialog(dialogId, title, content, useRawContent);
+        this.open = (dialogId: string, content: React.ReactNode, config: DialogConfig) => {
+            manager.openDialog(dialogId, content, config);
         };
         this.close = (dialogId: string) => manager.closeDialog(dialogId);
         this.bringToFront = (dialogId: string) => manager.bringToFront(dialogId);

@@ -1,14 +1,14 @@
 import React from "react";
 import styles from './Dialog.module.css';
+import { DialogConfig } from "./DialogConfig";
 import { DialogContext } from "./DialogContext";
 
 
 interface Props {
     id: string;
-    title?: string;
-    dragBoundary?: React.RefObject<HTMLElement>;
-    useRawContent: boolean;
+    config: DialogConfig;
     children: React.ReactNode;
+    dragBoundary?: React.RefObject<HTMLElement>;
 }
 
 interface State {
@@ -18,7 +18,6 @@ interface State {
     offsetLeft: number;
     offsetTop: number;
 }
-
 
 export class Dialog extends React.Component<Props, State> {
     public static contextType = DialogContext;
@@ -129,7 +128,7 @@ export class Dialog extends React.Component<Props, State> {
             >
                 <header className={styles['dialog-header']} onMouseDown={this.onHeaderMouseDown}>
                     <div className={styles['dialog-title']}>
-                        {this.props.title}
+                        {this.props.config.title}
                     </div>
                     <div
                         className={styles['dialog-close']}
@@ -145,7 +144,7 @@ export class Dialog extends React.Component<Props, State> {
     }
 
     private renderContent(): React.ReactNode {
-        if (this.props.useRawContent) {
+        if (this.props.config.useRawContent) {
             return this.props.children;
         }
         return (

@@ -46,8 +46,7 @@ export class DialogContainer extends React.Component<Props, State> {
                 <Dialog
                     key={dialog.id}
                     id={dialog.id}
-                    title={dialog.title}
-                    useRawContent={dialog.useRawContent}
+                    config={dialog.config}
                     dragBoundary={this.props.dragBoundary}
                 >
                     {dialog.content}
