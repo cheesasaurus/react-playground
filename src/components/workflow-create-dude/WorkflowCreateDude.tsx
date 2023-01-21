@@ -148,6 +148,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                         pendingDudeName={this.state.pendingDudeName}
                         errors={this.state.errors}
                         onUpdate={this.onStep1Update}
+                        onStepCompletionRequested={this.startTransitionNext}
                     />
                 );
             default:
