@@ -2,14 +2,14 @@ import styles from './WorkflowCreateDude.module.css';
 import React, { ChangeEvent } from "react";
 
 
-export interface Step1UpdateInfo {
+export interface NameWritingUpdateInfo {
     dudeName: string;
 }
 
 interface Props {
     pendingDudeName: string;
     errors: Array<string>;
-    onUpdate: (info: Step1UpdateInfo) => void;
+    onUpdate: (info: NameWritingUpdateInfo) => void;
     onStepCompletionRequested: () => void;
 }
 
@@ -17,7 +17,7 @@ interface State {
 
 }
 
-export class Step1 extends React.Component<Props, State> {
+export class NameWriting extends React.Component<Props, State> {
 
     private pendingDudeNameChanged = (e: ChangeEvent<HTMLInputElement>) => {
         this.props.onUpdate({

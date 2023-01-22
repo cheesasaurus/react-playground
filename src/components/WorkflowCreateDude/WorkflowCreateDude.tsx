@@ -3,7 +3,7 @@ import { Dude } from "../../black-box/exposed/models";
 import { Race } from "../../black-box/exposed/DudeModifierPresets/Races";
 import { NavButtonProps, Workflow } from "../Workflow/Workflow";
 import { RaceSelection, RaceSelectionUpdateInfo } from "./RaceSelection";
-import { Step1, Step1UpdateInfo } from "./Step1";
+import { NameWriting, NameWritingUpdateInfo } from "./NameWriting";
 import { ProfessionSelection, ProfessionSelectionUpdateInfo } from "./ProfessionSelection";
 import { Profession } from "../../black-box/exposed/DudeModifierPresets/Professions";
 
@@ -33,8 +33,8 @@ interface Nav {
 
 
 export class WorkflowCreateDude extends React.Component<Props, State> {
-    private steps = 3;
-    private stepsX: (Step|null)[] = [];
+    private stepCount = 3;
+    private steps: (Step|null)[] = [];
 
     public constructor(props: Props) {
         super(props);
@@ -57,11 +57,11 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             setState: (newState: any) => this.setState(newState),
             transitionToNextStep: this.startTransitionNext,
         };
-        this.stepsX = [
+        this.steps = [
             null,
-            new Step1X(stepContext),
-            new Step2X(stepContext),
-            new Step3X(stepContext),
+            new Step1NameWriting(stepContext),
+            new Step2RaceSelection(stepContext),
+            new Step3ProfessionSelection(stepContext),
         ];
 
         if (!this.props.dudeId) {
@@ -89,7 +89,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
 
     public componentWillUnmount() {
         // remove circular reference for gc. (the steps reference this, and this references the steps)
-        this.stepsX = [];
+        this.steps = [];
     }
 
     private startTransitionNext = () => {
@@ -115,9 +115,9 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
     }
 
     private async completeStep() {
-        await this.stepsX[this.state.step]?.complete(this.state);
+        await this.steps[this.state.step]?.complete(this.state);
 
-        const isLastStep = this.state.step === this.steps;
+        const isLastStep = this.state.step === this.stepCount;
         if (isLastStep) {
             if (this.props.onWorkflowCompleted) {
                 this.props.onWorkflowCompleted();
@@ -150,7 +150,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         if (this.state.loading) {
             return <span>loading...</span>
         }
-        return this.stepsX[this.state.step]?.renderContent(this.state);
+        return this.steps[this.state.step]?.renderContent(this.state);
     }
 
     private configureNav(): Nav {
@@ -165,7 +165,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             next: {
                 visible: true,
                 disabled: state.loading || state.proceeding || state.backtracking,
-                text: state.step === this.steps ? 'Finish' : 'Next',
+                text: state.step === this.stepCount ? 'Finish' : 'Next',
                 onPressed: this.startTransitionNext,
             },
         };
@@ -185,14 +185,14 @@ interface StepContext {
     transitionToNextStep(): void;
 }
 
-class Step1X implements Step {
+class Step1NameWriting implements Step {
     context: StepContext;
 
     constructor(context: StepContext) {
         this.context = context;
     }
 
-    private onUpdate = (info: Step1UpdateInfo) => {
+    private onUpdate = (info: NameWritingUpdateInfo) => {
         this.context.setState({
             pendingDudeName: info.dudeName,
         });
@@ -200,7 +200,7 @@ class Step1X implements Step {
 
     public renderContent(state: State): React.ReactNode {
         return (
-            <Step1
+            <NameWriting
                 pendingDudeName={state.pendingDudeName}
                 errors={state.errors}
                 onUpdate={this.onUpdate}
@@ -238,7 +238,7 @@ class Step1X implements Step {
 }
 
 
-class Step2X implements Step {
+class Step2RaceSelection implements Step {
     context: StepContext;
 
     constructor(context: StepContext) {
@@ -279,7 +279,7 @@ class Step2X implements Step {
 }
 
 
-class Step3X implements Step {
+class Step3ProfessionSelection implements Step {
     context: StepContext;
 
     constructor(context: StepContext) {
