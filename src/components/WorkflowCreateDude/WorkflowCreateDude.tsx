@@ -34,6 +34,7 @@ interface Nav {
 
 export class WorkflowCreateDude extends React.Component<Props, State> {
     private steps = 3;
+    private stepsX: (Step|null)[] = [];
 
     public constructor(props: Props) {
         super(props);
@@ -52,6 +53,17 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
     }
 
     public componentDidMount(): void {
+        const stepContext = {
+            setState: (newState: any) => this.setState(newState),
+            transitionToNextStep: this.startTransitionNext,
+        };
+        this.stepsX = [
+            null,
+            new Step1X(stepContext),
+            new Step2X(stepContext),
+            new Step3X(stepContext),
+        ];
+
         if (!this.props.dudeId) {
             this.setState({
                 loading: false,
@@ -73,6 +85,11 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                 step: dude.creation.step,
             });
         });
+    }
+
+    public componentWillUnmount() {
+        // remove circular reference for gc. (the steps reference this, and this references the steps)
+        this.stepsX = [];
     }
 
     private startTransitionNext = () => {
@@ -189,24 +206,6 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         }));
     };
 
-    private onStep1Update = (info: Step1UpdateInfo): void => {
-        this.setState({
-            pendingDudeName: info.dudeName,
-        });
-    };
-
-    private onStep2Update = (info: RaceSelectionUpdateInfo): void => {
-        this.setState({
-            pendingRace: info.selectedRace,
-        });
-    }
-
-    private onStep3Update = (info: ProfessionSelectionUpdateInfo): void => {
-        this.setState({
-            pendingProfession: info.selectedProfession,
-        });
-    }
-
     public render(): React.ReactNode {
         return (
             <Workflow nav={this.configureNav()} overflow='hidden'>
@@ -219,36 +218,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         if (this.state.loading) {
             return <span>loading...</span>
         }
-
-        switch (this.state.step) {
-            case 1:
-                return (
-                    <Step1
-                        pendingDudeName={this.state.pendingDudeName}
-                        errors={this.state.errors}
-                        onUpdate={this.onStep1Update}
-                        onStepCompletionRequested={this.startTransitionNext}
-                    />
-                );
-            case 2:
-                return (
-                    <RaceSelection
-                        selectedRace={this.state.pendingRace}
-                        dude={this.state.dude!}
-                        onUpdate={this.onStep2Update}
-                    />
-                );
-            case 3:
-                return (
-                    <ProfessionSelection
-                        selectedProfession={this.state.pendingProfession}
-                        dude={this.state.dude!}
-                        onUpdate={this.onStep3Update}
-                    />
-                );
-            default:
-                return undefined;
-        }
+        return this.stepsX[this.state.step]?.renderContent(this.props, this.state);
     }
 
     private configureNav(): Nav {
@@ -269,4 +239,104 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         };
     }
 
+}
+
+
+
+interface Step {
+    complete(): void;
+    renderContent(props: Props, state: State): React.ReactNode;
+}
+
+interface StepContext {
+    setState(nextState: any): any;
+    transitionToNextStep(): void;
+}
+
+class Step1X implements Step {
+    context: StepContext;
+
+    constructor(context: StepContext) {
+        this.context = context;
+    }
+
+    private onUpdate = (info: Step1UpdateInfo) => {
+        this.context.setState({
+            pendingDudeName: info.dudeName,
+        });
+    };
+
+    public renderContent(props: Props, state: State): React.ReactNode {
+        return (
+            <Step1
+                pendingDudeName={state.pendingDudeName}
+                errors={state.errors}
+                onUpdate={this.onUpdate}
+                onStepCompletionRequested={this.context.transitionToNextStep}
+            />
+        );
+    };
+
+    public complete(): void {
+        // todo
+    }
+
+}
+
+
+class Step2X implements Step {
+    context: StepContext;
+
+    constructor(context: StepContext) {
+        this.context = context;
+    }
+
+    private onUpdate = (info: RaceSelectionUpdateInfo) => {
+        this.context.setState({
+            pendingRace: info.selectedRace,
+        });
+    };
+
+    public renderContent(props: Props, state: State): React.ReactNode {
+        return (
+            <RaceSelection
+                selectedRace={state.pendingRace}
+                dude={state.dude!}
+                onUpdate={this.onUpdate}
+            />
+        );
+    };
+
+    public complete(): void {
+        // todo
+    }
+}
+
+
+class Step3X implements Step {
+    context: StepContext;
+
+    constructor(context: StepContext) {
+        this.context = context;
+    }
+
+    private onUpdate = (info: ProfessionSelectionUpdateInfo) => {
+        this.context.setState({
+            pendingProfession: info.selectedProfession,
+        });
+    };
+
+    public renderContent(props: Props, state: State): React.ReactNode {
+        return (
+            <ProfessionSelection
+                selectedProfession={state.pendingProfession}
+                dude={state.dude!}
+                onUpdate={this.onUpdate}
+            />
+        );
+    };
+
+    public complete(): void {
+        // todo
+    }
 }
