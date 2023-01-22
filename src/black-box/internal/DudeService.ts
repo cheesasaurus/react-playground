@@ -73,6 +73,7 @@ export class DudeService implements IDudeService {
     }
 
     public updateDude(pendingDude: RequestUpdateDude): Promise<ResponseUpdateDude> {
+
         const errors = Array<ServiceError>();
         if (!(pendingDude.id in this.dudes)) {
             errors.push({
@@ -81,6 +82,7 @@ export class DudeService implements IDudeService {
             });
         }
         if (pendingDude.name !== undefined) {
+            pendingDude.name = pendingDude.name.trim();
             errors.push(...this.checkNameErrors(pendingDude.name));
         }
         if (errors.length > 0) {
