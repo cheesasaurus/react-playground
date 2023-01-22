@@ -118,7 +118,7 @@ export const ProfessionPresets: Array<DudeModifierPreset<Profession>> = [
     {
         id: Profession.Tinkerer,
         name: 'Tinkerer',
-        description: '.',
+        description: 'Fiddling with contraptions.',
         statModifiers: [
             {
                 type: DudeStatType.WeaponCrossbow,

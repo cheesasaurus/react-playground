@@ -1,3 +1,4 @@
+import { Profession } from "./DudeModifierPresets/Professions";
 import { Race } from "./DudeModifierPresets/Races";
 import { DudeStatModifier, DudeStatType } from "./DudeStats";
 
@@ -19,7 +20,7 @@ export interface Dude {
     name: string,
     hp: HP,
     race: Race,
-    starterWeapon: WeaponType,
+    profession: Profession,
     creation: {
         completed: boolean,
         step: number,

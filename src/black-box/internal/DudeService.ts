@@ -4,8 +4,7 @@ import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, Resp
 import { Dude, DudeMap, DudeStatMap, iterateModelMap, WeaponType } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race } from "../exposed/DudeModifierPresets/Races";
-
-
+import { Profession } from "../exposed/DudeModifierPresets/Professions";
 
 
 export class DudeService implements IDudeService {
@@ -99,8 +98,8 @@ export class DudeService implements IDudeService {
         if (pendingDude.race) {
             dude.race = pendingDude.race;
         }
-        if (pendingDude.starterWeapon) {
-            dude.starterWeapon = pendingDude.starterWeapon;
+        if (pendingDude.profession) {
+            dude.profession = pendingDude.profession;
         }
         if (pendingDude.finishCreation) {
             dude.creation.completed = true;
@@ -162,7 +161,7 @@ export class DudeService implements IDudeService {
                 current: 100,
             },
             race: Race.Human,
-            starterWeapon: WeaponType.Sword,
+            profession: Profession.Beggar,
             creation: {
                 completed: false,
                 step: 2,

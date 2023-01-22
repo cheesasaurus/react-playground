@@ -4,6 +4,8 @@ import { Race } from "../../black-box/exposed/DudeModifierPresets/Races";
 import { NavButtonProps, Workflow } from "../Workflow/Workflow";
 import { RaceSelection, RaceSelectionUpdateInfo } from "./RaceSelection";
 import { Step1, Step1UpdateInfo } from "./Step1";
+import { ProfessionSelection, ProfessionSelectionUpdateInfo } from "./ProfessionSelection";
+import { Profession } from "../../black-box/exposed/DudeModifierPresets/Professions";
 
 
 interface Props {
@@ -21,6 +23,7 @@ interface State {
     errors: Array<string>,
     pendingDudeName: string,
     pendingRace: Race,
+    pendingProfession: Profession,
 }
 
 interface Nav {
@@ -44,6 +47,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             errors: Array<string>(),
             pendingDudeName: '',
             pendingRace: Race.Human,
+            pendingProfession: Profession.Beggar,
         };
     }
 
@@ -65,6 +69,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                 dude: dude,
                 pendingDudeName: dude.name,
                 pendingRace: dude.race,
+                pendingProfession: dude.profession,
                 step: dude.creation.step,
             });
         });
@@ -99,6 +104,9 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                 break;
             case 2:
                 await this.completeStep2();
+                break;
+            case 3:
+                await this.completeStep3();
                 break;
         }
 
@@ -159,6 +167,22 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         });
     }
 
+    private async completeStep3() {
+        let dude: Dude;
+        const response = await window.blackBox.api.dudes.updateDude({
+            id: this.state.dudeId!,
+            profession: this.state.pendingProfession,
+            finishCreation: true,
+        });
+        if (response.errors && response.errors.length > 0) {
+            throw Error(response.errors![0].message);
+        }
+        dude = response.data!;
+        this.setState({
+            dude: dude,
+        });
+    }
+
     private startTransitionPrev = () => {
         this.setState((state) => ({
             step: state.step - 1
@@ -174,6 +198,12 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
     private onStep2Update = (info: RaceSelectionUpdateInfo): void => {
         this.setState({
             pendingRace: info.selectedRace,
+        });
+    }
+
+    private onStep3Update = (info: ProfessionSelectionUpdateInfo): void => {
+        this.setState({
+            pendingProfession: info.selectedProfession,
         });
     }
 
@@ -206,6 +236,14 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                         selectedRace={this.state.pendingRace}
                         dude={this.state.dude!}
                         onUpdate={this.onStep2Update}
+                    />
+                );
+            case 3:
+                return (
+                    <ProfessionSelection
+                        selectedProfession={this.state.pendingProfession}
+                        dude={this.state.dude!}
+                        onUpdate={this.onStep3Update}
                     />
                 );
             default:

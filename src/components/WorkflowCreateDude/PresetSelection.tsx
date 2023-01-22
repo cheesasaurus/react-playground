@@ -35,7 +35,7 @@ export class PresetSelection<OptionIdType extends string> extends React.Componen
     
     public render(): React.ReactNode {
         return (
-            <div className={styles['step-2-container']}>
+            <div className={styles['preset-container']}>
                 <section className={styles['stats-section']}>
                     <header className={styles['preset-label']}>{this.props.title} →</header>
                     <div className={styles['stat-list']}>

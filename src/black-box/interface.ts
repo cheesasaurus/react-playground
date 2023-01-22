@@ -1,4 +1,5 @@
 import { Subscription } from "../utils";
+import { Profession } from "./exposed/DudeModifierPresets/Professions";
 import { Race } from "./exposed/DudeModifierPresets/Races";
 import { Dude, DudeMap, WeaponType } from "./exposed/models";
 
@@ -86,7 +87,7 @@ export interface RequestUpdateDude {
     id: number,
     name?: string,
     race?: Race,
-    starterWeapon?: WeaponType,
+    profession?: Profession,
     creationStep?: number,
     finishCreation?: boolean,
 }
