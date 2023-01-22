@@ -1,7 +1,7 @@
 import { Subscription } from "../utils";
 import { Profession } from "./exposed/DudeModifierPresets/Professions";
 import { Race } from "./exposed/DudeModifierPresets/Races";
-import { Dude, DudeMap, WeaponType } from "./exposed/models";
+import { Dude, DudeMap } from "./exposed/models";
 
 /**
  * Some black box (for example, a game engine providing the webview),

@@ -1,7 +1,7 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
 import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
-import { Dude, DudeMap, DudeStatMap, iterateModelMap, WeaponType } from "../exposed/models";
+import { Dude, DudeMap, DudeStatMap, iterateModelMap } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race } from "../exposed/DudeModifierPresets/Races";
 import { Profession } from "../exposed/DudeModifierPresets/Professions";
