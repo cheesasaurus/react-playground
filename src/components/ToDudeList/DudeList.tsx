@@ -3,7 +3,7 @@ import './DudeList.module.css';
 import React from "react";
 import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
-import { SocketMessageType } from '../../black-box/interface';
+import { SocketMessage, SocketMessageType } from '../../black-box/interface';
 import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
 import { DialogControlContext } from '../Dialog/DialogContext';
 import { Subscriptions } from '../../utils';
@@ -37,22 +37,34 @@ export class ToDudeList extends React.Component<Props, State> {
     }
 
     public async componentDidMount(): Promise<void> {
-        const subscription = window.blackBox.socket.on(SocketMessageType.DudeCreated, (message) => {
-            const dude = message.data as Dude;
-            this.setState({
-                dudes: {
-                    ...this.state.dudes,
-                    [dude.id]: dude,
-                }
-            });
-        });
-        this.subscriptions.add(subscription);
+        this.subscribeToDudeCreation();
+        this.subscribeToDudeUpdates();
         const response = await window.blackBox.api.dudes.getDudes();
         if (response.errors) {
             response.errors.forEach(console.error)
             return;
         }
         this.setState({dudes: response.data!});
+    }
+
+    private subscribeToDudeCreation() {
+        const subscription = window.blackBox.socket.on(SocketMessageType.DudeCreated, this.pipeInDude);
+        this.subscriptions.add(subscription);
+    }
+
+    private subscribeToDudeUpdates() {
+        const subscription = window.blackBox.socket.on(SocketMessageType.DudeUpdated, this.pipeInDude);
+        this.subscriptions.add(subscription);
+    }
+
+    private pipeInDude = (message: SocketMessage) => {
+        const dude = message.data as Dude;
+        this.setState({
+            dudes: {
+                ...this.state.dudes,
+                [dude.id]: dude,
+            }
+        });
     }
 
     public componentWillUnmount(): void {

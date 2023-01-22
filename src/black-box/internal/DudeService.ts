@@ -106,7 +106,12 @@ export class DudeService implements IDudeService {
             // todo: give equipment, cache boosted stats, etc
         }
         this.save();
-        return delayedResponse<ResponseUpdateDude>({data: structuredClone(dude)});
+        const dudeCopy = structuredClone(dude);
+        this.messageQueue.push({
+            type: SocketMessageType.DudeUpdated,
+            data: dudeCopy,
+        });
+        return delayedResponse<ResponseUpdateDude>({data: dudeCopy});
     }
 
     private checkNewNameErrors(name: string): Array<ServiceError> {

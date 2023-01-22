@@ -54,6 +54,7 @@ export interface SocketMessage {
 
 export enum SocketMessageType {
     DudeCreated = 'DudeCreated',
+    DudeUpdated = 'DudeUpdated',
 }
 
 
