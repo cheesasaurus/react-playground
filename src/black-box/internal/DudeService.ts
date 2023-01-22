@@ -88,6 +88,9 @@ export class DudeService implements IDudeService {
         }
 
         const dude = this.dudes[pendingDude.id];
+        if (pendingDude.creationStep) {
+            dude.creation.step = pendingDude.creationStep;
+        }
         if (pendingDude.name !== undefined) {
             dude.name = pendingDude.name;
         }
@@ -96,6 +99,10 @@ export class DudeService implements IDudeService {
         }
         if (pendingDude.starterWeapon) {
             dude.starterWeapon = pendingDude.starterWeapon;
+        }
+        if (pendingDude.finishCreation) {
+            dude.creation.completed = true;
+            // todo: give equipment, cache boosted stats, etc
         }
         this.save();
         return delayedResponse<ResponseUpdateDude>({data: structuredClone(dude)});

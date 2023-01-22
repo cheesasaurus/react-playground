@@ -87,6 +87,8 @@ export interface RequestUpdateDude {
     name?: string,
     race?: Race,
     starterWeapon?: WeaponType,
+    creationStep?: number,
+    finishCreation?: boolean,
 }
 
 export interface ResponseUpdateDude {

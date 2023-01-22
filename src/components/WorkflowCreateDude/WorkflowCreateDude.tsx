@@ -130,6 +130,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             const response = await window.blackBox.api.dudes.updateDude({
                 id: this.state.dudeId,
                 name: this.state.pendingDudeName,
+                creationStep: 2,
             });
             if (response.errors && response.errors.length > 0) {
                 throw Error(response.errors![0].message);
@@ -139,11 +140,23 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         this.setState({
             dudeId: dude.id,
             dude: dude,
-        });        
+        });
     }
 
     private async completeStep2() {
-        // todo
+        let dude: Dude;
+        const response = await window.blackBox.api.dudes.updateDude({
+            id: this.state.dudeId!,
+            race: this.state.pendingRace,
+            creationStep: 3,
+        });
+        if (response.errors && response.errors.length > 0) {
+            throw Error(response.errors![0].message);
+        }
+        dude = response.data!;
+        this.setState({
+            dude: dude,
+        });
     }
 
     private startTransitionPrev = () => {
