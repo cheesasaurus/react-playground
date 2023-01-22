@@ -13,7 +13,8 @@ interface WorkflowProps {
     nav: {
         prev: NavButtonProps,
         next: NavButtonProps,
-    }
+    },
+    overflow: 'hidden' | 'auto',
 }
 
 export function Workflow(props: WorkflowProps) {
@@ -21,7 +22,7 @@ export function Workflow(props: WorkflowProps) {
     const next = props.nav.next;
     return (
         <div className={styles.container}>
-            <section className={styles['content']}>
+            <section className={styles['content']} style={{overflow: props.overflow}}>
                 {props.children}
             </section>
             <section className={styles['nav-bar']}>

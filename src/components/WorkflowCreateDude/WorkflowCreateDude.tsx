@@ -209,7 +209,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
 
     public render(): React.ReactNode {
         return (
-            <Workflow nav={this.configureNav()}>
+            <Workflow nav={this.configureNav()} overflow='hidden'>
                 {this.renderContent()}
             </Workflow>
         );

@@ -83,7 +83,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
             height: '1000px',
         };
         const workflow = (
-            <Workflow nav={nav}>
+            <Workflow nav={nav} overflow='auto'>
                 <p>Hi hello howdy</p>
                 <div style={bingbong}>
                     bing bong bing bing bong
