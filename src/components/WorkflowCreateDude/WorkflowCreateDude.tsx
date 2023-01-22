@@ -115,17 +115,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
     }
 
     private async completeStep() {
-        switch (this.state.step) {
-            case 1:
-                await this.completeStep1();
-                break;
-            case 2:
-                await this.completeStep2();
-                break;
-            case 3:
-                await this.completeStep3();
-                break;
-        }
+        await this.stepsX[this.state.step]?.complete(this.state);
 
         const isLastStep = this.state.step === this.steps;
         if (isLastStep) {
@@ -140,64 +130,6 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             step: state.step + 1,
             errors: [],
         }));
-    }
-
-    private async completeStep1() {
-        let dude: Dude;
-        if (this.state.dudeId === undefined) {
-            const response = await window.blackBox.api.dudes.createDude(this.state.pendingDudeName);
-            if (response.errors && response.errors.length > 0) {
-                throw Error(response.errors![0].message);
-            }
-            dude = response.data!;
-        }
-        else {
-            const response = await window.blackBox.api.dudes.updateDude({
-                id: this.state.dudeId,
-                name: this.state.pendingDudeName,
-                creationStep: 2,
-            });
-            if (response.errors && response.errors.length > 0) {
-                throw Error(response.errors![0].message);
-            }
-            dude = response.data!;
-        }
-        this.setState({
-            dudeId: dude.id,
-            dude: dude,
-        });
-    }
-
-    private async completeStep2() {
-        let dude: Dude;
-        const response = await window.blackBox.api.dudes.updateDude({
-            id: this.state.dudeId!,
-            race: this.state.pendingRace,
-            creationStep: 3,
-        });
-        if (response.errors && response.errors.length > 0) {
-            throw Error(response.errors![0].message);
-        }
-        dude = response.data!;
-        this.setState({
-            dude: dude,
-        });
-    }
-
-    private async completeStep3() {
-        let dude: Dude;
-        const response = await window.blackBox.api.dudes.updateDude({
-            id: this.state.dudeId!,
-            profession: this.state.pendingProfession,
-            finishCreation: true,
-        });
-        if (response.errors && response.errors.length > 0) {
-            throw Error(response.errors![0].message);
-        }
-        dude = response.data!;
-        this.setState({
-            dude: dude,
-        });
     }
 
     private startTransitionPrev = () => {
@@ -218,7 +150,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         if (this.state.loading) {
             return <span>loading...</span>
         }
-        return this.stepsX[this.state.step]?.renderContent(this.props, this.state);
+        return this.stepsX[this.state.step]?.renderContent(this.state);
     }
 
     private configureNav(): Nav {
@@ -244,8 +176,8 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
 
 
 interface Step {
-    complete(): void;
-    renderContent(props: Props, state: State): React.ReactNode;
+    complete(state: State): Promise<void>
+    renderContent(state: State): React.ReactNode;
 }
 
 interface StepContext {
@@ -266,7 +198,7 @@ class Step1X implements Step {
         });
     };
 
-    public renderContent(props: Props, state: State): React.ReactNode {
+    public renderContent(state: State): React.ReactNode {
         return (
             <Step1
                 pendingDudeName={state.pendingDudeName}
@@ -277,8 +209,30 @@ class Step1X implements Step {
         );
     };
 
-    public complete(): void {
-        // todo
+    public async complete(state: State): Promise<void> {
+        let dude: Dude;
+        if (state.dudeId === undefined) {
+            const response = await window.blackBox.api.dudes.createDude(state.pendingDudeName);
+            if (response.errors && response.errors.length > 0) {
+                throw Error(response.errors![0].message);
+            }
+            dude = response.data!;
+        }
+        else {
+            const response = await window.blackBox.api.dudes.updateDude({
+                id: state.dudeId,
+                name: state.pendingDudeName,
+                creationStep: 2,
+            });
+            if (response.errors && response.errors.length > 0) {
+                throw Error(response.errors![0].message);
+            }
+            dude = response.data!;
+        }
+        this.context.setState({
+            dudeId: dude.id,
+            dude: dude,
+        });
     }
 
 }
@@ -297,7 +251,7 @@ class Step2X implements Step {
         });
     };
 
-    public renderContent(props: Props, state: State): React.ReactNode {
+    public renderContent(state: State): React.ReactNode {
         return (
             <RaceSelection
                 selectedRace={state.pendingRace}
@@ -307,8 +261,20 @@ class Step2X implements Step {
         );
     };
 
-    public complete(): void {
-        // todo
+    async complete(state: State): Promise<void> {
+        let dude: Dude;
+        const response = await window.blackBox.api.dudes.updateDude({
+            id: state.dudeId!,
+            race: state.pendingRace,
+            creationStep: 3,
+        });
+        if (response.errors && response.errors.length > 0) {
+            throw Error(response.errors![0].message);
+        }
+        dude = response.data!;
+        this.context.setState({
+            dude: dude,
+        });
     }
 }
 
@@ -326,7 +292,7 @@ class Step3X implements Step {
         });
     };
 
-    public renderContent(props: Props, state: State): React.ReactNode {
+    public renderContent(state: State): React.ReactNode {
         return (
             <ProfessionSelection
                 selectedProfession={state.pendingProfession}
@@ -336,7 +302,19 @@ class Step3X implements Step {
         );
     };
 
-    public complete(): void {
-        // todo
+    async complete(state: State): Promise<void> {
+        let dude: Dude;
+        const response = await window.blackBox.api.dudes.updateDude({
+            id: state.dudeId!,
+            profession: state.pendingProfession,
+            finishCreation: true,
+        });
+        if (response.errors && response.errors.length > 0) {
+            throw Error(response.errors![0].message);
+        }
+        dude = response.data!;
+        this.context.setState({
+            dude: dude,
+        });
     }
 }
