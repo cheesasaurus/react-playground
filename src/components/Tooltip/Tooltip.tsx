@@ -19,6 +19,7 @@ interface State {
 export class Tooltip extends React.Component<Props, State> {
     private el = document.createElement('div');
     private root = document.getElementById('tooltip-root');
+    ref: React.RefObject<HTMLDivElement>;
 
     public constructor(props: Props) {
         super(props);
@@ -27,6 +28,7 @@ export class Tooltip extends React.Component<Props, State> {
             x: 0,
             y: 0,
         };
+        this.ref = React.createRef();
     }
 
     public componentDidMount(): void {
@@ -46,11 +48,12 @@ export class Tooltip extends React.Component<Props, State> {
     };
 
     private onMouseMove = (e: MouseEvent) => {
+        this.determinePosition(e);
         this.setState({
             hovering: true,
-            x: e.clientX,
-            y: e.clientY,
+            ...this.determinePosition(e),
         });
+        
     };
 
     private onMouseLeave = (e: MouseEvent) => {
@@ -58,6 +61,54 @@ export class Tooltip extends React.Component<Props, State> {
             hovering: false,
         });
     };
+
+    private determinePosition(e: MouseEvent): {x: number, y:number} {
+        const mousePadding = {
+            top: 20,
+            right: 30,
+            bottom: 30,
+            left: 20,
+        };
+
+        if (!this.ref.current) {
+            return {
+                x: e.clientX + mousePadding.right,
+                y: e.clientY + mousePadding.bottom,
+            };
+        }
+
+        const bounds = {
+            xMin: 0,
+            xMax: document.documentElement.clientWidth,
+            yMin: 0,
+            yMax: document.documentElement.clientHeight, 
+        };
+        const rect = this.ref.current!.getBoundingClientRect();
+
+        // x
+        let x = e.clientX;
+        if (x + rect.width > bounds.xMax) {
+            // tooltip should be to the left of the mouse
+            x = x - rect.width - mousePadding.left;
+        }
+        else {
+            // tooltip should be to the right of the mouse
+            x = x + mousePadding.right;
+        }
+
+        // y
+        let y = e.clientY;
+        if (y + rect.height > bounds.yMax) {
+            // tooltip should be above the mouse
+            y = y - rect.height - mousePadding.top;
+        }
+        else {
+            // tooltip should be below the mouse
+            y = y + mousePadding.bottom;
+        }
+
+        return {x, y};
+    }
 
     public render(): React.ReactNode {
         return (
@@ -91,12 +142,13 @@ export class Tooltip extends React.Component<Props, State> {
         }
 
         const style = {
-            top: this.state.y - 10,
-            left: this.state.x + 30,
+            top: this.state.y,
+            left: this.state.x,
         };
 
         return(
             <div
+                ref={this.ref}
                 className={styles['tooltip']}
                 style={style}
             >
