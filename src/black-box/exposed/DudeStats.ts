@@ -25,6 +25,7 @@ export const DudeStatTypes = [
     DudeStatType.Dexterity,
     DudeStatType.MartialArts,
     DudeStatType.WeaponUnarmed,
+    DudeStatType.WeaponSword,
     DudeStatType.WeaponAxe,
     DudeStatType.WeaponHammer,
     DudeStatType.WeaponDagger,
@@ -37,7 +38,15 @@ export const DudeStatTypes = [
 
 const weaponSkillDescription = 'Increases [frequency of attacks] and [chance to hit] with this type of weapon.';
 
-export const DudeStatInfo = {
+type InfoMap = {
+    [statType: string]: {
+        type: DudeStatType,
+        name: string,
+        description: string,
+    };
+};
+
+export const DudeStatInfo: InfoMap = {
     [DudeStatType.Strength]: {
         type: DudeStatType.Strength,
         name: 'Strength',
@@ -71,6 +80,11 @@ export const DudeStatInfo = {
     [DudeStatType.WeaponUnarmed]: {
         type: DudeStatType.WeaponUnarmed,
         name: 'Unarmed',
+        description: weaponSkillDescription,
+    },
+    [DudeStatType.WeaponSword]: {
+        type: DudeStatType.WeaponSword,
+        name: 'Sword',
         description: weaponSkillDescription,
     },
     [DudeStatType.WeaponAxe]: {

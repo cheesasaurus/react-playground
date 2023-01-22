@@ -1,8 +1,8 @@
 import styles from './WorkflowCreateDude.module.css';
 import React from "react";
 import { DudeModifierPreset } from '../../black-box/exposed/models';
-import { DudeStatType } from '../../black-box/exposed/DudeStats';
-import { cssClassNames } from '../../utils';
+import { DudeStatInfo, DudeStatType, DudeStatTypes } from '../../black-box/exposed/DudeStats';
+import { cssClassNames, signedNumber } from '../../utils';
 
 export interface PresetSelectionUpdateInfo<OptionIdType> {
     selectedOptionId: OptionIdType;
@@ -13,6 +13,7 @@ export type BaseStatMap = {
 }
 
 interface Props<OptionIdType extends string> {
+    title: string;
     selectedOptionId: string;
     options: Array<DudeModifierPreset<OptionIdType>>;
     baseStats: BaseStatMap;
@@ -32,12 +33,14 @@ export class PresetSelection<OptionIdType extends string> extends React.Componen
         });
     };
     
-    render(): React.ReactNode {
+    public render(): React.ReactNode {
         return (
             <div className={styles['step-2-container']}>
-                <section className={styles['stats']}>
-                    <header className={styles['preset-label']}>Race Selection</header>
-                    stats go here
+                <section className={styles['stats-section']}>
+                    <header className={styles['preset-label']}>{this.props.title} →</header>
+                    <div className={styles['stat-list']}>
+                        {this.renderStats()}
+                    </div>
                 </section>
                 <section className={styles['preset-options']}>
                     {this.renderOptions()}
@@ -46,7 +49,36 @@ export class PresetSelection<OptionIdType extends string> extends React.Componen
         );
     }
 
-    renderOptions(): React.ReactNode {
+    private renderStats(): React.ReactNode {
+        const preset = this.props.options.find(opt => opt.id === this.props.selectedOptionId)!;
+        const magnitudeMap = Object.fromEntries(
+            preset.statModifiers.map(mod => [mod.type, mod.magnitude])
+        );
+
+        return DudeStatTypes.map((statType) => {
+            const base = this.props.baseStats[statType];
+            const name = DudeStatInfo[statType].name;
+            const magnitude = magnitudeMap[statType] || 0;
+
+            return (
+                <div key={statType} className={styles['stat']}>
+                    <span className={styles['stat-name']}>{name}</span>
+                    <span className={styles['stat-base']}>{base}</span>
+                    {this.renderStatModifier(magnitude)}
+                </div>
+            );
+        });
+    }
+
+    private renderStatModifier(magnitude: number): React.ReactNode {
+        if (!magnitude) {
+            return undefined;
+        }
+        const className = magnitude > 0 ? styles['modifier-positive'] : styles['modifier-negative'];
+        return <span className={className}>{signedNumber(magnitude)}</span>;
+    }
+
+    private renderOptions(): React.ReactNode {
         return this.props.options.map(option => (
             <div
                 key={option.id}

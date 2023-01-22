@@ -10,6 +10,11 @@ export function docReady(fn: () => void): void {
 }
 
 
+export function signedNumber(number: number): string {
+    return (number < 0 ? '' : '+') + number;
+}
+
+
 type cssClassNamesConfig = {
     [className: string]: boolean
 };

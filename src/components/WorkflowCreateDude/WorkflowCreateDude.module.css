@@ -13,13 +13,46 @@
     display: flex;
 }
 
-.stats {
+.stats-section {
+    user-select: none;
     flex-grow: 1;
 }
 
+.stat-list {
+    column-count: 2;
+    padding-left: 100px;
+}
+
+.stat {
+    padding: 5px 20px;
+    font-size: 18px;
+    color: rgb(219, 215, 162);
+}
+.stat:nth-child(2n) {
+    color: rgb(158, 155, 115);
+}
+
+.stat-name {
+    display: inline-block;
+    width: 100px;
+}
+
+.stat-base {
+
+}
+
+.modifier-positive {
+    color: rgb(94, 184, 94);
+}
+
+.modifier-negative {
+    color: rgb(252, 96, 96);
+}
+
 .preset-label {
-    white-space: nowrap;
     font-size: 40px;
+    text-align: center;
+    padding: 0 0 20px 0; 
 }
 
 .preset-options {

@@ -6,7 +6,7 @@ import { DudeListItem } from "./DudeListItem";
 import { SocketMessageType } from '../../black-box/interface';
 import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
 import { DialogControlContext } from '../Dialog/DialogContext';
-import { Subscription, Subscriptions } from '../../utils';
+import { Subscriptions } from '../../utils';
 
 
 interface Props {

@@ -32,7 +32,7 @@ export class RaceSelection extends React.Component<Props, State> {
         const dudeStats = this.props.dude.stats;
         const kvPairs = DudeStatTypes.map(statType => {
             const baseStat = dudeStats[statType].level;
-            return [statType, baseStat];
+            return [statType, baseStat.actual];
         });
         return Object.fromEntries(kvPairs);
     }
@@ -41,6 +41,7 @@ export class RaceSelection extends React.Component<Props, State> {
         return(
             <PresetSelection<Race>
                 selectedOptionId={this.props.selectedRace}
+                title={'Race Selection'}
                 options={RacePresets}
                 baseStats={this.baseStats()}
                 onUpdate={this.onUpdate}
