@@ -1,9 +1,9 @@
 import React from "react";
-import { Profession, ProfessionPresets } from "../../black-box/exposed/DudeModifierPresets/Professions";
-import { RacePresetsMap } from "../../black-box/exposed/DudeModifierPresets/Races";
-import { DudeStatTypes } from "../../black-box/exposed/DudeStats";
-import { Dude, DudeModifierPreset } from "../../black-box/exposed/models";
-import { BaseStatMap, PresetSelection, PresetSelectionUpdateInfo } from "./PresetSelection";
+import { Profession, ProfessionPresets } from "../../../black-box/exposed/DudeModifierPresets/Professions";
+import { RacePresetsMap } from "../../../black-box/exposed/DudeModifierPresets/Races";
+import { DudeStatTypes } from "../../../black-box/exposed/DudeStats";
+import { Dude, DudeModifierPreset } from "../../../black-box/exposed/models";
+import { BaseStatMap, PresetSelection, PresetSelectionUpdateInfo } from "../PresetSelection";
 
 
 export interface ProfessionSelectionUpdateInfo {

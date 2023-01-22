@@ -1,9 +1,7 @@
 import React from "react";
 import { SocketMessage } from "../black-box/interface";
-import { Subscription, Subscriptions } from "../utils";
+import { Subscriptions } from "../utils";
 import { DialogControlContext } from "./Dialog/DialogContext";
-import { ToDudeList } from "./ToDudeList/DudeList";
-import { Workflow } from "./Workflow/Workflow";
 
 
 interface IProps {

@@ -1,8 +1,8 @@
 import React from "react";
-import { Race, RacePresets } from "../../black-box/exposed/DudeModifierPresets/Races";
-import { DudeStatTypes } from "../../black-box/exposed/DudeStats";
-import { Dude } from "../../black-box/exposed/models";
-import { BaseStatMap, PresetSelection, PresetSelectionUpdateInfo } from "./PresetSelection";
+import { Race, RacePresets } from "../../../black-box/exposed/DudeModifierPresets/Races";
+import { DudeStatTypes } from "../../../black-box/exposed/DudeStats";
+import { Dude } from "../../../black-box/exposed/models";
+import { BaseStatMap, PresetSelection, PresetSelectionUpdateInfo } from "../PresetSelection";
 
 
 export interface RaceSelectionUpdateInfo {

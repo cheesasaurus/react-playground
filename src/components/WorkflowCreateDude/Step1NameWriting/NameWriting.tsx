@@ -1,4 +1,4 @@
-import styles from './WorkflowCreateDude.module.css';
+import styles from '../WorkflowCreateDude.module.css';
 import React, { ChangeEvent } from "react";
 
 

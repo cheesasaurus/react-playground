@@ -2,10 +2,11 @@ import React from "react";
 import { Dude } from "../../black-box/exposed/models";
 import { Race } from "../../black-box/exposed/DudeModifierPresets/Races";
 import { NavButtonProps, Workflow } from "../Workflow/Workflow";
-import { RaceSelection, RaceSelectionUpdateInfo } from "./RaceSelection";
-import { NameWriting, NameWritingUpdateInfo } from "./NameWriting";
-import { ProfessionSelection, ProfessionSelectionUpdateInfo } from "./ProfessionSelection";
 import { Profession } from "../../black-box/exposed/DudeModifierPresets/Professions";
+import { Step3ProfessionSelection } from "./Step3ProfessionSelection/Step3ProfessionSelection";
+import { Step2RaceSelection } from "./Step2RaceSelection/Step2RaceSelection";
+import { Step1NameWriting } from "./Step1NameWriting/Step1NameWriting";
+import { Step } from "./Step";
 
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
     onWorkflowCompleted?: () => void,
 }
 
-interface State {
+export interface State {
     dudeId: number | undefined,
     step: number,
     dude: Dude | undefined,
@@ -171,150 +172,4 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         };
     }
 
-}
-
-
-
-interface Step {
-    complete(state: State): Promise<void>
-    renderContent(state: State): React.ReactNode;
-}
-
-interface StepContext {
-    setState(nextState: any): any;
-    transitionToNextStep(): void;
-}
-
-class Step1NameWriting implements Step {
-    context: StepContext;
-
-    constructor(context: StepContext) {
-        this.context = context;
-    }
-
-    private onUpdate = (info: NameWritingUpdateInfo) => {
-        this.context.setState({
-            pendingDudeName: info.dudeName,
-        });
-    };
-
-    public renderContent(state: State): React.ReactNode {
-        return (
-            <NameWriting
-                pendingDudeName={state.pendingDudeName}
-                errors={state.errors}
-                onUpdate={this.onUpdate}
-                onStepCompletionRequested={this.context.transitionToNextStep}
-            />
-        );
-    };
-
-    public async complete(state: State): Promise<void> {
-        let dude: Dude;
-        if (state.dudeId === undefined) {
-            const response = await window.blackBox.api.dudes.createDude(state.pendingDudeName);
-            if (response.errors && response.errors.length > 0) {
-                throw Error(response.errors![0].message);
-            }
-            dude = response.data!;
-        }
-        else {
-            const response = await window.blackBox.api.dudes.updateDude({
-                id: state.dudeId,
-                name: state.pendingDudeName,
-                creationStep: 2,
-            });
-            if (response.errors && response.errors.length > 0) {
-                throw Error(response.errors![0].message);
-            }
-            dude = response.data!;
-        }
-        this.context.setState({
-            dudeId: dude.id,
-            dude: dude,
-        });
-    }
-
-}
-
-
-class Step2RaceSelection implements Step {
-    context: StepContext;
-
-    constructor(context: StepContext) {
-        this.context = context;
-    }
-
-    private onUpdate = (info: RaceSelectionUpdateInfo) => {
-        this.context.setState({
-            pendingRace: info.selectedRace,
-        });
-    };
-
-    public renderContent(state: State): React.ReactNode {
-        return (
-            <RaceSelection
-                selectedRace={state.pendingRace}
-                dude={state.dude!}
-                onUpdate={this.onUpdate}
-            />
-        );
-    };
-
-    async complete(state: State): Promise<void> {
-        let dude: Dude;
-        const response = await window.blackBox.api.dudes.updateDude({
-            id: state.dudeId!,
-            race: state.pendingRace,
-            creationStep: 3,
-        });
-        if (response.errors && response.errors.length > 0) {
-            throw Error(response.errors![0].message);
-        }
-        dude = response.data!;
-        this.context.setState({
-            dude: dude,
-        });
-    }
-}
-
-
-class Step3ProfessionSelection implements Step {
-    context: StepContext;
-
-    constructor(context: StepContext) {
-        this.context = context;
-    }
-
-    private onUpdate = (info: ProfessionSelectionUpdateInfo) => {
-        this.context.setState({
-            pendingProfession: info.selectedProfession,
-        });
-    };
-
-    public renderContent(state: State): React.ReactNode {
-        return (
-            <ProfessionSelection
-                selectedProfession={state.pendingProfession}
-                dude={state.dude!}
-                onUpdate={this.onUpdate}
-            />
-        );
-    };
-
-    async complete(state: State): Promise<void> {
-        let dude: Dude;
-        const response = await window.blackBox.api.dudes.updateDude({
-            id: state.dudeId!,
-            profession: state.pendingProfession,
-            finishCreation: true,
-        });
-        if (response.errors && response.errors.length > 0) {
-            throw Error(response.errors![0].message);
-        }
-        dude = response.data!;
-        this.context.setState({
-            dude: dude,
-        });
-    }
 }
