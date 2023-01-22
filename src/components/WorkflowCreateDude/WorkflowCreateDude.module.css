@@ -15,7 +15,6 @@
 }
 
 .stats-section {
-    user-select: none;
     flex-grow: 1;
 }
 
@@ -67,7 +66,6 @@
 
 .preset-option {
     cursor: default;
-    user-select: none;
     text-align: center;
     border: 1px solid rgb(58, 45, 40);
     border-radius: 7px;

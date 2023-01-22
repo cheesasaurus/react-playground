@@ -4,6 +4,7 @@
     height: 100%;
     max-height: 100%;
     overflow: hidden;
+    cursor: default;
 }
 
 .header {
@@ -45,6 +46,17 @@
     height: 32px;
     border: 1px solid rgb(59, 51, 42);
     border-radius: 2px;
+    background-image: radial-gradient(
+        closest-side,
+        rgb(68, 58, 48) 0,
+        rgb(51, 43, 36) 100%
+    );
+}
+.dude:hover {
+    background-image: radial-gradient(
+        closest-side, rgb(83, 71, 59) 0,
+        rgb(83, 71, 59) 100%
+    );
 }
 
 .dude > * {

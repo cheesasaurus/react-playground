@@ -24,7 +24,6 @@
     color: rgb(235, 235, 235);
     display: flex;
     justify-content: space-between;
-    user-select: none;
 }
 
 .dialog-title {

@@ -1,12 +1,11 @@
 import styles from './DudeList.module.css';
 import { Dude } from "../../black-box/exposed/models";
-import { HitPoints } from './HitPoints';
 import React from 'react';
 
 
 interface Props {
     dude: Dude;
-    openDudeInfo: (dudeId: number) => void;
+    resumeDudeCreation: (dudeId: number) => void;
 }
 
 interface State {
@@ -14,13 +13,11 @@ interface State {
 }
 
 
-export class DudeListItem extends React.Component<Props, State> {
+export class DudeListItemCreationPending extends React.Component<Props, State> {
 
-    onClick = () => {
+    private onClick = () => {
         const dude = this.props.dude;
-        if (!dude.creation.completed) {
-            this.props.openDudeInfo(dude.id);
-        }
+        this.props.resumeDudeCreation(dude.id);
     };
 
     public render(): React.ReactNode {
@@ -28,9 +25,7 @@ export class DudeListItem extends React.Component<Props, State> {
         return (
             <div className={styles['dude']} onClick={this.onClick}>
                 <div className={styles['dude-name']} title={dude.name}>{dude.name}</div>
-                <div className={styles['dude-hp']}>
-                    <HitPoints hp={dude.hp}></HitPoints>
-                </div>
+                <span>Finish creating this dude</span>
             </div>
         );
     }

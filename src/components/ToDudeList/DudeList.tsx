@@ -7,6 +7,7 @@ import { SocketMessage, SocketMessageType } from '../../black-box/interface';
 import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
 import { DialogControlContext } from '../Dialog/DialogContext';
 import { Subscriptions } from '../../utils';
+import { DudeListItemCreationPending } from './DudeListItemCreationPending';
 
 
 interface Props {
@@ -75,6 +76,10 @@ export class ToDudeList extends React.Component<Props, State> {
 
     private resumeDudeCreation = (dudeId?: number) => this.openDudeCreationDialog(dudeId);
 
+    private openDudeInfo = (dudeId?: number) => {
+        // todo: dude info
+    };
+
     private openDudeCreationDialog(dudeId?: number): void {
         const dialogControl = this.context!;
         const dialogId = 'WorkflowCreateDude';
@@ -118,16 +123,32 @@ export class ToDudeList extends React.Component<Props, State> {
                     </div>
                 </header>
                 <section className={styles['dude-list']}>
-                    {dudes.map(dude => (
-                        <DudeListItem
-                            key={dude.id}
-                            dude={dude}
-                            resumeDudeCreation={this.resumeDudeCreation}
-                        />
-                    ))}
+                    {dudes.map(dude => this.renderDudeListItem(dude))}
                     {dudelessMessage}
                 </section>
             </div>
         );
+
     }
+    
+    private renderDudeListItem(dude: Dude): React.ReactNode {
+        if (!dude.creation.completed) {
+            return (
+                <DudeListItemCreationPending
+                    key={dude.id}
+                    dude={dude}
+                    resumeDudeCreation={this.resumeDudeCreation}
+                />
+            );
+        }
+        
+        return (
+            <DudeListItem
+                key={dude.id}
+                dude={dude}
+                openDudeInfo={this.openDudeInfo}
+            />
+        );
+    }
+
 }
