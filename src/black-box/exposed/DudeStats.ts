@@ -39,12 +39,14 @@ export const DudeStatTypes = [
 const weaponSkillDescription = 'Increases [frequency of attacks] and [chance to hit] with this type of weapon.';
 
 type InfoMap = {
-    [statType: string]: {
-        type: DudeStatType,
-        name: string,
-        description: string,
-    };
+    [statType: string]: DudeStatInfoItem;
 };
+
+export interface DudeStatInfoItem {
+    type: DudeStatType,
+    name: string,
+    description: string,
+}
 
 export const DudeStatInfo: InfoMap = {
     [DudeStatType.Strength]: {

@@ -1,8 +1,9 @@
 import styles from './WorkflowCreateDude.module.css';
 import React from "react";
 import { DudeModifierPreset } from '../../black-box/exposed/models';
-import { DudeStatInfo, DudeStatType, DudeStatTypes } from '../../black-box/exposed/DudeStats';
+import { DudeStatInfo, DudeStatInfoItem, DudeStatType, DudeStatTypes } from '../../black-box/exposed/DudeStats';
 import { cssClassNames, signedNumber } from '../../utils';
+import { Tooltip } from '../Tooltip/Tooltip';
 
 export interface PresetSelectionUpdateInfo<OptionIdType> {
     selectedOptionId: OptionIdType;
@@ -57,17 +58,31 @@ export class PresetSelection<OptionIdType extends string> extends React.Componen
 
         return DudeStatTypes.map((statType) => {
             const base = this.props.baseStats[statType];
-            const name = DudeStatInfo[statType].name;
+            const statInfo = DudeStatInfo[statType];
             const magnitude = magnitudeMap[statType] || 0;
 
             return (
-                <div key={statType} className={styles['stat']}>
-                    <span className={styles['stat-name']}>{name}</span>
-                    <span className={styles['stat-base']}>{base}</span>
-                    {this.renderStatModifier(magnitude)}
-                </div>
+                <Tooltip
+                    key={statType}
+                    tooltip={this.renderStatTooltip(statInfo)}
+                >
+                    <div className={styles['stat']}>
+                        <span className={styles['stat-name']}>{statInfo.name}</span>
+                        <span className={styles['stat-base']}>{base}</span>
+                        {this.renderStatModifier(magnitude)}
+                    </div>
+                </Tooltip>
             );
         });
+    }
+
+    private renderStatTooltip(statInfo: DudeStatInfoItem): React.ReactNode {
+        return (
+            <div  className={styles['tooltip-stat']}>
+                <div className={styles['tooltip-stat-name']}>{statInfo.name}</div>
+                <div className={styles['tooltip-stat-description']}>{statInfo.description}</div>
+            </div>
+        );
     }
 
     private renderStatModifier(magnitude: number): React.ReactNode {

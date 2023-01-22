@@ -1,0 +1,8 @@
+
+.tooltip {
+    color: rgb(211, 202, 196);
+    background-color: rgb(31, 24, 14);
+    border-radius: 5px;
+    position: fixed;
+    padding: 10px;
+}
