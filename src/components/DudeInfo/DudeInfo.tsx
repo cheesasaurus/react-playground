@@ -4,6 +4,7 @@ import { Dude, EquipmentSlot } from "../../black-box/exposed/models";
 import { EquipmentSlotEl } from './EquipmentSlot';
 import { CrudeStore } from '../../crude-store/CrudeStore';
 import { Subscriptions } from '../../utils';
+import { DragDropCommands, DragDropCommandTypes } from '../../DragDropCommands';
 
 
 interface Props {
@@ -47,8 +48,6 @@ export class DudeInfo extends React.Component<Props, State> {
         this.subscriptions.unsubscribe();
     }
 
-    // todo: clean this up
-
     private onDragEnter = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         this.onDragOver(e);
@@ -57,7 +56,10 @@ export class DudeInfo extends React.Component<Props, State> {
     private onDragOver = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         const dat = JSON.parse(e.dataTransfer.getData('application/json'));
-        if (dat?.command === 'SwapEquipmentWithOtherDude' && dat.dudeId !== this.props.dudeId) {
+        if (dat?.command === DragDropCommandTypes.SwapEquipmentWithOtherDude) {
+            if (dat.dudeId === this.props.dudeId) {
+                return;
+            }
             this.setState({
                 equipmentDropSlot: dat.slot,
             });
@@ -74,12 +76,16 @@ export class DudeInfo extends React.Component<Props, State> {
 
     private onDrop = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
+        this.setState({
+            equipmentDropSlot: undefined,
+        });
+
         const dat = JSON.parse(e.dataTransfer.getData('application/json'));
-        if (dat?.command === 'SwapEquipmentWithOtherDude' && dat.dudeId !== this.props.dudeId) {
-            this.setState({
-                equipmentDropSlot: undefined,
-            });
-            window.blackBox.api.dudes.swapEquipmentWithOtherDude(dat.slot, dat.dudeId, this.props.dudeId);
+        if (dat?.command === DragDropCommandTypes.SwapEquipmentWithOtherDude) {
+            DragDropCommands.swapEquipmentWithOtherDude()
+                .fromPayload(dat)
+                .setOtherDude(this.props.dudeId)
+                .execute();
         }
     }
 

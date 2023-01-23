@@ -1,6 +1,7 @@
 import styles from './DudeInfo.module.css';
 import React, { CSSProperties } from "react";
 import { Dude, EquipmentSlot } from '../../black-box/exposed/models';
+import { DragDropCommands } from '../../DragDropCommands';
 
 
 interface Props {
@@ -24,11 +25,10 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
     }
 
     private dragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        e.dataTransfer.setData('application/json', JSON.stringify({
-            command: 'SwapEquipmentWithOtherDude',
-            dudeId: this.props.dude.id,
-            slot: this.props.slot,
-        }));
+        DragDropCommands.swapEquipmentWithOtherDude()
+            .setEquipmentSlot(this.props.slot)
+            .setFirstDude(this.props.dude.id)
+            .attachPayloadTo(e);
     };
 
     public render(): React.ReactNode {
