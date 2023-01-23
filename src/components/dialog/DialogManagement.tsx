@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { docReady, MessageBus, MessageHandler, Subscription } from "../../utils";
+import { DudeInfo } from "../DudeInfo/DudeInfo";
 import { WorkflowCreateDude } from "../WorkflowCreateDude/WorkflowCreateDude";
 import { DialogConfig } from "./DialogConfig";
 
@@ -178,6 +179,26 @@ export class DialogControl {
             width: 1000,
             height: 500,
         });
+    }
+
+    public openDudeInfo(dudeId: number): void {
+        const dialogId = `DudeInfo#${dudeId}`;
+        const initialTitle = 'Dude Info';
+
+        const onNameDetermined = (dudeName: string) => {
+            const newTitle = `Dude Info: ${dudeName}`;
+            this.manager.updateTitle(dialogId, newTitle);
+        };
+        const content = (
+            <DudeInfo
+                dudeId={dudeId}
+                onNameDetermined={onNameDetermined}
+            />
+        );
+        this.manager.openDialog(dialogId, content, {
+            title: initialTitle,
+        });
+
     }
 
 }

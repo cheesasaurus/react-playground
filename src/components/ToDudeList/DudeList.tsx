@@ -76,8 +76,9 @@ export class ToDudeList extends React.Component<Props, State> {
 
     private resumeDudeCreation = (dudeId?: number) => this.openDudeCreationDialog(dudeId);
 
-    private openDudeInfo = (dudeId?: number) => {
-        // todo: dude info
+    private openDudeInfo = (dudeId: number) => {
+        const dialogControl = this.context!;
+        dialogControl.openDudeInfo(dudeId);
     };
 
     private openDudeCreationDialog(dudeId?: number): void {

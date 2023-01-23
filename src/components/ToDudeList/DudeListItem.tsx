@@ -17,10 +17,7 @@ interface State {
 export class DudeListItem extends React.Component<Props, State> {
 
     onClick = () => {
-        const dude = this.props.dude;
-        if (!dude.creation.completed) {
-            this.props.openDudeInfo(dude.id);
-        }
+        this.props.openDudeInfo(this.props.dude.id);
     };
 
     public render(): React.ReactNode {
