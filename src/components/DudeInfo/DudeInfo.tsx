@@ -56,7 +56,7 @@ export class DudeInfo extends React.Component<Props, State> {
     private onDragOver = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
         const dat = JSON.parse(e.dataTransfer.getData('application/json'));
-        if (dat?.command === DragDropCommandTypes.SwapEquipmentWithOtherDude) {
+        if (dat?.command === DragDropCommandTypes.SendEquipmentFromDude) {
             if (dat.dudeId === this.props.dudeId) {
                 return;
             }
@@ -81,10 +81,10 @@ export class DudeInfo extends React.Component<Props, State> {
         });
 
         const dat = JSON.parse(e.dataTransfer.getData('application/json'));
-        if (dat?.command === DragDropCommandTypes.SwapEquipmentWithOtherDude) {
-            DragDropCommands.swapEquipmentWithOtherDude()
+        if (dat?.command === DragDropCommandTypes.SendEquipmentFromDude) {
+            DragDropCommands.sendEquipmentFromDude()
                 .fromPayload(dat)
-                .setOtherDude(this.props.dudeId)
+                .toOtherDude(this.props.dudeId)
                 .execute();
         }
     }

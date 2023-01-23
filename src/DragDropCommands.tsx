@@ -2,17 +2,17 @@ import { Dude, EquipmentSlot } from "./black-box/exposed/models";
 
 
 export enum DragDropCommandTypes {
-    SwapEquipmentWithOtherDude = 'SwapEquipmentWithOtherDude',
+    SendEquipmentFromDude = 'SendEquipmentFromDude',
 };
 
 
-function swapEquipmentWithOtherDude() {
+function sendEquipmentFromDude() {
     return {
         setEquipmentSlot: (slot: EquipmentSlot) => ({
-            setFirstDude: (dudeId: number) => ({
+            setDude: (dudeId: number) => ({
                 attachPayloadTo(e: React.DragEvent<HTMLElement>) {
                     const payload = JSON.stringify({
-                        command: DragDropCommandTypes.SwapEquipmentWithOtherDude,
+                        command: DragDropCommandTypes.SendEquipmentFromDude,
                         dudeId: dudeId,
                         slot: slot,
                     });
@@ -21,7 +21,7 @@ function swapEquipmentWithOtherDude() {
             }),
         }),
         fromPayload: (payload: any) => ({
-            setOtherDude: (otherDudeId: number) => ({
+            toOtherDude: (otherDudeId: number) => ({
                 execute() {
                     if (payload.dudeId === otherDudeId) {
                         return;
@@ -39,5 +39,5 @@ function swapEquipmentWithOtherDude() {
 
 
 export const DragDropCommands = {
-    swapEquipmentWithOtherDude: swapEquipmentWithOtherDude,
+    sendEquipmentFromDude: sendEquipmentFromDude,
 };

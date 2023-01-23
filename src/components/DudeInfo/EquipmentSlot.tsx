@@ -25,9 +25,9 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
     }
 
     private dragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        DragDropCommands.swapEquipmentWithOtherDude()
+        DragDropCommands.sendEquipmentFromDude()
             .setEquipmentSlot(this.props.slot)
-            .setFirstDude(this.props.dude.id)
+            .setDude(this.props.dude.id)
             .attachPayloadTo(e);
     };
 
