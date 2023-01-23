@@ -1,5 +1,5 @@
 import React from "react";
-import { DialogControl, DialogMonitor } from "./DialogControl";
+import { DialogControl, DialogMonitor } from "./DialogManagement";
 
 type IDialogControl = DialogControl | undefined;
 export const DialogControlContext = React.createContext<IDialogControl>(undefined);

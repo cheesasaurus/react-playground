@@ -3,7 +3,7 @@ import styles from './App.module.css';
 import { DebugBlackBox } from './components/DebugBlackBox';
 import { DialogContainer } from './components/Dialog/DialogContainer';
 import { DialogControlContext, DialogMonitorContext } from './components/Dialog/DialogContext';
-import { DialogControl, DialogMonitor } from './components/Dialog/DialogControl';
+import { DialogControl, DialogMonitor } from './components/Dialog/DialogManagement';
 import { ToDudeList } from './components/ToDudeList/DudeList';
 
 

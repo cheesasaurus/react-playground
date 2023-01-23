@@ -82,22 +82,7 @@ export class ToDudeList extends React.Component<Props, State> {
 
     private openDudeCreationDialog(dudeId?: number): void {
         const dialogControl = this.context!;
-        const dialogId = 'WorkflowCreateDude';
-        const onWorkflowCompleted = () => {
-            dialogControl.close(dialogId);
-        };
-        const content = (
-            <WorkflowCreateDude
-                onWorkflowCompleted={onWorkflowCompleted}
-                dudeId={dudeId}
-            />
-        );
-        dialogControl.open(dialogId, content, {
-            title: 'Create a Dude',
-            useRawContent: true,
-            width: 1000,
-            height: 500,
-        });
+        dialogControl.openDudeCreator(dudeId);
     }
 
     public render(): React.ReactNode {

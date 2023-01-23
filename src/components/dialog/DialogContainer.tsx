@@ -1,7 +1,7 @@
 import React from "react";
 import { Subscriptions } from "../../utils";
 import { Dialog } from "./Dialog";
-import { DialogMonitor } from "./DialogControl";
+import { DialogMonitor } from "./DialogManagement";
 
 
 interface Props {

@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { docReady, MessageBus, MessageHandler, Subscription } from "../../utils";
+import { WorkflowCreateDude } from "../WorkflowCreateDude/WorkflowCreateDude";
 import { DialogConfig } from "./DialogConfig";
 
 
@@ -143,6 +144,25 @@ export class DialogControl {
 
     public close(dialogId: string) {
         this.manager.closeDialog(dialogId);
+    }
+
+    public openDudeCreator(dudeId?: number): void {
+        const dialogId = `WorkflowCreateDude#${dudeId || ''}`;
+        const onWorkflowCompleted = () => {
+            this.manager.closeDialog(dialogId);
+        };
+        const content = (
+            <WorkflowCreateDude
+                onWorkflowCompleted={onWorkflowCompleted}
+                dudeId={dudeId}
+            />
+        );
+        this.manager.openDialog(dialogId, content, {
+            title: 'Create a Dude',
+            useRawContent: true,
+            width: 1000,
+            height: 500,
+        });
     }
 
 }
