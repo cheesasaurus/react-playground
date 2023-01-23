@@ -7,6 +7,7 @@ import { DialogConfig } from "./DialogConfig";
 
 interface ActiveDialog {
     id: string,
+    domId: string,
     content: ReactNode,
     config: DialogConfig,
 }
@@ -48,6 +49,7 @@ export class DialogManager {
                 }
                 this.activeDialogs[dialogId] = {
                     id: dialogId,
+                    domId: `dialog#${dialogId}`,
                     content: jsx,
                     config: config,
                 };
@@ -124,7 +126,7 @@ export class DialogManager {
             const dialogId = this.order[i];
             const dialog = this.activeDialogs[dialogId];
             if (dialog.config.cascadeGroup === cascadeGroup) {
-                return document.getElementById(`dialog#${dialogId}`);
+                return document.getElementById(dialog.domId);
             }
         }
         return null;

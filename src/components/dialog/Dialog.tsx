@@ -6,6 +6,7 @@ import { DialogControlContext } from "./DialogContext";
 
 interface Props {
     id: string;
+    domId: string;
     config: DialogConfig;
     children: React.ReactNode;
     dragBoundary?: React.RefObject<HTMLElement>;
@@ -127,7 +128,7 @@ export class Dialog extends React.Component<Props, State> {
     public render(): React.ReactNode {
         return (
             <div
-                id={`dialog#${this.props.id}`}
+                id={this.props.domId}
                 className={styles['dialog']}
                 data-dialog-id={this.props.id}
                 onClick={this.bringToFront}
