@@ -14,6 +14,7 @@ interface Props {
 
 interface State {
     dude?: Dude,
+    equipmentDropSlot?: EquipmentSlot | undefined;
 }
 
 
@@ -24,6 +25,7 @@ export class DudeInfo extends React.Component<Props, State> {
         super(props);
         this.state = {
             dude: undefined,
+            equipmentDropSlot: undefined,
         };
     }
 
@@ -45,34 +47,86 @@ export class DudeInfo extends React.Component<Props, State> {
         this.subscriptions.unsubscribe();
     }
 
+    // todo: clean this up
+
+    private onDragEnter = (e: React.DragEvent<HTMLElement>) => {
+        e.preventDefault();
+        this.onDragOver(e);
+    }
+
+    private onDragOver = (e: React.DragEvent<HTMLElement>) => {
+        e.preventDefault();
+        const dat = JSON.parse(e.dataTransfer.getData('application/json'));
+        if (dat?.command === 'SwapEquipmentWithOtherDude' && dat.dudeId !== this.props.dudeId) {
+            this.setState({
+                equipmentDropSlot: dat.slot,
+            });
+            e.dataTransfer.dropEffect = 'move';
+        }
+    }
+
+    private onDragLeave = (e: React.DragEvent<HTMLElement>) => {
+        e.preventDefault();
+        this.setState({
+            equipmentDropSlot: undefined,
+        });
+    }
+
+    private onDrop = (e: React.DragEvent<HTMLElement>) => {
+        e.preventDefault();
+        const dat = JSON.parse(e.dataTransfer.getData('application/json'));
+        if (dat?.command === 'SwapEquipmentWithOtherDude' && dat.dudeId !== this.props.dudeId) {
+            this.setState({
+                equipmentDropSlot: undefined,
+            });
+            window.blackBox.api.dudes.swapEquipmentWithOtherDude(dat.slot, dat.dudeId, this.props.dudeId);
+        }
+    }
+
 
     public render(): React.ReactNode {
         if (!this.state.dude) {
             return <>{'Loading...'}</>
         }
-        const dude = this.state.dude;
+
         return (
             <div>
                 <div>action bar goes here</div>
                 <div>hp bar goes here</div>
                 <div>status effects bar goes here</div>
-                <section className={styles['section-equipment']}>
+                <section
+                    className={styles['section-equipment']}
+                    onDragOver={this.onDragOver}
+                    onDrop={this.onDrop}
+                    onDragEnter={this.onDragEnter}
+                    onDragLeave={this.onDragLeave}
+                >
                     <div className={styles['equipment-left-bar']}>
-                        <EquipmentSlotEl slot={EquipmentSlot.Hat} dude={dude}/>
-                        <EquipmentSlotEl slot={EquipmentSlot.Shirt} dude={dude}/>
-                        <EquipmentSlotEl slot={EquipmentSlot.Gloves} dude={dude}/>
-                        <EquipmentSlotEl slot={EquipmentSlot.Pants} dude={dude}/>
-                        <EquipmentSlotEl slot={EquipmentSlot.Boots} dude={dude}/>
+                        {this.renderEquipmentSlot(EquipmentSlot.Hat)}
+                        {this.renderEquipmentSlot(EquipmentSlot.Shirt)}
+                        {this.renderEquipmentSlot(EquipmentSlot.Gloves)}
+                        {this.renderEquipmentSlot(EquipmentSlot.Pants)}
+                        {this.renderEquipmentSlot(EquipmentSlot.Boots)}
                     </div>
                     <div className={styles['equipment-right-bar']}>
-                        <EquipmentSlotEl slot={EquipmentSlot.Weapon} dude={dude}/>
+                        {this.renderEquipmentSlot(EquipmentSlot.Weapon)}
                         <div className={styles['equipment-slot-spacer']}/>
-                        <EquipmentSlotEl slot={EquipmentSlot.Lumberjack} dude={dude}/>
-                        <EquipmentSlotEl slot={EquipmentSlot.Mining} dude={dude}/>
-                        <EquipmentSlotEl slot={EquipmentSlot.Skinning} dude={dude}/>
+                        {this.renderEquipmentSlot(EquipmentSlot.Lumberjack)}
+                        {this.renderEquipmentSlot(EquipmentSlot.Mining)}
+                        {this.renderEquipmentSlot(EquipmentSlot.Skinning)}
                     </div>
                 </section>
             </div>
+        );
+    }
+
+    private renderEquipmentSlot(slot: EquipmentSlot) {
+        return (
+            <EquipmentSlotEl
+                slot={slot}
+                dude={this.state.dude!}
+                isDropTarget={slot === this.state.equipmentDropSlot}
+            />
         );
     }
 

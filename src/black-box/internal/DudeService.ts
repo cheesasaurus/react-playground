@@ -1,6 +1,6 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
-import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
+import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
 import { Dude, DudeMap, DudeStatMap, EquipmentSlot, iterateModelMap, Weapon, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
@@ -114,6 +114,48 @@ export class DudeService implements IDudeService {
             data: dudeCopy,
         });
         return delayedResponse<ResponseUpdateDude>({data: dudeCopy});
+    }
+
+    public swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: number, dudeIdB: number): Promise<ResponseSwapEquipmentWithOtherDude> {
+        const errors = Array<ServiceError>();
+        if (!(dudeIdA in this.dudes)) {
+            errors.push({
+                code: 'DoesNotExist',
+                message: 'The first Dude does not exist.',
+            });
+        }
+        if (!(dudeIdB in this.dudes)) {
+            errors.push({
+                code: 'DoesNotExist',
+                message: 'The second Dude does not exist.',
+            });
+        }
+        if (errors.length > 0) {
+            return delayedResponse<ResponseSwapEquipmentWithOtherDude>({errors});
+        }
+
+        const dudeA = this.dudes[dudeIdA];
+        const dudeB = this.dudes[dudeIdB];
+
+        const detached = dudeA.equipment[slot];
+        // @ts-ignore
+        dudeA.equipment[slot] = dudeB.equipment[slot];
+        // @ts-ignore
+        dudeB.equipment[slot] = detached;
+
+        dudeA.version++;
+        dudeB.version++;
+        this.save();
+        
+        this.messageQueue.push({
+            type: SocketMessageType.DudeUpdated,
+            data: structuredClone(dudeA),
+        });
+        this.messageQueue.push({
+            type: SocketMessageType.DudeUpdated,
+            data: structuredClone(dudeB),
+        });
+        return delayedResponse<ResponseSwapEquipmentWithOtherDude>({});
     }
 
     private checkNewNameErrors(name: string): Array<ServiceError> {
