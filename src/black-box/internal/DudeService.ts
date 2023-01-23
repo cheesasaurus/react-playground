@@ -1,10 +1,12 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
 import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
-import { Dude, DudeMap, DudeStatMap, iterateModelMap } from "../exposed/models";
+import { Dude, DudeMap, DudeStatMap, EquipmentSlot, iterateModelMap, Weapon, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
-import { Race } from "../exposed/DudeModifierPresets/Races";
-import { Profession } from "../exposed/DudeModifierPresets/Professions";
+import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
+import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
+import { ArmorTemplates } from "./EquipmentTemplates/ArmorTemplates";
+import { WeaponTemplates } from "./EquipmentTemplates/WeaponTemplates";
 
 
 export class DudeService implements IDudeService {
@@ -102,8 +104,7 @@ export class DudeService implements IDudeService {
             dude.profession = pendingDude.profession;
         }
         if (pendingDude.finishCreation) {
-            dude.creation.completed = true;
-            // todo: give equipment, cache boosted stats, etc
+            this.finishDudeCreation(dude);
         }
         dude.version++;
         this.save();
@@ -173,12 +174,15 @@ export class DudeService implements IDudeService {
                 step: 2,
             },
             equipment: {
-                weapon: undefined,
-                hat: undefined,
-                shirt: undefined,
-                gloves: undefined,
-                pants: undefined,
-                boots: undefined,
+                [EquipmentSlot.Weapon]: undefined,
+                [EquipmentSlot.Hat]: undefined,
+                [EquipmentSlot.Shirt]: undefined,
+                [EquipmentSlot.Gloves]: undefined,
+                [EquipmentSlot.Pants]: undefined,
+                [EquipmentSlot.Boots]: undefined,
+                [EquipmentSlot.Lumberjack]: undefined,
+                [EquipmentSlot.Mining]: undefined,
+                [EquipmentSlot.Skinning]: undefined,
             },
             stats: this.newDudeStats(),
             version: 1,
@@ -197,6 +201,75 @@ export class DudeService implements IDudeService {
             };
         }
         return stats;
+    }
+
+    private finishDudeCreation(dude: Dude): void {
+        dude.equipment = {
+            [EquipmentSlot.Weapon]: this.starterWeapon(dude),
+            [EquipmentSlot.Hat]: undefined,
+            [EquipmentSlot.Shirt]: this.equipmentService.createArmor(ArmorTemplates.starterSet.shirt),
+            [EquipmentSlot.Gloves]: this.equipmentService.createArmor(ArmorTemplates.starterSet.gloves),
+            [EquipmentSlot.Pants]: this.equipmentService.createArmor(ArmorTemplates.starterSet.pants),
+            [EquipmentSlot.Boots]: undefined,
+            [EquipmentSlot.Lumberjack]: undefined,
+            [EquipmentSlot.Mining]: undefined,
+            [EquipmentSlot.Skinning]: undefined,
+        };
+        this.recalcBoostedStats(dude);
+        dude.creation.completed = true;
+    }
+
+    private starterWeapon(dude: Dude): Weapon|undefined {
+        const template = this.starterWeaponTemplate(dude);
+        if (template) {
+            return this.equipmentService.createWeapon(template);
+        }
+        return undefined;
+    }
+
+    private starterWeaponTemplate(dude: Dude): WeaponTemplate|undefined {
+        // todo: maybe move this to config
+        switch (dude.profession) {
+            case Profession.Monk:
+                return undefined;
+            case Profession.Soldier:
+                return WeaponTemplates.starterSet.sword;
+            case Profession.Lumberjack:
+                return WeaponTemplates.starterSet.axe;
+            case Profession.Smith:
+                return WeaponTemplates.starterSet.hammer;
+            case Profession.Assassin:
+                return WeaponTemplates.starterSet.dagger;
+            case Profession.Hermit:
+                return WeaponTemplates.starterSet.staff;
+            case Profession.Beggar:
+                return WeaponTemplates.starterSet.throwing;
+            case Profession.Stablehand:
+                return WeaponTemplates.starterSet.whip;
+            case Profession.Hunter:
+                return WeaponTemplates.starterSet.bow;
+            case Profession.Tinkerer:
+                return WeaponTemplates.starterSet.crossbow;
+            default:
+                return undefined;
+        }
+    }
+
+    private recalcBoostedStats(dude: Dude): void {
+        for (const statType of DudeStatTypes) {
+            const base = dude.stats[statType].level.actual;
+            dude.stats[statType].level.boosted = base;
+        }
+
+        const raceModifiers = RacePresetsMap[dude.race].statModifiers;
+        for (const modifier of raceModifiers) {
+            dude.stats[modifier.type].level.boosted += modifier.magnitude;
+        }
+
+        const professionModifiers = ProfessionPresetsMap[dude.profession].statModifiers;
+        for (const modifier of professionModifiers) {
+            dude.stats[modifier.type].level.boosted += modifier.magnitude;
+        }
     }
 
 }

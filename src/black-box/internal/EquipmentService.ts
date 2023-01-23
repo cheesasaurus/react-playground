@@ -24,7 +24,7 @@ export class EquipmentService {
         }
     }
 
-    public createWeapon(template: WeaponTemplate, crafterId: number): Weapon {
+    public createWeapon(template: WeaponTemplate, crafterId?: number): Weapon {
         const id = this.autoIncrement++;
         const weapon = {
             id: id,
@@ -35,7 +35,7 @@ export class EquipmentService {
         return weapon;
     }
 
-    public createArmor(template: ArmorTemplate, crafterId: number): Armor {
+    public createArmor(template: ArmorTemplate, crafterId?: number): Armor {
         const id = this.autoIncrement++;
         const armor = {
             id: id,

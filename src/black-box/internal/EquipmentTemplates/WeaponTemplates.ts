@@ -10,19 +10,61 @@ export const WeaponTemplates = {
             damage: 5,
             damageType: DamageType.slash,
         },
-        bow: {
+        axe: {
             id: 2,
+            type: WeaponType.Axe,
+            name: 'Rusty Axe',
+            damage: 5,
+            damageType: DamageType.pierce,
+        },
+        hammer: {
+            id: 3,
+            type: WeaponType.Hammer,
+            name: 'Rusty Hammer',
+            damage: 5,
+            damageType: DamageType.bash,
+        },
+        dagger: {
+            id: 4,
+            type: WeaponType.Dagger,
+            name: 'Rusty Sword',
+            damage: 5,
+            damageType: DamageType.slash,
+        },
+        staff: {
+            id: 5,
+            type: WeaponType.Staff,
+            name: 'Big Stick',
+            damage: 5,
+            damageType: DamageType.bash,
+        },
+        throwing: {
+            id: 6,
+            type: WeaponType.Throwing,
+            name: 'Stone',
+            damage: 5,
+            damageType: DamageType.bash,
+        },
+        whip: {
+            id: 7,
+            type: WeaponType.Whip,
+            name: 'Frayed Whip',
+            damage: 5,
+            damageType: DamageType.bash,
+        },
+        bow: {
+            id: 8,
             type: WeaponType.Bow,
             name: 'Practice Bow',
             damage: 5,
             damageType: DamageType.pierce,
         },
-        staff: {
-            id: 3,
-            type: WeaponType.Staff,
-            name: 'Big stick',
+        crossbow: {
+            id: 9,
+            type: WeaponType.Crossbow,
+            name: 'Shoddy Crossbow',
             damage: 5,
-            damageType: DamageType.bash,
+            damageType: DamageType.pierce,
         }
     }
 };
