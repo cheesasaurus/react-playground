@@ -15,7 +15,7 @@ interface State {
 
 
 export class DialogContainer extends React.Component<Props, State> {
-    private subscriptions = new Subscriptions;
+    private subscriptions = new Subscriptions();
 
     public constructor(props: Props) {
         super(props);
