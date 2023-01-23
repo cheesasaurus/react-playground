@@ -33,31 +33,35 @@ export class DialogManager {
         // Allow any event propagation to complete before actually opening the dialog.
         // E.g. In case this dialog is being opened due to the user clicking something from another semi-active dialog:
         // That dialog should be brought to the foreground, and then this dialog should be opened above it.
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             setTimeout(() => {
-                const cascadeTarget = this.findCascadeTarget(config.cascadeGroup);
-                if (cascadeTarget) {
-                    const {x, y} = this.cascadePos(cascadeTarget);
-                    config.initialX = x;
-                    config.initialY = y;
-                }
-
                 if (dialogId in this.activeDialogs) {
                     this._bringToFront(dialogId);
                 }
                 else {
-                    this.order.push(dialogId);
+                    this.openNewDialog(dialogId, jsx, config);
                 }
-                this.activeDialogs[dialogId] = {
-                    id: dialogId,
-                    domId: `dialog#${dialogId}`,
-                    content: jsx,
-                    config: config,
-                };
                 this.triggerUpdate();
                 resolve();
             }, 0);
         });
+    }
+
+    private openNewDialog(dialogId: string, jsx: ReactNode, config: DialogConfig): void {
+        const cascadeTarget = this.findCascadeTarget(config.cascadeGroup);
+        if (cascadeTarget) {
+            const {x, y} = this.cascadePos(cascadeTarget);
+            config.initialX = x;
+            config.initialY = y;
+        }
+
+        this.order.push(dialogId);
+        this.activeDialogs[dialogId] = {
+            id: dialogId,
+            domId: `dialog#${dialogId}`,
+            content: jsx,
+            config: config,
+        };
     }
 
     public closeDialog(dialogId: string): void {
