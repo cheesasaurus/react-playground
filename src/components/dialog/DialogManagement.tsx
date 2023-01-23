@@ -33,11 +33,11 @@ export class DialogManager {
         // That dialog should be brought to the foreground, and then this dialog should be opened above it.
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                const cascadeTarget = this.cascadeTarget(config.cascadeGroup);
+                const cascadeTarget = this.findCascadeTarget(config.cascadeGroup);
                 if (cascadeTarget) {
-                    const rect = cascadeTarget.getBoundingClientRect();
-                    config.initialY = rect.top;
-                    config.initialX = rect.left;
+                    const {x, y} = this.cascadePos(cascadeTarget);
+                    config.initialX = x;
+                    config.initialY = y;
                 }
 
                 if (dialogId in this.activeDialogs) {
@@ -116,7 +116,7 @@ export class DialogManager {
         });
     }
 
-    private cascadeTarget(cascadeGroup?: string): HTMLElement|null {
+    private findCascadeTarget(cascadeGroup?: string): HTMLElement|null {
         if (!cascadeGroup) {
             return null;
         }
@@ -128,6 +128,32 @@ export class DialogManager {
             }
         }
         return null;
+    }
+
+    private cascadePos(el: HTMLElement): {x: number, y: number} {
+        const maxX = document.documentElement.clientWidth - 250;
+        const maxY = document.documentElement.clientHeight - 250;
+        const rect = el.getBoundingClientRect();
+
+        const offset = 30;
+
+        let x = rect.left;
+        if (x > maxX) {
+            x -= offset;
+        }
+        else {
+            x += offset;
+        }
+
+        let y = rect.top;
+        if (y > maxY) {
+            y -= offset;
+        }
+        else {
+            y += offset;
+        }
+
+        return {x, y};
     }
 
 }
