@@ -104,29 +104,40 @@ export class DialogManager {
 
 
 export class DialogControl {
-    public open: (dialogId: string, content: React.ReactNode, config: DialogConfig) => void;
-    public close: (dialogId: string) => void;
-    public bringToFront: (dialogId: string) => void;
-    public getOrder: () => Array<string>;
-    public getDialog: (dialogId: string) => ActiveDialog;
-    public onUpdate: (handler: MessageHandler<UpdateMessage>) => Subscription;
+    private manager: DialogManager;
+    private bus: MessageBus<UpdateMessage>;
 
     public constructor(bus: MessageBus<UpdateMessage>, manager: DialogManager) {
-        // The control is intended to be used in react context.
-        // Closures are used to avoid [unwanted react updates due to manager properties changing].
-        this.open = (dialogId: string, content: React.ReactNode, config: DialogConfig) => {
-            manager.openDialog(dialogId, content, config);
-        };
-        this.close = (dialogId: string) => manager.closeDialog(dialogId);
-        this.bringToFront = (dialogId: string) => manager.bringToFront(dialogId);
-        this.getOrder = () => manager.getOrder();
-        this.getDialog = (dialogId: string) => manager.getDialog(dialogId);
-        this.onUpdate = (handler: MessageHandler<UpdateMessage>): Subscription => {
-            return bus.on('updated', handler);
-        }
+        this.bus = bus;
+        this.manager = manager;
+    }
+
+    public open(dialogId: string, content: React.ReactNode, config: DialogConfig) {
+        this.manager.openDialog(dialogId, content, config);
+    }
+
+    public bringToFront(dialogId: string) {
+        this.manager.bringToFront(dialogId)
+    }
+
+    public close(dialogId: string) {
+        this.manager.closeDialog(dialogId);
+    }
+
+    public onUpdate(handler: MessageHandler<UpdateMessage>): Subscription {
+        return this.bus.on('updated', handler);
+    }
+
+    public getDialog(dialogId: string) {
+        return this.manager.getDialog(dialogId)
+    }
+
+    public getOrder() {
+        return this.manager.getOrder();
     }
 
 }
+
 
 export const factoryDialogControl = () => {
     const bus = new MessageBus<UpdateMessage>();
