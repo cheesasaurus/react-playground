@@ -109,6 +109,9 @@ export enum EquipmentSlot {
     Gloves = 'gloves',
     Pants = 'pants',
     Boots = 'boots',
+    Lumberjack = 'lumberjack',
+    Mining = 'mining',
+    Skinning = 'skinning'
 }
 
 

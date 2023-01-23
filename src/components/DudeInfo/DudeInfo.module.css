@@ -1,0 +1,33 @@
+
+.section-equipment {
+    position: relative;
+    width: 450px;
+    height: 450px;
+}
+
+
+.equipment-slot {
+    display: block;
+    width: 70px;
+    height: 70px;
+    background-color: magenta;
+    margin: 5px;
+}
+.equipment-slot-spacer {
+    display: block;
+    width: 70px;
+    height: 70px;
+    margin: 5px;
+}
+
+.equipment-left-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.equipment-right-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
