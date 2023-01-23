@@ -30,6 +30,9 @@
     display: inline-block;
     padding: 0 3px 5px 10px;
     cursor: default;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .dialog-close {
