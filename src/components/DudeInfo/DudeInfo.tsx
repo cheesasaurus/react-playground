@@ -2,10 +2,13 @@ import styles from './DudeInfo.module.css';
 import React from "react";
 import { Dude, EquipmentSlot } from "../../black-box/exposed/models";
 import { EquipmentSlotEl } from './EquipmentSlot';
+import { CrudeStore } from '../../crude-store/CrudeStore';
+import { Subscriptions } from '../../utils';
 
 
 interface Props {
     dudeId: number,
+    crudeStore: CrudeStore,
     onNameDetermined?(dudeName: string): void,
 }
 
@@ -15,6 +18,7 @@ interface State {
 
 
 export class DudeInfo extends React.Component<Props, State> {
+    private subscriptions = new Subscriptions();
 
     public constructor(props: Props) {
         super(props);
@@ -24,12 +28,8 @@ export class DudeInfo extends React.Component<Props, State> {
     }
 
     public componentDidMount(): void {
-        window.blackBox.api.dudes.getDude(this.props.dudeId).then(response => {
-            if (response.errors) {
-                console.error(response.errors);
-                return;
-            }
-            const dude = response.data!;
+        this.props.crudeStore.willNeedDude(this.props.dudeId);
+        const subscription = this.props.crudeStore.subscribeSelectDude(this.props.dudeId, (dude: Dude) => {
             this.setState({
                 dude: dude,
             });
@@ -38,6 +38,11 @@ export class DudeInfo extends React.Component<Props, State> {
                 this.props.onNameDetermined(dude.name);
             }
         });
+        this.subscriptions.add(subscription);
+    }
+
+    public componentWillUnmount(): void {
+        this.subscriptions.unsubscribe();
     }
 
 

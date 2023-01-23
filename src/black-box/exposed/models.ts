@@ -34,6 +34,7 @@ export interface Dude {
         [EquipmentSlot.Boots]: Armor | undefined,
     },
     stats: DudeStatMap,
+    version: number,
 }
 
 export interface DudeStat {

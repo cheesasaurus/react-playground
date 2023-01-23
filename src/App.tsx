@@ -5,6 +5,7 @@ import { DialogContainer } from './components/Dialog/DialogContainer';
 import { DialogMonitorContext } from './components/Dialog/DialogContext';
 import { DialogProvider } from './components/Dialog/DialogProvider';
 import { ToDudeList } from './components/ToDudeList/DudeList';
+import { CrudeStoreProvider } from './crude-store/CrudeStoreProvider';
 
 
 interface Props {
@@ -26,29 +27,25 @@ export class App extends React.Component<Props, State> {
   public render(): React.ReactNode {
     return (
       <div className={styles['app']}>
-        <DialogProvider>
-          <main className={styles['main']} ref={this.mainRef}>
+        <CrudeStoreProvider>
+          <DialogProvider>
+            <main className={styles['main']} ref={this.mainRef}>
 
-            <ToDudeList />
-          
-            <DialogMonitorContext.Consumer>
-              {/*
-                  This consumer is just being used for practice.
-                  It would be senseless to use it like this in the real world,
-                  Since the provider is obviously right there above it.
-              */}
-
-              {(dialogMonitor) => (
-                <DialogContainer dialogMonitor={dialogMonitor!} dragBoundary={this.mainRef}/>
-              )}
-            </DialogMonitorContext.Consumer>
+              <ToDudeList />
             
-          </main>
-          <footer className={styles['footer']}>
-            debug &nbsp;
-            <DebugBlackBox />
-          </footer>
-        </DialogProvider>
+              <DialogMonitorContext.Consumer>
+                {(dialogMonitor) => (
+                  <DialogContainer dialogMonitor={dialogMonitor!} dragBoundary={this.mainRef}/>
+                )}
+              </DialogMonitorContext.Consumer>
+              
+            </main>
+            <footer className={styles['footer']}>
+              debug &nbsp;
+              <DebugBlackBox />
+            </footer>
+          </DialogProvider>
+        </CrudeStoreProvider>
       </div>
     );
   }

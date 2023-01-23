@@ -7,9 +7,12 @@ import { Step3ProfessionSelection } from "./Step3ProfessionSelection/Step3Profes
 import { Step2RaceSelection } from "./Step2RaceSelection/Step2RaceSelection";
 import { Step1NameWriting } from "./Step1NameWriting/Step1NameWriting";
 import { Step } from "./Step";
+import { CrudeStore } from "../../crude-store/CrudeStore";
+import { Subscriptions } from "../../utils";
 
 
 export interface Props {
+    crudeStore: CrudeStore,
     dudeId?: number,
     onWorkflowCompleted?: () => void,
     onNameDetermined?: (dudeName: string) => void,
@@ -35,6 +38,7 @@ interface Nav {
 
 
 export class WorkflowCreateDude extends React.Component<Props, State> {
+    private subscriptions = new Subscriptions();
     private stepCount = 3;
     private steps: (Step|null)[] = [];
 
@@ -72,12 +76,18 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
             });
             return;
         }
-        window.blackBox.api.dudes.getDude(this.props.dudeId).then(response => {
-            if (response.errors) {
-                console.error(response.errors);
-                return;
-            }
-            const dude = response.data!;
+        this.subscribeToDude(this.props.dudeId);
+    }
+
+    public componentWillUnmount() {
+        this.subscriptions.unsubscribe();
+        // remove circular reference for gc. (the steps reference this, and this references the steps)
+        this.steps = [];
+    }
+
+    private subscribeToDude(dudeId: number) {
+        this.props.crudeStore.willNeedDude(dudeId);
+        const subscription = this.props.crudeStore.subscribeSelectDude(dudeId, (dude: Dude) => {
             this.setState({
                 loading: false,
                 dude: dude,
@@ -91,11 +101,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                 this.props.onNameDetermined(dude.name);
             }
         });
-    }
-
-    public componentWillUnmount() {
-        // remove circular reference for gc. (the steps reference this, and this references the steps)
-        this.steps = [];
+        this.subscriptions.add(subscription);
     }
 
     private startTransitionNext = () => {

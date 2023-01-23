@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { CrudeStoreContext } from "../../crude-store/CrudeStoreProvider";
 import { docReady, MessageBus, MessageHandler, Subscription } from "../../utils";
 import { DudeInfo } from "../DudeInfo/DudeInfo";
 import { WorkflowCreateDude } from "../WorkflowCreateDude/WorkflowCreateDude";
@@ -215,11 +216,17 @@ export class DialogControl {
             this.manager.updateTitle(dialogId, newTitle);
         };
         const content = (
-            <WorkflowCreateDude
-                dudeId={dudeId}
-                onWorkflowCompleted={onWorkflowCompleted}
-                onNameDetermined={onNameDetermined}
-            />
+            <CrudeStoreContext.Consumer>
+                {crudeStore => (
+                    <WorkflowCreateDude
+                        crudeStore={crudeStore!}
+                        dudeId={dudeId}
+                        onWorkflowCompleted={onWorkflowCompleted}
+                        onNameDetermined={onNameDetermined}
+                />
+                )}
+            </CrudeStoreContext.Consumer>
+            
         );
         this.manager.openDialog(dialogId, content, {
             title: 'Create a Dude',
@@ -239,10 +246,15 @@ export class DialogControl {
             this.manager.updateTitle(dialogId, newTitle);
         };
         const content = (
-            <DudeInfo
-                dudeId={dudeId}
-                onNameDetermined={onNameDetermined}
-            />
+            <CrudeStoreContext.Consumer>
+                {crudeStore => (
+                    <DudeInfo
+                        dudeId={dudeId}
+                        onNameDetermined={onNameDetermined}
+                        crudeStore={crudeStore!}
+                    />
+                )}
+            </CrudeStoreContext.Consumer>
         );
         this.manager.openDialog(dialogId, content, {
             title: initialTitle,

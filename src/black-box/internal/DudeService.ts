@@ -105,6 +105,7 @@ export class DudeService implements IDudeService {
             dude.creation.completed = true;
             // todo: give equipment, cache boosted stats, etc
         }
+        dude.version++;
         this.save();
         const dudeCopy = structuredClone(dude);
         this.messageQueue.push({
@@ -180,6 +181,7 @@ export class DudeService implements IDudeService {
                 boots: undefined,
             },
             stats: this.newDudeStats(),
+            version: 1,
         };
     }
 
