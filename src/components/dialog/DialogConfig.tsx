@@ -21,4 +21,11 @@ export interface DialogConfig {
      */
     height?: number;
     
+    /**
+     * When opened, the dialog will cascade with the frontmost dialog of the group
+     */
+    cascadeGroup?: string;
+
+    initialX?: number;
+    initialY?: number
 }

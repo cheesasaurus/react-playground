@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import styles from './Dialog.module.css';
 import { DialogConfig } from "./DialogConfig";
 import { DialogControlContext } from "./DialogContext";
@@ -19,6 +19,8 @@ interface State {
     offsetTop: number;
     width: string;
     height: string;
+    x?: number;
+    y?: number;
 }
 
 export class Dialog extends React.Component<Props, State> {
@@ -36,6 +38,8 @@ export class Dialog extends React.Component<Props, State> {
             offsetTop: 0,
             width: cfg.width ? `${cfg.width}px` : '',
             height: cfg.height ? `${cfg.height}px` : '',
+            x: cfg.initialX,
+            y: cfg.initialY,
         };
     }
 
@@ -123,15 +127,11 @@ export class Dialog extends React.Component<Props, State> {
     public render(): React.ReactNode {
         return (
             <div
+                id={`dialog#${this.props.id}`}
                 className={styles['dialog']}
                 data-dialog-id={this.props.id}
                 onClick={this.bringToFront}
-                style={{
-                    marginLeft: -this.state.offsetLeft,
-                    marginTop: -this.state.offsetTop,
-                    width: this.state.width,
-                    height: this.state.height,
-                }}
+                style={this.style()}
             >
                 <header className={styles['dialog-header']} onMouseDown={this.onHeaderMouseDown}>
                     <div className={styles['dialog-title']}>
@@ -148,6 +148,26 @@ export class Dialog extends React.Component<Props, State> {
                 {this.renderContent()}
             </div>
         );
+    }
+
+    private style(): CSSProperties {
+        const styleKv = [
+            ['marginLeft', -this.state.offsetLeft],
+            ['marginTop', -this.state.offsetTop],
+            ['width', this.state.width],
+            ['height', this.state.height],
+        ];
+        const transforms = [];
+        if (this.state.x !== undefined) {
+            styleKv.push(['left', this.state.x]);
+            transforms.push('translateX(0)');
+        }
+        if (this.state.y !== undefined) {
+            styleKv.push(['top', this.state.y]);
+            transforms.push('translateY(0)');
+        }
+        styleKv.push(['transform', transforms.join(' ')]);
+        return Object.fromEntries(styleKv);
     }
 
     private renderContent(): React.ReactNode {

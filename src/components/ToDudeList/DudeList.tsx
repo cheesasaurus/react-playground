@@ -4,7 +4,6 @@ import React from "react";
 import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
 import { SocketMessage, SocketMessageType } from '../../black-box/interface';
-import { WorkflowCreateDude } from '../WorkflowCreateDude/WorkflowCreateDude';
 import { DialogControlContext } from '../Dialog/DialogContext';
 import { Subscriptions } from '../../utils';
 import { DudeListItemCreationPending } from './DudeListItemCreationPending';

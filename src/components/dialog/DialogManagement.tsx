@@ -9,7 +9,6 @@ interface ActiveDialog {
     id: string,
     content: ReactNode,
     config: DialogConfig,
-    
 }
 
 interface UpdateMessage {
@@ -34,6 +33,13 @@ export class DialogManager {
         // That dialog should be brought to the foreground, and then this dialog should be opened above it.
         return new Promise((resolve, reject) => {
             setTimeout(() => {
+                const cascadeTarget = this.cascadeTarget(config.cascadeGroup);
+                if (cascadeTarget) {
+                    const rect = cascadeTarget.getBoundingClientRect();
+                    config.initialY = rect.top;
+                    config.initialX = rect.left;
+                }
+
                 if (dialogId in this.activeDialogs) {
                     this._bringToFront(dialogId);
                 }
@@ -110,6 +116,20 @@ export class DialogManager {
         });
     }
 
+    private cascadeTarget(cascadeGroup?: string): HTMLElement|null {
+        if (!cascadeGroup) {
+            return null;
+        }
+        for (let i = this.order.length - 1; i >= 0; i--) {
+            const dialogId = this.order[i];
+            const dialog = this.activeDialogs[dialogId];
+            if (dialog.config.cascadeGroup === cascadeGroup) {
+                return document.getElementById(`dialog#${dialogId}`);
+            }
+        }
+        return null;
+    }
+
 }
 
 
@@ -175,6 +195,7 @@ export class DialogControl {
         );
         this.manager.openDialog(dialogId, content, {
             title: 'Create a Dude',
+            cascadeGroup: 'WorkflowCreateDude',
             useRawContent: true,
             width: 1000,
             height: 500,
@@ -197,6 +218,7 @@ export class DialogControl {
         );
         this.manager.openDialog(dialogId, content, {
             title: initialTitle,
+            cascadeGroup: 'DudeInfo',
         });
 
     }
