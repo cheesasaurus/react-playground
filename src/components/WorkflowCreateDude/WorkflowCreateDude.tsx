@@ -9,9 +9,10 @@ import { Step1NameWriting } from "./Step1NameWriting/Step1NameWriting";
 import { Step } from "./Step";
 
 
-interface Props {
+export interface Props {
     dudeId?: number,
     onWorkflowCompleted?: () => void,
+    onNameDetermined?: (dudeName: string) => void,
 }
 
 export interface State {
@@ -85,6 +86,10 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
                 pendingProfession: dude.profession,
                 step: dude.creation.step,
             });
+
+            if (this.props.onNameDetermined) {
+                this.props.onNameDetermined(dude.name);
+            }
         });
     }
 
@@ -116,7 +121,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
     }
 
     private async completeStep() {
-        await this.steps[this.state.step]?.complete(this.state);
+        await this.steps[this.state.step]?.complete(this.props, this.state);
 
         const isLastStep = this.state.step === this.stepCount;
         if (isLastStep) {

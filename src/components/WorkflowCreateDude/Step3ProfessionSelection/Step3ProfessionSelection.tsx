@@ -1,7 +1,7 @@
 import React from "react";
 import { Dude } from "../../../black-box/exposed/models";
 import { ProfessionSelection, ProfessionSelectionUpdateInfo } from "./ProfessionSelection";
-import { State } from "../WorkflowCreateDude";
+import { Props, State } from "../WorkflowCreateDude";
 import { Step, StepContext } from "../Step";
 
 export class Step3ProfessionSelection implements Step {
@@ -27,7 +27,7 @@ export class Step3ProfessionSelection implements Step {
         );
     };
 
-    public async complete(state: State): Promise<void> {
+    public async complete(props: Props, state: State): Promise<void> {
         let dude: Dude;
         const response = await window.blackBox.api.dudes.updateDude({
             id: state.dudeId!,

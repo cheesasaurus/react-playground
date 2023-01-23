@@ -1,11 +1,11 @@
 import React from "react";
-import { State } from "./WorkflowCreateDude";
+import { Props, State } from "./WorkflowCreateDude";
 
 
 
 
 export interface Step {
-    complete(state: State): Promise<void>;
+    complete(props: Props, state: State): Promise<void>;
     renderContent(state: State): React.ReactNode;
 }
 

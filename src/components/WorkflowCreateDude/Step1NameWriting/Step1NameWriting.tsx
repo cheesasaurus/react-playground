@@ -1,7 +1,7 @@
 import React from "react";
 import { Dude } from "../../../black-box/exposed/models";
 import { NameWriting, NameWritingUpdateInfo } from "./NameWriting";
-import { State } from "../WorkflowCreateDude";
+import { Props, State } from "../WorkflowCreateDude";
 import { Step, StepContext } from "../Step";
 
 export class Step1NameWriting implements Step {
@@ -28,7 +28,7 @@ export class Step1NameWriting implements Step {
         );
     };
 
-    public async complete(state: State): Promise<void> {
+    public async complete(props: Props, state: State): Promise<void> {
         let dude: Dude;
         if (state.dudeId === undefined) {
             const response = await window.blackBox.api.dudes.createDude(state.pendingDudeName);
@@ -52,6 +52,10 @@ export class Step1NameWriting implements Step {
             dudeId: dude.id,
             dude: dude,
         });
+        
+        if (props.onNameDetermined) {
+            props.onNameDetermined(dude.name);
+        }
     }
     
 }

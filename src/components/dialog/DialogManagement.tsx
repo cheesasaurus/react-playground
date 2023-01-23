@@ -76,6 +76,14 @@ export class DialogManager {
         this.order.push(dialogId);
     }
 
+    public updateTitle(dialogId: string, title: string) {
+        if (!(dialogId in this.activeDialogs)) {
+            return;
+        }
+        this.activeDialogs[dialogId].config.title = title;
+        this.triggerUpdate();
+    }
+
     public closeFrontmostDialogWhenKeyPressed(key: string): void {
         document.addEventListener('keydown', (e: KeyboardEvent) => {
             const order = this.order;
@@ -148,13 +156,20 @@ export class DialogControl {
 
     public openDudeCreator(dudeId?: number): void {
         const dialogId = `WorkflowCreateDude#${dudeId || ''}`;
+        const initialTitle = 'Create a Dude';
+
         const onWorkflowCompleted = () => {
             this.manager.closeDialog(dialogId);
         };
+        const onNameDetermined = (dudeName: string) => {
+            const newTitle = `${initialTitle}: ${dudeName}`;
+            this.manager.updateTitle(dialogId, newTitle);
+        };
         const content = (
             <WorkflowCreateDude
-                onWorkflowCompleted={onWorkflowCompleted}
                 dudeId={dudeId}
+                onWorkflowCompleted={onWorkflowCompleted}
+                onNameDetermined={onNameDetermined}
             />
         );
         this.manager.openDialog(dialogId, content, {
