@@ -88,13 +88,15 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
     private subscribeToDude(dudeId: number) {
         this.props.crudeStore.willNeedDude(dudeId);
         const subscription = this.props.crudeStore.subscribeSelectDude(dudeId, (dude: Dude) => {
-            this.setState({
-                loading: false,
-                dude: dude,
-                pendingDudeName: dude.name,
-                pendingRace: dude.race,
-                pendingProfession: dude.profession,
-                step: dude.creation.step,
+            this.setState((state: State) => {
+                return {
+                    loading: false,
+                    dude: dude,
+                    pendingDudeName: dude.name,
+                    pendingRace: dude.race,
+                    pendingProfession: dude.profession,
+                    step: state.loading ? dude.creation.step : state.step,
+                };
             });
 
             if (this.props.onNameDetermined) {
@@ -139,8 +141,8 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
 
         this.setState((state) => ({
             proceeding: false,
-            step: state.step + 1,
             errors: [],
+            step: state.step + 1,
         }));
     }
 

@@ -5,7 +5,7 @@ import { DialogContainer } from './components/Dialog/DialogContainer';
 import { DialogMonitorContext } from './components/Dialog/DialogContext';
 import { DialogProvider } from './components/Dialog/DialogProvider';
 import { ToDudeList } from './components/ToDudeList/DudeList';
-import { CrudeStoreProvider } from './crude-store/CrudeStoreProvider';
+import { CrudeStoreContext, CrudeStoreProvider } from './crude-store/CrudeStoreProvider';
 
 
 interface Props {
@@ -31,7 +31,12 @@ export class App extends React.Component<Props, State> {
           <DialogProvider>
             <main className={styles['main']} ref={this.mainRef}>
 
-              <ToDudeList />
+              <CrudeStoreContext.Consumer>
+                {(crudeStore) => (
+                  <ToDudeList crudeStore={crudeStore!}/>
+                )}
+              </CrudeStoreContext.Consumer>
+             
             
               <DialogMonitorContext.Consumer>
                 {(dialogMonitor) => (

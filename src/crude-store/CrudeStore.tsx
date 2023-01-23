@@ -1,13 +1,11 @@
-import { Dude } from "../black-box/exposed/models";
+import { Dude, DudeMap } from "../black-box/exposed/models";
 import { SocketMessage, SocketMessageType } from "../black-box/interface";
 import { MessageBus, MessageHandler, Subscription, Subscriptions } from "../utils";
 
 
 interface State {
     dudes: {
-        entries: {
-            [dudeId: number]: Dude;
-        },
+        entries: DudeMap,
     },
 }
 
@@ -22,8 +20,11 @@ export class CrudeStore {
     };
 
     public constructor() {
-        const subscription = window.blackBox.socket.on(SocketMessageType.DudeCreated, this.pipeInDude);
-        this.subscriptions.add(subscription);
+        const subs = [
+            window.blackBox.socket.on(SocketMessageType.DudeCreated, this.pipeInDude),
+            window.blackBox.socket.on(SocketMessageType.DudeUpdated, this.pipeInDude),
+        ];
+        subs.forEach(sub => this.subscriptions.add(sub));
     }
 
     subscribeSelectDude(dudeId: number, handler: MessageHandler<Dude>): Subscription {
@@ -34,7 +35,13 @@ export class CrudeStore {
         return this.bus.on(`selectDude#${dudeId}`, handler);
     }
 
-    public willNeedDude(dudeId: number): void {
+    subscribeSelectAllDudes(handler: MessageHandler<DudeMap>): Subscription {
+        const dudes = this.state.dudes.entries;
+        handler(dudes);
+        return this.bus.on(`selectAllDudes`, handler);
+    }
+
+    public async willNeedDude(dudeId: number): Promise<void> {
         if (dudeId in this.state.dudes.entries) {
             return;
         }
@@ -44,16 +51,33 @@ export class CrudeStore {
                 return;
             }
             const dude = response.data!;
-            this.updateDude(dude);
+            this.updateAndTriggerDude(dude);
+            this.triggerDudeContainer();
         });
+    }
+
+    public async willNeedAllDudes(): Promise<void> {
+        const response = await window.blackBox.api.dudes.getDudes();
+        if (response.errors) {
+            response.errors.forEach(console.error)
+            return;
+        }
+        const dudeMap = response.data!
+        for (const dudeId in dudeMap) {
+            if (dudeMap.hasOwnProperty(dudeId)) {
+                this.updateAndTriggerDude(dudeMap[dudeId]);
+            }
+        }
+        this.triggerDudeContainer();
     }
 
     private pipeInDude = (message: SocketMessage) => {
         const dude = message.data as Dude;
-        this.updateDude(dude);
+        this.updateAndTriggerDude(dude);
+        this.triggerDudeContainer();
     }
 
-    private updateDude(dude: Dude): void {
+    private updateAndTriggerDude(dude: Dude): void {
         const prev = this.state.dudes.entries[dude.id];
         if (prev && dude.version < prev.version) {
             // incoming data is stale
@@ -61,6 +85,10 @@ export class CrudeStore {
         }
         this.state.dudes.entries[dude.id] = dude;
         this.bus.emit(`selectDude#${dude.id}`, dude);
+    }
+
+    private triggerDudeContainer() {
+        this.bus.emit(`selectAllDudes`, this.state.dudes.entries);
     }
 
 }

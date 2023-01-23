@@ -3,21 +3,19 @@ import './DudeList.module.css';
 import React from "react";
 import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
-import { SocketMessage, SocketMessageType } from '../../black-box/interface';
 import { DialogControlContext } from '../Dialog/DialogContext';
 import { Subscriptions } from '../../utils';
 import { DudeListItemCreationPending } from './DudeListItemCreationPending';
+import { CrudeStore } from '../../crude-store/CrudeStore';
 
 
 interface Props {
-
+    crudeStore: CrudeStore
 }
 
 
 interface State {
     dudes: DudeMap;
-    pendingDudeName: string;
-    creatingDude: boolean;
 }
 
 
@@ -31,40 +29,15 @@ export class ToDudeList extends React.Component<Props, State> {
         super(props);
         this.state = {
             dudes: {},
-            pendingDudeName: '',
-            creatingDude: false,
         };
     }
 
     public async componentDidMount(): Promise<void> {
-        this.subscribeToDudeCreation();
-        this.subscribeToDudeUpdates();
-        const response = await window.blackBox.api.dudes.getDudes();
-        if (response.errors) {
-            response.errors.forEach(console.error)
-            return;
-        }
-        this.setState({dudes: response.data!});
-    }
-
-    private subscribeToDudeCreation() {
-        const subscription = window.blackBox.socket.on(SocketMessageType.DudeCreated, this.pipeInDude);
-        this.subscriptions.add(subscription);
-    }
-
-    private subscribeToDudeUpdates() {
-        const subscription = window.blackBox.socket.on(SocketMessageType.DudeUpdated, this.pipeInDude);
-        this.subscriptions.add(subscription);
-    }
-
-    private pipeInDude = (message: SocketMessage) => {
-        const dude = message.data as Dude;
-        this.setState({
-            dudes: {
-                ...this.state.dudes,
-                [dude.id]: dude,
-            }
+        this.props.crudeStore.willNeedAllDudes();
+        const subscription = this.props.crudeStore.subscribeSelectAllDudes((dudeMap: DudeMap) => {
+            this.setState({dudes: dudeMap});
         });
+        this.subscriptions.add(subscription);
     }
 
     public componentWillUnmount(): void {
