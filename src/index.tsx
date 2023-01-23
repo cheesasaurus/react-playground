@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { BlackBox } from './black-box/BlackBox';
 import { IBlackBox } from './black-box/interface';
 import { App } from './App';
-import { factoryDialogControl } from './components/Dialog/DialogControl';
+import { factoryDialogManagement } from './components/Dialog/DialogControl';
 
 // init black box.
 // In practice this would already be done by the engine,
@@ -16,7 +16,7 @@ declare global {
 window.blackBox = new BlackBox();
 
 // init mediators, managers, etc
-const dialogControl = factoryDialogControl();
+const {dialogControl, dialogMonitor} = factoryDialogManagement();
 
 // init view
 const root = ReactDOM.createRoot(
@@ -24,7 +24,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <App dialogControl={dialogControl}/>
+    <App dialogControl={dialogControl} dialogMonitor={dialogMonitor}/>
   </React.StrictMode>
 );
 

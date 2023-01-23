@@ -1,11 +1,11 @@
 import React from "react";
-import { Subscription, Subscriptions } from "../../utils";
+import { Subscriptions } from "../../utils";
 import { Dialog } from "./Dialog";
-import { DialogControl } from "./DialogControl";
+import { DialogMonitor } from "./DialogControl";
 
 
 interface Props {
-    dialogControl: DialogControl;
+    dialogMonitor: DialogMonitor;
     dragBoundary?: React.RefObject<HTMLElement>;
 }
 
@@ -25,7 +25,7 @@ export class DialogContainer extends React.Component<Props, State> {
     }
 
     public componentDidMount(): void {
-        const subscription = this.props.dialogControl.onUpdate((m) => {
+        const subscription = this.props.dialogMonitor.onUpdate((m) => {
             this.setState({order: m.order});
         });
         this.subscriptions.add(subscription);
@@ -36,7 +36,7 @@ export class DialogContainer extends React.Component<Props, State> {
     }
 
     public render(): React.ReactNode {
-        const control = this.props.dialogControl;
+        const control = this.props.dialogMonitor;
         const dialogs = control.getOrder().map(dialogId => {
             const dialog = control.getDialog(dialogId);
             return (

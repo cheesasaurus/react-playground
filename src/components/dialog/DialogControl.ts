@@ -103,12 +103,33 @@ export class DialogManager {
 }
 
 
-export class DialogControl {
+export class DialogMonitor {
     private manager: DialogManager;
     private bus: MessageBus<UpdateMessage>;
 
-    public constructor(bus: MessageBus<UpdateMessage>, manager: DialogManager) {
+    public constructor(manager: DialogManager, bus: MessageBus<UpdateMessage>, ) {
         this.bus = bus;
+        this.manager = manager;
+    }
+
+    public onUpdate(handler: MessageHandler<UpdateMessage>): Subscription {
+        return this.bus.on('updated', handler);
+    }
+
+    public getDialog(dialogId: string) {
+        return this.manager.getDialog(dialogId)
+    }
+
+    public getOrder() {
+        return this.manager.getOrder();
+    }
+}
+
+
+export class DialogControl {
+    private manager: DialogManager;
+
+    public constructor(manager: DialogManager) {
         this.manager = manager;
     }
 
@@ -124,25 +145,14 @@ export class DialogControl {
         this.manager.closeDialog(dialogId);
     }
 
-    public onUpdate(handler: MessageHandler<UpdateMessage>): Subscription {
-        return this.bus.on('updated', handler);
-    }
-
-    public getDialog(dialogId: string) {
-        return this.manager.getDialog(dialogId)
-    }
-
-    public getOrder() {
-        return this.manager.getOrder();
-    }
-
 }
 
 
-export const factoryDialogControl = () => {
+export const factoryDialogManagement = () => {
     const bus = new MessageBus<UpdateMessage>();
     const dialogManager = new DialogManager(bus);
-    const dialogControl = new DialogControl(bus, dialogManager);
+    const dialogControl = new DialogControl(dialogManager);
+    const dialogMonitor = new DialogMonitor(dialogManager, bus);
     docReady(() => dialogManager.closeFrontmostDialogWhenKeyPressed('Escape'));
-    return dialogControl;
+    return {dialogControl, dialogMonitor};
 };
