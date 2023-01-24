@@ -1,15 +1,12 @@
 
-export function docReady(fn: () => void): void {
-    // see if DOM is already available
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-        // call on next available tick
-        setTimeout(fn, 1);
-    } else {
-        document.addEventListener("DOMContentLoaded", fn);
-    }
-}
-
-
+/**
+ * Format a number with a sign
+ * 
+ * EXAMPLES
+ * negative:  '-123'
+ * zero:        '+0'
+ * positive:  '+123'
+ */
 export function signedNumber(number: number): string {
     return (number < 0 ? '' : '+') + number;
 }

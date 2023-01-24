@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { CrudeStoreContext } from "../../crude-store/CrudeStoreProvider";
-import { docReady, MessageBus, MessageHandler, Subscription } from "../../utils";
+import { MessageBus, MessageHandler, Subscription } from "../../utils";
 import { DudeInfo } from "../DudeInfo/DudeInfo";
 import { WorkflowCreateDude } from "../WorkflowCreateDude/WorkflowCreateDude";
 import { DialogConfig } from "./DialogConfig";
@@ -13,7 +13,7 @@ interface ActiveDialog {
     config: DialogConfig,
 }
 
-interface UpdateMessage {
+export interface MessageDialogsUpdated {
     order: Array<string>
 };
 
@@ -23,9 +23,9 @@ export class DialogManager {
     private activeDialogs: {
         [dialogId: string]: ActiveDialog;
     } = {};
-    private bus: MessageBus<UpdateMessage>;
+    private bus: MessageBus<MessageDialogsUpdated>;
 
-    public constructor(bus: MessageBus<UpdateMessage>) {
+    public constructor(bus: MessageBus<MessageDialogsUpdated>) {
         this.bus = bus;
     }
 
@@ -168,14 +168,14 @@ export class DialogManager {
 
 export class DialogMonitor {
     private manager: DialogManager;
-    private bus: MessageBus<UpdateMessage>;
+    private bus: MessageBus<MessageDialogsUpdated>;
 
-    public constructor(manager: DialogManager, bus: MessageBus<UpdateMessage>, ) {
+    public constructor(manager: DialogManager, bus: MessageBus<MessageDialogsUpdated>, ) {
         this.bus = bus;
         this.manager = manager;
     }
 
-    public onUpdate(handler: MessageHandler<UpdateMessage>): Subscription {
+    public onUpdate(handler: MessageHandler<MessageDialogsUpdated>): Subscription {
         return this.bus.on('updated', handler);
     }
 
@@ -269,13 +269,3 @@ export class DialogControl {
     }
 
 }
-
-
-export const factoryDialogManagement = () => {
-    const bus = new MessageBus<UpdateMessage>();
-    const dialogManager = new DialogManager(bus);
-    const dialogControl = new DialogControl(dialogManager);
-    const dialogMonitor = new DialogMonitor(dialogManager, bus);
-    docReady(() => dialogManager.closeFrontmostDialogWhenKeyPressed('Escape'));
-    return {dialogControl, dialogMonitor};
-};

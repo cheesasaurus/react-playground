@@ -26,6 +26,14 @@ export interface DialogConfig {
      */
     cascadeGroup?: string;
 
+    /**
+     * When opened, position the left side of the dialog
+     */
     initialX?: number;
-    initialY?: number
+
+    /**
+     * When opened, position the top side of the dialog
+     */
+    initialY?: number;
+    
 }

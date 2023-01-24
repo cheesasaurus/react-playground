@@ -1,6 +1,7 @@
 import React from "react";
+import { MessageBus } from "../../utils";
 import { DialogControlContext, DialogMonitorContext } from "./DialogContext";
-import { DialogControl, DialogMonitor, factoryDialogManagement } from "./DialogManagement";
+import { DialogControl, DialogManager, DialogMonitor, MessageDialogsUpdated } from "./DialogManagement";
 
 
 interface Props {
@@ -16,7 +17,13 @@ export class DialogProvider extends React.Component<Props> {
 
     public constructor(props: Props) {
         super(props);
-        this.providing = factoryDialogManagement();
+        const bus = new MessageBus<MessageDialogsUpdated>();
+        const dialogManager = new DialogManager(bus);
+        dialogManager.closeFrontmostDialogWhenKeyPressed('Escape');
+        this.providing = {
+            dialogControl: new DialogControl(dialogManager),
+            dialogMonitor: new DialogMonitor(dialogManager, bus)
+        };
     }
 
     public render(): React.ReactNode {
