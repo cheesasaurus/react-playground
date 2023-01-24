@@ -1,4 +1,4 @@
-import { Dude, EquipmentSlot } from "./black-box/exposed/models";
+import { EquipmentSlot } from "./black-box/exposed/models";
 
 
 export enum DragDropCommandTypes {

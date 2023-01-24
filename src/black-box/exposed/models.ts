@@ -15,8 +15,33 @@ export function *iterateModelMap<Model>(modelMap: ModelMap<Model>): Generator<Mo
 }
 
 
+export enum EquipmentSlot {
+    Weapon = 'weapon',
+    Hat = 'hat',
+    Shirt = 'shirt',
+    Gloves = 'gloves',
+    Pants = 'pants',
+    Boots = 'boots',
+    Lumberjack = 'lumberjack',
+    Mining = 'mining',
+    Skinning = 'skinning'
+}
+
+
+export enum BodyPart {
+    Head = 'head',
+    Chest = 'chest',
+    Torso = 'torso',
+    LeftArm = 'leftArm',
+    RightArm = 'rightArm',
+    LeftLeg = 'leftLeg',
+    RightLeg = 'rightLeg',
+}
+
+
 export interface Dude {
     id: number,
+    version: number,
     name: string,
     hp: HP,
     race: Race,
@@ -37,7 +62,7 @@ export interface Dude {
         [EquipmentSlot.Skinning]: undefined,
     },
     stats: DudeStatMap,
-    version: number,
+    actionId: number | undefined,
 }
 
 export interface DudeStat {
@@ -106,19 +131,6 @@ export interface Weapon {
 }
 
 
-export enum EquipmentSlot {
-    Weapon = 'weapon',
-    Hat = 'hat',
-    Shirt = 'shirt',
-    Gloves = 'gloves',
-    Pants = 'pants',
-    Boots = 'boots',
-    Lumberjack = 'lumberjack',
-    Mining = 'mining',
-    Skinning = 'skinning'
-}
-
-
 export interface ArmorTemplate {
     id: number,
     slot: EquipmentSlot,
@@ -145,17 +157,6 @@ export interface Armor {
     id: number,
     template: ArmorTemplate,
     crafterId?: number,
-}
-
-
-export enum BodyPart {
-    Head = 'head',
-    Chest = 'chest',
-    Torso = 'torso',
-    LeftArm = 'leftArm',
-    RightArm = 'rightArm',
-    LeftLeg = 'leftLeg',
-    RightLeg = 'rightLeg',
 }
 
 

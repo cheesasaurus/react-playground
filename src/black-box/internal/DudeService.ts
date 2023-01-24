@@ -227,6 +227,7 @@ export class DudeService implements IDudeService {
                 [EquipmentSlot.Skinning]: undefined,
             },
             stats: this.newDudeStats(),
+            actionId: undefined,
             version: 1,
         };
     }
