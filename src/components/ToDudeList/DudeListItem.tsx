@@ -6,7 +6,7 @@ import React from 'react';
 
 interface Props {
     dude: Dude;
-    openDudeInfo: (dudeId: number) => void;
+    openDudeInfo: (dudeId: string) => void;
 }
 
 interface State {

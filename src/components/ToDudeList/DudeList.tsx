@@ -46,14 +46,14 @@ export class ToDudeList extends React.Component<Props, State> {
 
     private beginDudeCreation = () => this.openDudeCreationDialog();
 
-    private resumeDudeCreation = (dudeId?: number) => this.openDudeCreationDialog(dudeId);
+    private resumeDudeCreation = (dudeId?: string) => this.openDudeCreationDialog(dudeId);
 
-    private openDudeInfo = (dudeId: number) => {
+    private openDudeInfo = (dudeId: string) => {
         const dialogControl = this.context!;
         dialogControl.openDudeInfo(dudeId);
     };
 
-    private openDudeCreationDialog(dudeId?: number): void {
+    private openDudeCreationDialog(dudeId?: string): void {
         const dialogControl = this.context!;
         dialogControl.openDudeCreator(dudeId);
     }

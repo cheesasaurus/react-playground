@@ -75,9 +75,9 @@ export interface IDebugService {
 export interface IDudeService {
     createDude(name: string): Promise<ResponseCreateDude>;
     getDudes(): Promise<ResponseGetDudes>;
-    getDude(dudeId: number): Promise<ResponseGetDude>;
+    getDude(dudeId: string): Promise<ResponseGetDude>;
     updateDude(dude: RequestUpdateDude): Promise<ResponseUpdateDude>;
-    swapEquipmentWithOtherDude(slot: EquipmentSlot, dude1Id: number, dude2Id: number): Promise<ResponseSwapEquipmentWithOtherDude>;
+    swapEquipmentWithOtherDude(slot: EquipmentSlot, dude1Id: string, dude2Id: string): Promise<ResponseSwapEquipmentWithOtherDude>;
 }
 
 export interface ResponseCreateDude {
@@ -86,7 +86,7 @@ export interface ResponseCreateDude {
 }
 
 export interface RequestUpdateDude {
-    id: number,
+    id: string,
     name?: string,
     race?: Race,
     profession?: Profession,

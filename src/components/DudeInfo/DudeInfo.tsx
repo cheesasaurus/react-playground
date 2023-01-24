@@ -8,7 +8,7 @@ import { DragDropCommands, DragDropCommandTypes } from '../../DragDropCommands';
 
 
 interface Props {
-    dudeId: number,
+    dudeId: string,
     crudeStore: CrudeStore,
     onNameDetermined?(dudeName: string): void,
 }

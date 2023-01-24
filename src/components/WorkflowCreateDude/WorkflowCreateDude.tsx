@@ -13,13 +13,13 @@ import { Subscriptions } from "../../utils";
 
 export interface Props {
     crudeStore: CrudeStore,
-    dudeId?: number,
+    dudeId?: string,
     onWorkflowCompleted?: () => void,
     onNameDetermined?: (dudeName: string) => void,
 }
 
 export interface State {
-    dudeId: number | undefined,
+    dudeId: string | undefined,
     step: number,
     dude: Dude | undefined,
     loading: boolean,
@@ -85,7 +85,7 @@ export class WorkflowCreateDude extends React.Component<Props, State> {
         this.steps = [];
     }
 
-    private subscribeToDude(dudeId: number) {
+    private subscribeToDude(dudeId: string) {
         this.props.crudeStore.willNeedDude(dudeId);
         const subscription = this.props.crudeStore.subscribeSelectDude(dudeId, (dude: Dude) => {
             this.setState((state: State) => {

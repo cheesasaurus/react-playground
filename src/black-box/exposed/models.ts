@@ -40,7 +40,7 @@ export enum BodyPart {
 
 
 export interface Dude {
-    id: number,
+    id: string,
     version: number,
     name: string,
     hp: HP,

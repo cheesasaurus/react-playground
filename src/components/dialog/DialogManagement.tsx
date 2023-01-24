@@ -208,7 +208,7 @@ export class DialogControl {
         this.manager.closeDialog(dialogId);
     }
 
-    public openDudeCreator(dudeId?: number): void {
+    public openDudeCreator(dudeId?: string): void {
         const dialogId = `WorkflowCreateDude#${dudeId || ''}`;
         const initialTitle = 'Create a Dude';
 
@@ -241,7 +241,7 @@ export class DialogControl {
         });
     }
 
-    public openDudeInfo(dudeId: number): void {
+    public openDudeInfo(dudeId: string): void {
         const dialogId = `DudeInfo#${dudeId}`;
         const initialTitle = 'Dude Info';
 

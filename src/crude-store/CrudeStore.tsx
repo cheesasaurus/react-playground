@@ -27,7 +27,7 @@ export class CrudeStore {
         subs.forEach(sub => this.subscriptions.add(sub));
     }
 
-    subscribeSelectDude(dudeId: number, handler: MessageHandler<Dude>): Subscription {
+    subscribeSelectDude(dudeId: string, handler: MessageHandler<Dude>): Subscription {
         const dude = this.state.dudes.entries[dudeId];
         if (dude) {
             handler(dude);
@@ -41,7 +41,7 @@ export class CrudeStore {
         return this.bus.on(`selectAllDudes`, handler);
     }
 
-    public async willNeedDude(dudeId: number): Promise<void> {
+    public async willNeedDude(dudeId: string): Promise<void> {
         if (dudeId in this.state.dudes.entries) {
             return;
         }

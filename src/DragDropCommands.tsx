@@ -9,7 +9,7 @@ export enum DragDropCommandTypes {
 function sendEquipmentFromDude() {
     return {
         setEquipmentSlot: (slot: EquipmentSlot) => ({
-            setDude: (dudeId: number) => ({
+            setDude: (dudeId: string) => ({
                 attachPayloadTo(e: React.DragEvent<HTMLElement>) {
                     const payload = JSON.stringify({
                         command: DragDropCommandTypes.SendEquipmentFromDude,
@@ -21,7 +21,7 @@ function sendEquipmentFromDude() {
             }),
         }),
         fromPayload: (payload: any) => ({
-            toOtherDude: (otherDudeId: number) => ({
+            toOtherDude: (otherDudeId: string) => ({
                 execute() {
                     if (payload.dudeId === otherDudeId) {
                         return;

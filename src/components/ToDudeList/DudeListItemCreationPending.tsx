@@ -5,7 +5,7 @@ import React from 'react';
 
 interface Props {
     dude: Dude;
-    resumeDudeCreation: (dudeId: number) => void;
+    resumeDudeCreation: (dudeId: string) => void;
 }
 
 interface State {

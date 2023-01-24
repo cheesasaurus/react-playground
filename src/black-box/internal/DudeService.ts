@@ -10,7 +10,6 @@ import { WeaponTemplates } from "./EquipmentTemplates/WeaponTemplates";
 
 
 export class DudeService implements IDudeService {
-    private autoIncrement = 1;
     private dudes: DudeMap = {};
     private localStorageKey = 'db.dudes';
     private equipmentService: EquipmentService;
@@ -25,7 +24,6 @@ export class DudeService implements IDudeService {
     private save(): void {
         // todo: maybe IndexedDB instead of localStorage
         const obj = {
-            autoIncrement: this.autoIncrement,
             entries: this.dudes,
         };
         localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
@@ -35,7 +33,6 @@ export class DudeService implements IDudeService {
         const saved = localStorage.getItem(this.localStorageKey);
         if (saved) {
             const obj = JSON.parse(saved);
-            this.autoIncrement = obj.autoIncrement;
             this.dudes = obj.entries;
         }
     }
@@ -58,7 +55,7 @@ export class DudeService implements IDudeService {
         return delayedResponse<ResponseCreateDude>({data: dudeCopy});
     }
 
-    public getDude(dudeId: number): Promise<ResponseGetDude> {
+    public getDude(dudeId: string): Promise<ResponseGetDude> {
         if (!(dudeId in this.dudes)) {
             const errors = [{
                 code: 'DoesNotExist',
@@ -116,7 +113,7 @@ export class DudeService implements IDudeService {
         return delayedResponse<ResponseUpdateDude>({data: dudeCopy});
     }
 
-    public swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: number, dudeIdB: number): Promise<ResponseSwapEquipmentWithOtherDude> {
+    public swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
         const errors = Array<ServiceError>();
         if (!(dudeIdA in this.dudes)) {
             errors.push({
@@ -203,7 +200,7 @@ export class DudeService implements IDudeService {
 
     private newDude(name: string): Dude {
         return {
-            id: this.autoIncrement++,
+            id: window.crypto.randomUUID(),
             name: name,
             hp: {
                 max: 100,
