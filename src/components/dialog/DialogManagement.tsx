@@ -263,6 +263,7 @@ export class DialogControl {
         this.manager.openDialog(dialogId, content, {
             title: initialTitle,
             cascadeGroup: 'DudeInfo',
+            width: 450,
         });
 
     }
