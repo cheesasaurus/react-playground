@@ -73,7 +73,10 @@ export class MessageBus<Message> {
         this.handlersByType = {};
     }
 
-    public on = (messageType: string, messageHandler: MessageHandler<Message>): Subscription => {
+    /**
+     * Subscribe to a particular messageType 
+     */
+    public on(messageType: string, messageHandler: MessageHandler<Message>): Subscription {
         if (!(messageType in this.handlersByType)) {
             this.handlersByType[messageType] = new Set([messageHandler]);
         }
@@ -81,7 +84,7 @@ export class MessageBus<Message> {
             this.handlersByType[messageType].add(messageHandler);
         }
 
-        // build Subsription
+        // build Subscription
         let subscribed = true;
         return {
             unsubscribe: () => {
@@ -91,14 +94,17 @@ export class MessageBus<Message> {
                 }
             }
         };
-    };
+    }
 
-    public emit = (messageType: string, message: Message) => {
+    /**
+     * Publish a message 
+     */
+    public emit(messageType: string, message: Message): void {
         if (messageType in this.handlersByType) {
             for (const handler of this.handlersByType[messageType]) {
                 handler(message);
-            }          
+            }
         }
-    };
+    }
 
 }
