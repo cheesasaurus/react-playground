@@ -1,7 +1,7 @@
 import { Subscription } from "../utils";
 import { Profession } from "./exposed/DudeModifierPresets/Professions";
 import { Race } from "./exposed/DudeModifierPresets/Races";
-import { Dude, DudeMap, EquipmentSlot } from "./exposed/models";
+import { Dude, DudeMap, EquipmentMap, EquipmentSlot } from "./exposed/models";
 
 /**
  * Some black box (for example, a game engine providing the webview),
@@ -80,6 +80,11 @@ export interface IDudeService {
     swapEquipmentWithOtherDude(slot: EquipmentSlot, dude1Id: string, dude2Id: string): Promise<ResponseSwapEquipmentWithOtherDude>;
 }
 
+export interface DudeApiResponseData {
+    dudes: DudeMap,
+    equipment: EquipmentMap,
+}
+
 export interface ResponseCreateDude {
     errors?: Array<ServiceError>;
     data?: Dude;
@@ -101,12 +106,12 @@ export interface ResponseUpdateDude {
 
 export interface ResponseGetDudes {
     errors?: Array<ServiceError>;
-    data?: DudeMap;
+    data?: DudeApiResponseData;
 }
 
 export interface ResponseGetDude {
     errors?: Array<ServiceError>;
-    data?: Dude;
+    data?: DudeApiResponseData;
 }
 
 export interface ResponseSwapEquipmentWithOtherDude {

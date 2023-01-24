@@ -50,8 +50,9 @@ export class CrudeStore {
                 console.error(response.errors);
                 return;
             }
-            const dude = response.data!;
-            this.updateAndTriggerDude(dude);
+            const {dudes, equipment} = response.data!;
+            // todo: store equipment
+            this.updateAndTriggerDude(dudes[dudeId]);
             this.triggerDudeContainer();
         });
     }
@@ -62,10 +63,11 @@ export class CrudeStore {
             response.errors.forEach(console.error)
             return;
         }
-        const dudeMap = response.data!
-        for (const dudeId in dudeMap) {
-            if (dudeMap.hasOwnProperty(dudeId)) {
-                this.updateAndTriggerDude(dudeMap[dudeId]);
+        // todo: store equipment
+        const {dudes, equipment} = response.data!;
+        for (const dudeId in dudes) {
+            if (dudes.hasOwnProperty(dudeId)) {
+                this.updateAndTriggerDude(dudes[dudeId]);
             }
         }
         this.triggerDudeContainer();

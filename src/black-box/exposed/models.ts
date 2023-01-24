@@ -27,6 +27,18 @@ export enum EquipmentSlot {
     Skinning = 'skinning'
 }
 
+export const EquipmentSlots = [
+    EquipmentSlot.Weapon,
+    EquipmentSlot.Hat,
+    EquipmentSlot.Shirt,
+    EquipmentSlot.Gloves,
+    EquipmentSlot.Pants,
+    EquipmentSlot.Boots,
+    EquipmentSlot.Lumberjack,
+    EquipmentSlot.Mining,
+    EquipmentSlot.Skinning,
+];
+
 
 export enum BodyPart {
     Head = 'head',
@@ -157,5 +169,9 @@ export interface Equipment {
     slot: EquipmentSlot,
     templateId: string,
     crafterId?: number,
+}
+
+export interface EquipmentMap {
+    [id: string]: Equipment,
 }
 

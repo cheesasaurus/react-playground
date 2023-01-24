@@ -1,7 +1,7 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
 import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
-import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentSlot, iterateModelMap, WeaponTemplate } from "../exposed/models";
+import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, iterateModelMap, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
 import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
@@ -63,11 +63,25 @@ export class DudeService implements IDudeService {
             }];
             return delayedResponse<ResponseGetDude>({errors});
         }
-        return delayedResponse<ResponseGetDude>({data: structuredClone(this.dudes[dudeId])});
+        
+        const dude = this.dudes[dudeId];
+        const dudeClone = structuredClone(dude);
+        const data = {
+            dudes: {
+                [dude.id]: dudeClone,
+            },
+            equipment: this.findEquipmentOnDude(dude),
+        };
+        return delayedResponse<ResponseGetDude>({data});
     }
 
     public getDudes(): Promise<ResponseGetDudes> {
-        return delayedResponse<ResponseGetDudes>({data: structuredClone(this.dudes)});
+        const data = {
+            dudes: structuredClone(this.dudes),
+            equipment: {} // todo
+        };
+
+        return delayedResponse<ResponseGetDudes>({data});
     }
 
     public updateDude(pendingDude: RequestUpdateDude): Promise<ResponseUpdateDude> {
@@ -310,6 +324,17 @@ export class DudeService implements IDudeService {
         for (const modifier of professionModifiers) {
             dude.stats[modifier.type].level.boosted += modifier.magnitude;
         }
+    }
+
+    private findEquipmentOnDude(dude: Dude): EquipmentMap {
+        const equipment: EquipmentMap = {};
+        for (const slot of EquipmentSlots) {
+            const entry = dude.equipment[slot];
+            if (entry) {
+                equipment[entry.id] = entry;
+            }
+        }
+        return equipment;
     }
 
 }
