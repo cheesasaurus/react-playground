@@ -1,7 +1,7 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
 import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
-import { Dude, DudeMap, DudeStatMap, EquipmentSlot, iterateModelMap, Weapon, WeaponTemplate } from "../exposed/models";
+import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentSlot, iterateModelMap, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
 import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
@@ -259,7 +259,7 @@ export class DudeService implements IDudeService {
         dude.creation.completed = true;
     }
 
-    private starterWeapon(dude: Dude): Weapon|undefined {
+    private starterWeapon(dude: Dude): Equipment|undefined {
         const template = this.starterWeaponTemplate(dude);
         if (template) {
             return this.equipmentService.createWeapon(template);

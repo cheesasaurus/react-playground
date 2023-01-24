@@ -1,8 +1,7 @@
-import { Armor, ArmorTemplate, Weapon, WeaponTemplate } from "../exposed/models";
+import { ArmorTemplate, Equipment, EquipmentSlot, EquipmentType, WeaponTemplate } from "../exposed/models";
 
 
 export class EquipmentService {
-    private autoIncrement = 1;
     private localStorageKey = 'db.equipment';
 
     public constructor() {
@@ -11,7 +10,7 @@ export class EquipmentService {
 
     private save(): void {
         const obj = {
-            autoIncrement: this.autoIncrement,
+            
         };
         localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
     }
@@ -20,14 +19,16 @@ export class EquipmentService {
         const saved = localStorage.getItem(this.localStorageKey);
         if (saved) {
             const obj = JSON.parse(saved);
-            this.autoIncrement = obj.autoIncrement;
+            
         }
     }
 
-    public createWeapon(template: WeaponTemplate, crafterId?: number): Weapon {
-        const id = this.autoIncrement++;
+    public createWeapon(template: WeaponTemplate, crafterId?: number): Equipment {
+        const id = window.crypto.randomUUID();
         const weapon = {
             id: id,
+            type: EquipmentType.Weapon,
+            slot: EquipmentSlot.Weapon,
             template: template,
             crafterId: crafterId,
         };
@@ -35,10 +36,12 @@ export class EquipmentService {
         return weapon;
     }
 
-    public createArmor(template: ArmorTemplate, crafterId?: number): Armor {
-        const id = this.autoIncrement++;
+    public createArmor(template: ArmorTemplate, crafterId?: number): Equipment {
+        const id = window.crypto.randomUUID();
         const armor = {
             id: id,
+            type: EquipmentType.Armor,
+            slot: template.slot,
             template: template,
             crafterId: crafterId,
         };

@@ -51,15 +51,15 @@ export interface Dude {
         step: number,
     },
     equipment: {
-        [EquipmentSlot.Weapon]: Weapon | undefined,
-        [EquipmentSlot.Hat]: Armor | undefined,
-        [EquipmentSlot.Shirt]: Armor | undefined,
-        [EquipmentSlot.Gloves]: Armor | undefined,
-        [EquipmentSlot.Pants]: Armor | undefined,
-        [EquipmentSlot.Boots]: Armor | undefined,
-        [EquipmentSlot.Lumberjack]: undefined,
-        [EquipmentSlot.Mining]: undefined,
-        [EquipmentSlot.Skinning]: undefined,
+        [EquipmentSlot.Weapon]: Equipment | undefined,
+        [EquipmentSlot.Hat]: Equipment | undefined,
+        [EquipmentSlot.Shirt]: Equipment | undefined,
+        [EquipmentSlot.Gloves]: Equipment | undefined,
+        [EquipmentSlot.Pants]: Equipment | undefined,
+        [EquipmentSlot.Boots]: Equipment | undefined,
+        [EquipmentSlot.Lumberjack]: Equipment | undefined,
+        [EquipmentSlot.Mining]: Equipment | undefined,
+        [EquipmentSlot.Skinning]: Equipment | undefined,
     },
     stats: DudeStatMap,
     actionId: number | undefined,
@@ -124,13 +124,6 @@ export interface WeaponTemplate {
 }
 
 
-export interface Weapon {
-    id: number,
-    template: WeaponTemplate,
-    crafterId?: number,
-}
-
-
 export interface ArmorTemplate {
     id: number,
     slot: EquipmentSlot,
@@ -153,19 +146,16 @@ export interface ArmorTemplate {
 }
 
 
-export interface Armor {
-    id: number,
-    template: ArmorTemplate,
-    crafterId?: number,
+export enum EquipmentType {
+    Weapon = 'Weapon',
+    Armor = 'Armor',
 }
 
-
-/**
- * Equipment that is not currently equipped
- */
-export interface LooseEquipment {
-    id: number,
+export interface Equipment {
+    id: string,
+    type: EquipmentType,
     slot: EquipmentSlot,
-    instance: Weapon | Armor,
+    template: WeaponTemplate | ArmorTemplate,
+    crafterId?: number,
 }
 
