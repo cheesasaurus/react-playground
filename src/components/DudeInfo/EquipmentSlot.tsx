@@ -2,6 +2,7 @@ import styles from './DudeInfo.module.css';
 import React, { CSSProperties } from "react";
 import { Dude, EquipmentSlot } from '../../black-box/exposed/models';
 import { DragDropCommands } from '../../DragDropCommands';
+import { EquipmentTemplateLookup } from '../../black-box/internal/EquipmentTemplates/EquipmentTemplateLookup';
 
 
 interface Props {
@@ -39,6 +40,9 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
             cssStyles.borderColor = 'gold';
         }
 
+        const equipment = this.props.dude.equipment[this.props.slot];
+        const template = equipment ? EquipmentTemplateLookup[equipment.templateId]: undefined;
+
         return (
             <div
                 className={styles['equipment-slot']} style={cssStyles}
@@ -46,7 +50,7 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
                 onDragStart={this.dragStart}
             >
                 <div>{this.renderHintIcon()}</div>
-                {this.props.dude.equipment[this.props.slot]?.template.name}
+                {template?.name}
             </div>
         );
     }

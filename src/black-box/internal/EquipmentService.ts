@@ -3,6 +3,7 @@ import { ArmorTemplate, Equipment, EquipmentSlot, EquipmentType, WeaponTemplate 
 
 export class EquipmentService {
     private localStorageKey = 'db.equipment';
+    private entries = {};
 
     public constructor() {
         this.load();
@@ -10,7 +11,7 @@ export class EquipmentService {
 
     private save(): void {
         const obj = {
-            
+            entries: this.entries,
         };
         localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
     }
@@ -19,7 +20,7 @@ export class EquipmentService {
         const saved = localStorage.getItem(this.localStorageKey);
         if (saved) {
             const obj = JSON.parse(saved);
-            
+            this.entries = obj.entries;
         }
     }
 
@@ -29,7 +30,7 @@ export class EquipmentService {
             id: id,
             type: EquipmentType.Weapon,
             slot: EquipmentSlot.Weapon,
-            template: template,
+            templateId: template.id,
             crafterId: crafterId,
         };
         this.save();
@@ -42,7 +43,7 @@ export class EquipmentService {
             id: id,
             type: EquipmentType.Armor,
             slot: template.slot,
-            template: template,
+            templateId: template.id,
             crafterId: crafterId,
         };
         this.save();

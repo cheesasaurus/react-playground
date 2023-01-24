@@ -1,10 +1,17 @@
-import { BodyPart, DamageType, EquipmentSlot } from "../../exposed/models";
+import { ArmorTemplate, BodyPart, DamageType, EquipmentSlot } from "../../exposed/models";
 
-export const ArmorTemplates = {
+
+interface IArmorTemplates {
+    [setName: string]: {
+        [ezKey: string]: ArmorTemplate;
+    }
+}
+
+
+export const ArmorTemplates: IArmorTemplates = {
     starterSet: {
-        idRange: [1, 100],
         hat: {
-            id: 1,
+            id: '37a1be90-edc8-4b59-a4b7-79e700d9795f',
             slot: EquipmentSlot.Hat,
             name: 'Feathered cap',
             defense: 1,
@@ -19,7 +26,7 @@ export const ArmorTemplates = {
             }
         },
         shirt: {
-            id: 2,
+            id: '5642c813-6003-45f0-b0e8-52039569e6dc',
             slot: EquipmentSlot.Shirt,
             name: 'Raggedy t-shirt',
             defense: 1,
@@ -37,7 +44,7 @@ export const ArmorTemplates = {
             }
         },
         pants: {
-            id: 3,
+            id: '26ff8be3-ecaf-4ae5-869e-811252d24407',
             slot: EquipmentSlot.Pants,
             name: 'Ripped pants',
             defense: 1,
@@ -54,7 +61,7 @@ export const ArmorTemplates = {
             }
         },
         gloves: {
-            id: 4,
+            id: '56c7587e-0b1f-4ebc-b5a6-81a234d41700',
             slot: EquipmentSlot.Gloves,
             name: 'Hobo gloves',
             defense: 1,

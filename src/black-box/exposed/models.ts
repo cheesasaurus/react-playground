@@ -116,7 +116,7 @@ export enum WeaponType {
 
 
 export interface WeaponTemplate {
-    id: number,
+    id: string,
     type: WeaponType,
     name: string,
     damage: number,
@@ -125,7 +125,7 @@ export interface WeaponTemplate {
 
 
 export interface ArmorTemplate {
-    id: number,
+    id: string,
     slot: EquipmentSlot,
     name: string,
     defense: number,
@@ -155,7 +155,7 @@ export interface Equipment {
     id: string,
     type: EquipmentType,
     slot: EquipmentSlot,
-    template: WeaponTemplate | ArmorTemplate,
+    templateId: string,
     crafterId?: number,
 }
 
