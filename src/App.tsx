@@ -37,12 +37,7 @@ export class App extends React.Component<Props, State> {
 
               <ExampleClassComponent text={'hello'}/>
 
-              <CrudeStoreContext.Consumer>
-                {(crudeStore) => (
-                  <ToDudeList crudeStore={crudeStore!}/>
-                )}
-              </CrudeStoreContext.Consumer>
-             
+              <ToDudeList/>             
             
               <DialogMonitorContext.Consumer>
                 {(dialogMonitor) => (

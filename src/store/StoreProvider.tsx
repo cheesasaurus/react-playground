@@ -18,6 +18,7 @@ export class StoreProvider extends React.Component<Props> {
         super(props);
     }
 
+    // todo pipe in multiple dudes. rework the messaging
     private pipeInDude = (message: SocketMessage) => {
         const dude = message.data as Dude;
         store.dispatch(dudesLoaded({

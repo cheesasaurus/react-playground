@@ -4,109 +4,111 @@ import React from "react";
 import { Dude, DudeMap } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
 import { DialogControlContext } from '../Dialog/DialogContext';
-import { Subscriptions } from '../../utils';
 import { DudeListItemCreationPending } from './DudeListItemCreationPending';
-import { CrudeStore } from '../../crude-store/CrudeStore';
+import { connect } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { DudesThunks } from '../../store/slices/db/thunks/dudes';
 
 
 interface Props {
-    crudeStore: CrudeStore
+
 }
 
-
-interface State {
+interface InnerProps extends Props {
     dudes: DudeMap;
+    loadDudes: () => void;
 }
 
 
-export class ToDudeList extends React.Component<Props, State> {
-    public static contextType = DialogControlContext;
-    declare context: React.ContextType<typeof DialogControlContext>;
+const mapStateToProps = (state: RootState, ownProps: Props) => ({
+    dudes: state.db.entities.dudes,
+});
 
-    private subscriptions = new Subscriptions();
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+    loadDudes() {
+        dispatch(DudesThunks.fetchAll());
+    },
+});
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            dudes: {},
-        };
-    }
 
-    public async componentDidMount(): Promise<void> {
-        this.props.crudeStore.willNeedAllDudes();
-        const subscription = this.props.crudeStore.subscribeSelectAllDudes((dudeMap: DudeMap) => {
-            this.setState({dudes: dudeMap});
-        });
-        this.subscriptions.add(subscription);
-    }
 
-    public componentWillUnmount(): void {
-        this.subscriptions.unsubscribe();
-    }
+export const ToDudeList = connect(mapStateToProps, mapDispatchToProps)(
+    class extends React.Component<InnerProps> {
+        public static contextType = DialogControlContext;
+        declare context: React.ContextType<typeof DialogControlContext>;
 
-    private beginDudeCreation = () => this.openDudeCreationDialog();
-
-    private resumeDudeCreation = (dudeId?: string) => this.openDudeCreationDialog(dudeId);
-
-    private openDudeInfo = (dudeId: string) => {
-        const dialogControl = this.context!;
-        dialogControl.openDudeInfo(dudeId);
-    };
-
-    private openDudeCreationDialog(dudeId?: string): void {
-        const dialogControl = this.context!;
-        dialogControl.openDudeCreator(dudeId);
-    }
-
-    public render(): React.ReactNode {
-        const dudes = Object.values(this.state.dudes);
-
-        let dudelessMessage;
-        if (dudes.length === 0) {
-            dudelessMessage = (
-                <div className={styles['dudeless']}>
-                    <span>You don't have any dudes yet.</span>
-                </div>
-            );
+        constructor(props: InnerProps) {
+            super(props);
         }
 
-        return (
-            <div className={styles['container']}>
-                <header className={styles['header']}>
-                    <div style={{fontSize: '30px', fontWeight: 'bold'}}>My Dudes</div>
-                    <div>
-                        <button onClick={this.beginDudeCreation}>
-                            Create Dude
-                        </button>
-                    </div>
-                </header>
-                <section className={styles['dude-list']}>
-                    {dudes.map(dude => this.renderDudeListItem(dude))}
-                    {dudelessMessage}
-                </section>
-            </div>
-        );
+        public async componentDidMount(): Promise<void> {
+            this.props.loadDudes();
+        }
 
-    }
-    
-    private renderDudeListItem(dude: Dude): React.ReactNode {
-        if (!dude.creation.completed) {
+        private beginDudeCreation = () => this.openDudeCreationDialog();
+
+        private resumeDudeCreation = (dudeId?: string) => this.openDudeCreationDialog(dudeId);
+
+        private openDudeInfo = (dudeId: string) => {
+            const dialogControl = this.context!;
+            dialogControl.openDudeInfo(dudeId);
+        };
+
+        private openDudeCreationDialog(dudeId?: string): void {
+            const dialogControl = this.context!;
+            dialogControl.openDudeCreator(dudeId);
+        }
+
+        public render(): React.ReactNode {
+            const dudes = Object.values(this.props.dudes);
+
+            let dudelessMessage;
+            if (dudes.length === 0) {
+                dudelessMessage = (
+                    <div className={styles['dudeless']}>
+                        <span>You don't have any dudes yet.</span>
+                    </div>
+                );
+            }
+
             return (
-                <DudeListItemCreationPending
+                <div className={styles['container']}>
+                    <header className={styles['header']}>
+                        <div style={{fontSize: '30px', fontWeight: 'bold'}}>My Dudes</div>
+                        <div>
+                            <button onClick={this.beginDudeCreation}>
+                                Create Dude
+                            </button>
+                        </div>
+                    </header>
+                    <section className={styles['dude-list']}>
+                        {dudes.map(dude => this.renderDudeListItem(dude))}
+                        {dudelessMessage}
+                    </section>
+                </div>
+            );
+
+        }
+        
+        private renderDudeListItem(dude: Dude): React.ReactNode {
+            if (!dude.creation.completed) {
+                return (
+                    <DudeListItemCreationPending
+                        key={dude.id}
+                        dude={dude}
+                        resumeDudeCreation={this.resumeDudeCreation}
+                    />
+                );
+            }
+            
+            return (
+                <DudeListItem
                     key={dude.id}
                     dude={dude}
-                    resumeDudeCreation={this.resumeDudeCreation}
+                    openDudeInfo={this.openDudeInfo}
                 />
             );
         }
-        
-        return (
-            <DudeListItem
-                key={dude.id}
-                dude={dude}
-                openDudeInfo={this.openDudeInfo}
-            />
-        );
-    }
 
-}
+    }
+);
