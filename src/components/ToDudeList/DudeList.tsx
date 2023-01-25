@@ -37,10 +37,6 @@ export const ToDudeList = connect(mapStateToProps, mapDispatchToProps)(
         public static contextType = DialogControlContext;
         declare context: React.ContextType<typeof DialogControlContext>;
 
-        constructor(props: InnerProps) {
-            super(props);
-        }
-
         public async componentDidMount(): Promise<void> {
             this.props.loadDudes();
         }

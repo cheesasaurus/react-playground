@@ -48,9 +48,6 @@ export const ExampleClassComponent = connect(mapStateToProps, mapDispatchToProps
     // Maybe it's better to expose this internal class for testing purposes.
     // But I think you could use ExampleClassComponent.WrappedComponent for that.
     class extends React.Component<InnerProps> {
-        constructor(props: InnerProps) {
-            super(props);
-        }
         
         private increment = () => {
             this.props.dispatch(incremented());

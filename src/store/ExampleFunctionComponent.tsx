@@ -15,17 +15,17 @@ export function ExampleFunctionComponent(props: ExampleFunctionComponentProps) {
     
     const increment = useCallback(
         () => dispatch(incremented()),
-        ['callbackNeverChanges']
+        [dispatch]
     );
 
     const add5 = useCallback(
         () => dispatch(amountAdded(5)),
-        ['callbackNeverChanges']
+        [dispatch]
     );
     
     const fetchDudes = useCallback(
         () => dispatch(DudesThunks.fetchAll()),
-        ['callbackNeverChanges']
+        [dispatch]
     );
     
     return (

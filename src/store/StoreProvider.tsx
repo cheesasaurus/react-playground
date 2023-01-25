@@ -14,10 +14,6 @@ interface Props {
 export class StoreProvider extends React.Component<Props> {
     private subscriptions = new Subscriptions();
 
-    constructor(props: Props) {
-        super(props);
-    }
-
     // todo pipe in multiple dudes. rework the messaging
     private pipeInDude = (message: SocketMessage) => {
         const dude = message.data as Dude;
