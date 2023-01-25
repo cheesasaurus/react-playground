@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Provider as ReduxStoreProvider } from 'react-redux';
-import { store } from './store/store';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { BlackBox } from './black-box/BlackBox';
 import { IBlackBox } from './black-box/interface';
 import { App } from './App';
+import { StoreProvider } from './store/StoreProvider';
 
 
 // init black box.
@@ -23,9 +22,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <ReduxStoreProvider store={store}>
+    <StoreProvider>
       <App/>
-    </ReduxStoreProvider>
+    </StoreProvider>
   </React.StrictMode>
 );
 

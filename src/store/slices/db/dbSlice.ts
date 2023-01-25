@@ -63,5 +63,5 @@ const dbSlice = createSlice({
 
 });
 
-export const { incremented, amountAdded } = dbSlice.actions;
+export const { incremented, amountAdded, dudesLoaded } = dbSlice.actions;
 export const dbReducer = dbSlice.reducer;
