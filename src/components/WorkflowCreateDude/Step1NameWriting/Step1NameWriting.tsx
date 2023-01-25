@@ -1,7 +1,7 @@
 import React from "react";
 import { Dude } from "../../../black-box/exposed/models";
 import { NameWriting, NameWritingUpdateInfo } from "./NameWriting";
-import { Props, State } from "../WorkflowCreateDude";
+import { InnerProps, State } from "../WorkflowCreateDude";
 import { Step, StepContext } from "../Step";
 
 export class Step1NameWriting implements Step {
@@ -17,7 +17,7 @@ export class Step1NameWriting implements Step {
         });
     };
 
-    public renderContent(state: State): React.ReactNode {
+    public renderContent(props: InnerProps, state: State): React.ReactNode {
         return (
             <NameWriting
                 pendingDudeName={state.pendingDudeName}
@@ -28,18 +28,19 @@ export class Step1NameWriting implements Step {
         );
     };
 
-    public async complete(props: Props, state: State): Promise<void> {
+    public async complete(props: InnerProps, state: State): Promise<void> {
         let dude: Dude;
-        if (state.dudeId === undefined) {
+        if (props.dudeId === undefined) {
             const response = await window.blackBox.api.dudes.createDude(state.pendingDudeName);
             if (response.errors && response.errors.length > 0) {
                 throw Error(response.errors![0].message);
             }
             dude = response.data!;
+            this.context.setDudeId(dude.id);
         }
         else {
             const response = await window.blackBox.api.dudes.updateDude({
-                id: state.dudeId,
+                id: props.dudeId,
                 name: state.pendingDudeName,
                 creationStep: 2,
             });
@@ -48,10 +49,6 @@ export class Step1NameWriting implements Step {
             }
             dude = response.data!;
         }
-        this.context.setState({
-            dudeId: dude.id,
-            dude: dude,
-        });
         
         if (props.onNameDetermined) {
             props.onNameDetermined(dude.name);

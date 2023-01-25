@@ -4,3 +4,10 @@ This only occurs in the development mode; it does not occur in the production mo
 
 
 https://www.reddit.com/r/react/comments/vgiisj/react_app_mounting_twice/
+
+
+1) construct
+2) render
+3) mount
+4) unmount
+5) mount

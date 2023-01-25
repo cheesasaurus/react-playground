@@ -1,7 +1,6 @@
 import React from "react";
-import { Dude } from "../../../black-box/exposed/models";
 import { ProfessionSelection, ProfessionSelectionUpdateInfo } from "./ProfessionSelection";
-import { Props, State } from "../WorkflowCreateDude";
+import { InnerProps, State } from "../WorkflowCreateDude";
 import { Step, StepContext } from "../Step";
 
 export class Step3ProfessionSelection implements Step {
@@ -17,29 +16,25 @@ export class Step3ProfessionSelection implements Step {
         });
     };
 
-    public renderContent(state: State): React.ReactNode {
+    public renderContent(props: InnerProps, state: State): React.ReactNode {
         return (
             <ProfessionSelection
                 selectedProfession={state.pendingProfession}
-                dude={state.dude!}
+                dude={props.dude!}
                 onUpdate={this.onUpdate}
             />
         );
     };
 
-    public async complete(props: Props, state: State): Promise<void> {
-        let dude: Dude;
+    public async complete(props: InnerProps, state: State): Promise<void> {
         const response = await window.blackBox.api.dudes.updateDude({
-            id: state.dudeId!,
+            id: props.dudeId!,
             profession: state.pendingProfession,
             finishCreation: true,
         });
         if (response.errors && response.errors.length > 0) {
             throw Error(response.errors![0].message);
         }
-        dude = response.data!;
-        this.context.setState({
-            dude: dude,
-        });
     }
+
 }
