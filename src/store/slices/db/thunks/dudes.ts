@@ -1,13 +1,21 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createBlackBoxAsyncThunk } from "../../../utils";
 
 
 export const DudesThunks = {
 
-    fetchOneById: createAsyncThunk(
+    fetchOneById: createBlackBoxAsyncThunk(
         'db/dudes/fetchOneById',
         async (dudeId: string, thunkAPI) => {
-            // todo
+            try {
+                const response = await window.blackBox.api.dudes.getDude(dudeId);
+                if (response.errors) {
+                    return thunkAPI.rejectWithValue({errors: response.errors});
+                }
+                return response.data!;
+            }
+            catch (exception) {
+                return thunkAPI.rejectWithValue({exception});
+            }
         }
     ),
 
@@ -23,7 +31,7 @@ export const DudesThunks = {
             }
             catch (exception) {
                 return thunkAPI.rejectWithValue({exception});
-            }            
+            }
         }
     ),
 

@@ -250,15 +250,10 @@ export class DialogControl {
             this.manager.updateTitle(dialogId, newTitle);
         };
         const content = (
-            <CrudeStoreContext.Consumer>
-                {crudeStore => (
-                    <DudeInfo
-                        dudeId={dudeId}
-                        onNameDetermined={onNameDetermined}
-                        crudeStore={crudeStore!}
-                    />
-                )}
-            </CrudeStoreContext.Consumer>
+            <DudeInfo
+                dudeId={dudeId}
+                onNameDetermined={onNameDetermined}
+            />
         );
         this.manager.openDialog(dialogId, content, {
             title: initialTitle,
