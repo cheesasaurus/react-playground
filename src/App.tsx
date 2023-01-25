@@ -6,9 +6,8 @@ import { DialogMonitorContext } from './components/Dialog/DialogContext';
 import { DialogProvider } from './components/Dialog/DialogProvider';
 import { ToDudeList } from './components/ToDudeList/DudeList';
 import { CrudeStoreContext, CrudeStoreProvider } from './crude-store/CrudeStoreProvider';
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { amountAdded, incremented } from './store/slices/db/dbSlice';
-import { DudesThunks } from './store/slices/db/thunks/dudes';
+import { ExampleFunctionComponent } from './store/ExampleFunctionComponent';
+import { ExampleClassComponent } from './store/ExampleClassComponent';
 
 
 interface Props {
@@ -34,7 +33,9 @@ export class App extends React.Component<Props, State> {
           <DialogProvider>
             <main className={styles['main']} ref={this.mainRef}>
 
-              <DebugRemoveMeLater/>
+              <ExampleFunctionComponent/>
+
+              <ExampleClassComponent/>
 
               <CrudeStoreContext.Consumer>
                 {(crudeStore) => (
@@ -62,31 +63,3 @@ export class App extends React.Component<Props, State> {
 
 }
 
-
-interface DebugProps {
-
-}
-
-function DebugRemoveMeLater (props: DebugProps) {
-  const count = useAppSelector((storeState) => storeState.db.counter);
-  const dispatch = useAppDispatch();
-
-  const increment = () => {
-    dispatch(incremented())
-  }
-
-  const fetchDudes = async () => {
-    dispatch(DudesThunks.fetchAll());
-  }
-
-  const add5 = () => dispatch(amountAdded(5));
-
-  return (
-    <div>
-      <button onClick={increment}>count is: {count}</button>
-      <button onClick={add5}>add 5</button>
-      <button onClick={fetchDudes}>fetch dudes</button>
-      {}
-    </div>
-  );
-}
