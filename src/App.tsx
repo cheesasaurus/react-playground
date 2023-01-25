@@ -35,7 +35,7 @@ export class App extends React.Component<Props, State> {
 
               <ExampleFunctionComponent/>
 
-              <ExampleClassComponent/>
+              <ExampleClassComponent text={'hello'}/>
 
               <CrudeStoreContext.Consumer>
                 {(crudeStore) => (

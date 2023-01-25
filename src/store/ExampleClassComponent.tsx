@@ -7,10 +7,21 @@ import { DudesThunks } from './slices/db/thunks/dudes';
 // example of using a class component connected to the store
 
 
+
+/**
+ * Props that should be passed to the connected component (the one that's exported)
+ */
 interface Props {
-    count?: number;
-    dispatch?: AppDispatch;
-    add5?: () => void;
+    text: string,
+}
+
+/**
+ * Props that should be available to the internal component
+ */
+interface InnerProps extends Props {
+    count: number;
+    dispatch: AppDispatch;
+    add5: () => void;
 }
 
 /**
@@ -33,27 +44,30 @@ const mapDispatchToProps = (dispatch: AppDispatch) => ({
 export const ExampleClassComponent = connect(mapStateToProps, mapDispatchToProps)(
     // This is an anonymous class being passed to `connect`,
     // which in turn creates the actual class that will be used in the app.
-    // But maybe it's better to expose this internal class for testing purposes.
-    class extends React.Component<Props> {
-        constructor(props: Props) {
+    //
+    // Maybe it's better to expose this internal class for testing purposes.
+    // But I think you could use ExampleClassComponent.WrappedComponent for that.
+    class extends React.Component<InnerProps> {
+        constructor(props: InnerProps) {
             super(props);
         }
         
         private increment = () => {
-            this.props.dispatch!(incremented());
+            this.props.dispatch(incremented());
         };
         
         private add5 = () => {
-            this.props.add5!();
+            this.props.add5();
         };
         
         private fetchDudes = () => {
-            this.props.dispatch!(DudesThunks.fetchAll());
+            this.props.dispatch(DudesThunks.fetchAll());
         };
         
         public render(): React.ReactNode {
             return (
                 <div>
+                    {this.props.text}
                     <button onClick={this.increment}>count is: {this.props.count}</button>
                     <button onClick={this.add5}>add 5</button>
                     <button onClick={this.fetchDudes}>fetch dudes</button>
@@ -63,4 +77,3 @@ export const ExampleClassComponent = connect(mapStateToProps, mapDispatchToProps
         
     }    
 );
-        
