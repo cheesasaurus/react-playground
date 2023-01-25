@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { AppDispatch, RootState } from './store';
-import { DebugState } from "./ExampleFunctionComponent";
 import { amountAdded, incremented } from './slices/db/dbSlice';
 import { DudesThunks } from './slices/db/thunks/dudes';
 
@@ -35,7 +34,7 @@ export const ExampleClassComponent = connect(mapStateToProps, mapDispatchToProps
     // This is an anonymous class being passed to `connect`,
     // which in turn creates the actual class that will be used in the app.
     // But maybe it's better to expose this internal class for testing purposes.
-    class extends React.Component<Props, DebugState> {
+    class extends React.Component<Props> {
         constructor(props: Props) {
             super(props);
         }
