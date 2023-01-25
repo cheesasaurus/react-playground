@@ -53,8 +53,11 @@ const dbSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(DudesThunks.fetchAll.fulfilled, (state, action) => {
-            updateDudes(state, action.payload!.dudes);
-            updateEquipment(state, action.payload!.equipment);
+            updateDudes(state, action.payload.dudes);
+            updateEquipment(state, action.payload.equipment);
+        });
+        builder.addCase(DudesThunks.fetchAll.rejected, (state, action) => {
+            console.warn(action.payload);
         });
     },
 

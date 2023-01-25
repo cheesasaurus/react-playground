@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createBlackBoxAsyncThunk } from "../../../utils";
 
 
 export const DudesThunks = {
@@ -10,19 +11,22 @@ export const DudesThunks = {
         }
     ),
 
-    fetchAll: createAsyncThunk(
+    fetchAll: createBlackBoxAsyncThunk(
         'db/dudes/fetchAll',
-        async (thunkAPI) => {
-            const response = await window.blackBox.api.dudes.getDudes();
-            if (response.errors) {
-                response.errors.forEach(console.error)
-                throw Error('response had errors');
-                // todo: reject instead of throwing exception
-                // return thunkAPI.rejectWithValue(response.errors);
-                // 
-                // https://redux-toolkit.js.org/usage/usage-with-typescript#defining-a-pre-typed-createasyncthunk
+        async (notused, thunkAPI) => {
+            try {
+                const response = await window.blackBox.api.dudes.getDudes();
+                if (response.errors) {
+                    return thunkAPI.rejectWithValue({errors: response.errors});
+                }
+                return response.data!;
             }
-            return response.data!;
+            catch (exception) {
+                return thunkAPI.rejectWithValue({exception});
+            }            
         }
     ),
+
 };
+
+

@@ -64,6 +64,8 @@ export interface ServiceError {
     detail?: string;
 }
 
+export type ServiceErrors = ServiceError[];
+
 
 export interface IDebugService {
     emitMessageFromBlackBox(message: SocketMessage): Promise<void>;
@@ -86,7 +88,7 @@ export interface DudeApiResponseData {
 }
 
 export interface ResponseCreateDude {
-    errors?: Array<ServiceError>;
+    errors?: ServiceErrors;
     data?: Dude;
 }
 
@@ -100,22 +102,22 @@ export interface RequestUpdateDude {
 }
 
 export interface ResponseUpdateDude {
-    errors?: Array<ServiceError>;
+    errors?: ServiceErrors;
     data?: Dude;
 }
 
 export interface ResponseGetDudes {
-    errors?: Array<ServiceError>;
+    errors?: ServiceErrors;
     data?: DudeApiResponseData;
 }
 
 export interface ResponseGetDude {
-    errors?: Array<ServiceError>;
+    errors?: ServiceErrors;
     data?: DudeApiResponseData;
 }
 
 export interface ResponseSwapEquipmentWithOtherDude {
-    errors?: Array<ServiceError>;
+    errors?: ServiceErrors;
 }
 
 
