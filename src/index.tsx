@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider as ReduxStoreProvider } from 'react-redux';
+import { store } from './store/store';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { BlackBox } from './black-box/BlackBox';
@@ -21,7 +23,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <App/>
+    <ReduxStoreProvider store={store}>
+      <App/>
+    </ReduxStoreProvider>
   </React.StrictMode>
 );
 

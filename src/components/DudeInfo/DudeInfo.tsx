@@ -55,6 +55,7 @@ export class DudeInfo extends React.Component<Props, State> {
 
     private onDragOver = (e: React.DragEvent<HTMLElement>) => {
         e.preventDefault();
+        // todo: doesn't work on chrome. https://stackoverflow.com/questions/9534677/html5-drag-and-drop-getdata-only-works-on-drop-event-in-chrome
         const dat = JSON.parse(e.dataTransfer.getData('application/json'));
         if (dat?.command === DragDropCommandTypes.SendEquipmentFromDude) {
             if (dat.dudeId === this.props.dudeId) {
