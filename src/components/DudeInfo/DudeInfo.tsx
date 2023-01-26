@@ -1,6 +1,6 @@
 import styles from './DudeInfo.module.css';
 import React from "react";
-import { Dude, DudeMap, EquipmentMap, EquipmentSlot, EquipmentSlots } from "../../black-box/exposed/models";
+import { Dude, EquipmentMap, EquipmentSlot, EquipmentSlots } from "../../black-box/exposed/models";
 import { EquipmentSlotEl } from './EquipmentSlot';
 import { DragDropCommands, DragDropCommandTypes } from '../../DragDropCommands';
 import { connect } from 'react-redux';
@@ -42,9 +42,9 @@ function findEquipmentOnDude(state: RootState, dude: Dude): EquipmentMap {
         return equipment;
     }
     for (const slot of EquipmentSlots) {
-        const entry = dude.equipment[slot];
-        if (entry) {
-            equipment[entry.id] = state.db.entities.equipment[entry.id];
+        const equipmentId = dude.equipment[slot];
+        if (equipmentId) {
+            equipment[equipmentId] = state.db.entities.equipment[equipmentId];
         }
     }
     return equipment;
@@ -166,11 +166,14 @@ export const DudeInfo = connect(mapStateToProps, mapDispatchToProps)(
 
         private renderEquipmentSlot(slot: EquipmentSlot) {
             const dude = this.props.dude!;
+            const equipmentId = dude.equipment[slot];
+            const equipment = equipmentId ? this.props.equipment[equipmentId] : undefined;
+            
             return (
                 <EquipmentSlotEl
                     slot={slot}
                     dudeId={dude.id}
-                    equipment={dude.equipment[slot]}
+                    equipment={equipment}
                     isDropTarget={slot === this.state.equipmentDropSlot}
                 />
             );

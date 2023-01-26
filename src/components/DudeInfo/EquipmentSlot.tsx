@@ -1,6 +1,6 @@
 import styles from './DudeInfo.module.css';
 import React, { CSSProperties } from "react";
-import { Dude, Equipment, EquipmentSlot } from '../../black-box/exposed/models';
+import { Equipment, EquipmentSlot } from '../../black-box/exposed/models';
 import { DragDropCommands } from '../../DragDropCommands';
 import { EquipmentTemplateLookup } from '../../black-box/internal/EquipmentTemplates/EquipmentTemplateLookup';
 

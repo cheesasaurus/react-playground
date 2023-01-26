@@ -1,9 +1,9 @@
-import { ArmorTemplate, Equipment, EquipmentSlot, EquipmentType, WeaponTemplate } from "../exposed/models";
+import { ArmorTemplate, Equipment, EquipmentMap, EquipmentSlot, EquipmentType, UUID, WeaponTemplate } from "../exposed/models";
 
 
 export class EquipmentService {
     private localStorageKey = 'db.equipment';
-    private entries = {};
+    private entries: EquipmentMap = {};
 
     public constructor() {
         this.load();
@@ -33,6 +33,7 @@ export class EquipmentService {
             templateId: template.id,
             crafterId: crafterId,
         };
+        this.entries[id] = weapon;
         this.save();
         return weapon;
     }
@@ -46,8 +47,13 @@ export class EquipmentService {
             templateId: template.id,
             crafterId: crafterId,
         };
+        this.entries[id] = armor;
         this.save();
         return armor;
+    }
+
+    public getSingleEquipment(id: UUID): Equipment {
+        return this.entries[id];
     }
 
 }

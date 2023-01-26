@@ -14,6 +14,8 @@ export function *iterateModelMap<Model>(modelMap: ModelMap<Model>): Generator<Mo
     }
 }
 
+export type UUID = string;
+
 
 export enum EquipmentSlot {
     Weapon = 'weapon',
@@ -52,7 +54,7 @@ export enum BodyPart {
 
 
 export interface Dude {
-    id: string,
+    id: UUID,
     version: number,
     name: string,
     hp: HP,
@@ -63,15 +65,15 @@ export interface Dude {
         step: number,
     },
     equipment: {
-        [EquipmentSlot.Weapon]: Equipment | undefined,
-        [EquipmentSlot.Hat]: Equipment | undefined,
-        [EquipmentSlot.Shirt]: Equipment | undefined,
-        [EquipmentSlot.Gloves]: Equipment | undefined,
-        [EquipmentSlot.Pants]: Equipment | undefined,
-        [EquipmentSlot.Boots]: Equipment | undefined,
-        [EquipmentSlot.Lumberjack]: Equipment | undefined,
-        [EquipmentSlot.Mining]: Equipment | undefined,
-        [EquipmentSlot.Skinning]: Equipment | undefined,
+        [EquipmentSlot.Weapon]: UUID | undefined,
+        [EquipmentSlot.Hat]: UUID | undefined,
+        [EquipmentSlot.Shirt]: UUID | undefined,
+        [EquipmentSlot.Gloves]: UUID| undefined,
+        [EquipmentSlot.Pants]: UUID | undefined,
+        [EquipmentSlot.Boots]: UUID | undefined,
+        [EquipmentSlot.Lumberjack]: UUID | undefined,
+        [EquipmentSlot.Mining]: UUID | undefined,
+        [EquipmentSlot.Skinning]: UUID | undefined,
     },
     stats: DudeStatMap,
     actionId: number | undefined,
@@ -95,7 +97,7 @@ export interface HP {
 }
 
 export interface DudeMap extends ModelMap<Dude> {
-    [id: number]: Dude;
+    [id: UUID]: Dude;
 }
 
 export interface DudeModifierPreset<IdType extends string> {
@@ -128,7 +130,7 @@ export enum WeaponType {
 
 
 export interface WeaponTemplate {
-    id: string,
+    id: UUID,
     type: WeaponType,
     name: string,
     damage: number,
@@ -137,7 +139,7 @@ export interface WeaponTemplate {
 
 
 export interface ArmorTemplate {
-    id: string,
+    id: UUID,
     slot: EquipmentSlot,
     name: string,
     defense: number,
@@ -164,14 +166,14 @@ export enum EquipmentType {
 }
 
 export interface Equipment {
-    id: string,
+    id: UUID,
     type: EquipmentType,
     slot: EquipmentSlot,
-    templateId: string,
+    templateId: UUID,
     crafterId?: number,
 }
 
 export interface EquipmentMap {
-    [id: string]: Equipment,
+    [id: UUID]: Equipment,
 }
 

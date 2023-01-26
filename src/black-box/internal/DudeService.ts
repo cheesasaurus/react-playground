@@ -174,9 +174,7 @@ export class DudeService implements IDudeService {
         const dudeB = this.dudes[dudeIdB];
 
         const detached = dudeA.equipment[slot];
-        // @ts-ignore
         dudeA.equipment[slot] = dudeB.equipment[slot];
-        // @ts-ignore
         dudeB.equipment[slot] = detached;
 
         dudeA.version++;
@@ -289,11 +287,11 @@ export class DudeService implements IDudeService {
 
     private finishDudeCreation(dude: Dude): void {
         dude.equipment = {
-            [EquipmentSlot.Weapon]: this.starterWeapon(dude),
+            [EquipmentSlot.Weapon]: this.starterWeapon(dude)?.id,
             [EquipmentSlot.Hat]: undefined,
-            [EquipmentSlot.Shirt]: this.equipmentService.createArmor(ArmorTemplates.starterSet.shirt),
-            [EquipmentSlot.Gloves]: this.equipmentService.createArmor(ArmorTemplates.starterSet.gloves),
-            [EquipmentSlot.Pants]: this.equipmentService.createArmor(ArmorTemplates.starterSet.pants),
+            [EquipmentSlot.Shirt]: this.equipmentService.createArmor(ArmorTemplates.starterSet.shirt).id,
+            [EquipmentSlot.Gloves]: this.equipmentService.createArmor(ArmorTemplates.starterSet.gloves).id,
+            [EquipmentSlot.Pants]: this.equipmentService.createArmor(ArmorTemplates.starterSet.pants).id,
             [EquipmentSlot.Boots]: undefined,
             [EquipmentSlot.Lumberjack]: undefined,
             [EquipmentSlot.Mining]: undefined,
@@ -359,9 +357,9 @@ export class DudeService implements IDudeService {
     private findEquipmentOnDude(dude: Dude): EquipmentMap {
         const equipment: EquipmentMap = {};
         for (const slot of EquipmentSlots) {
-            const entry = dude.equipment[slot];
-            if (entry) {
-                equipment[entry.id] = entry;
+            const equipmentId = dude.equipment[slot];
+            if (equipmentId) {
+                equipment[equipmentId] = this.equipmentService.getSingleEquipment(equipmentId);
             }
         }
         return equipment;
