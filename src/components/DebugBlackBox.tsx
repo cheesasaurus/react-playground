@@ -19,6 +19,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
     declare context: React.ContextType<typeof DialogControlContext>;
 
     private subscriptions = new Subscriptions();
+    private exampleWorker: Worker | undefined;
 
     constructor(props: any) {
         super(props);
@@ -30,10 +31,16 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
     componentDidMount() {
         const subscription = window.blackBox.socket.on('testtest', this.handleTestMessage);
         this.subscriptions.add(subscription);
+
+        this.exampleWorker = new Worker(new URL('../black-box/internal/workers/dedicated/example.ts', import.meta.url));
+        this.exampleWorker.onmessage = (message) => {
+            console.log('received message from worker:', message);
+        }
     }
 
     componentWillUnmount() {
         this.subscriptions.unsubscribe();
+        this.exampleWorker?.terminate();
     }
 
     requestBlackBoxToEmitTestMessage = () => {
@@ -63,12 +70,19 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
     handleTestMessage = (message: SocketMessage) => {
         console.log(`received message from black box: ${JSON.stringify(message)}`);
     };
+
+    pingWorker = () => {
+        this.exampleWorker?.postMessage('ping');
+    };
     
     render(): React.ReactNode {
         return (
             <>
                 <button onClick={this.requestBlackBoxToEmitTestMessage}>
                     emit message from black box
+                </button>
+                <button onClick={this.pingWorker}>
+                    ping worker
                 </button>
                 <button onClick={this.openDebugDialogA}>
                     open dialog A
