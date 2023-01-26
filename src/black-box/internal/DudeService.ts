@@ -1,6 +1,6 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
-import { IDudeService, MessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
+import { IDudeService, SocketMessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
 import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, iterateModelMap, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
@@ -13,9 +13,9 @@ export class DudeService implements IDudeService {
     private dudes: DudeMap = {};
     private localStorageKey = 'db.dudes';
     private equipmentService: EquipmentService;
-    private messageQueue: MessageQueue;
+    private messageQueue: SocketMessageQueue;
 
-    constructor(messageQueue: MessageQueue, equipmentService: EquipmentService) {
+    constructor(messageQueue: SocketMessageQueue, equipmentService: EquipmentService) {
         this.messageQueue = messageQueue;
         this.equipmentService = equipmentService;
         this.load();
@@ -47,39 +47,55 @@ export class DudeService implements IDudeService {
         const dude = this.newDude(name);
         this.dudes[dude.id] = dude;
         this.save();
-        const dudeCopy = structuredClone(dude);
-        this.messageQueue.push({
-            type: SocketMessageType.DudeCreated,
-            data: dudeCopy,
+
+        const responseData = structuredClone({
+            dude: dude,
+            equipment: this.findEquipmentOnDude(dude),
         });
-        return delayedResponse<ResponseCreateDude>({data: dudeCopy});
+
+        this.messageQueue.push({
+            type: SocketMessageType.DudesCreated,
+            data: {
+                dudes: {[dude.id]: responseData.dude},
+                equipment: responseData.equipment,
+            },
+        });
+        return delayedResponse<ResponseCreateDude>({
+            data: responseData,
+        });
     }
 
     public getDude(dudeId: string): Promise<ResponseGetDude> {
         if (!(dudeId in this.dudes)) {
             const errors = [{
                 code: 'DoesNotExist',
-                message: 'The Dude does not exist.'
+                message: 'The Dude does not exist.',
             }];
             return delayedResponse<ResponseGetDude>({errors});
         }
         
         const dude = this.dudes[dudeId];
-        const dudeClone = structuredClone(dude);
-        const data = {
-            dudes: {
-                [dude.id]: dudeClone,
-            },
+
+        const responseData = structuredClone({
+            dude: dude,
             equipment: this.findEquipmentOnDude(dude),
-        };
-        return delayedResponse<ResponseGetDude>({data});
+        });
+        return delayedResponse<ResponseGetDude>({data: responseData});
     }
 
-    public getDudes(): Promise<ResponseGetDudes> {
-        const data = {
-            dudes: structuredClone(this.dudes),
-            equipment: {} // todo
-        };
+    public getAllDudes(): Promise<ResponseGetDudes> {
+        const equipment: EquipmentMap = {};
+        for (const dude of Object.values(this.dudes)) {
+            const equippedEquipment = this.findEquipmentOnDude(dude);
+            for (const eq of Object.values(equippedEquipment)) {
+                equipment[eq.id] = eq;
+            }
+        }
+
+        const data = structuredClone({
+            dudes: this.dudes,
+            equipment: equipment,
+        });
 
         return delayedResponse<ResponseGetDudes>({data});
     }
@@ -119,12 +135,21 @@ export class DudeService implements IDudeService {
         }
         dude.version++;
         this.save();
-        const dudeCopy = structuredClone(dude);
-        this.messageQueue.push({
-            type: SocketMessageType.DudeUpdated,
-            data: dudeCopy,
+
+
+        const responseData = structuredClone({
+            dude: dude,
+            equipment: this.findEquipmentOnDude(dude),
         });
-        return delayedResponse<ResponseUpdateDude>({data: dudeCopy});
+
+        this.messageQueue.push({
+            type: SocketMessageType.DudesUpdated,
+            data: {
+                dudes: {[dude.id]: responseData.dude},
+                equipment: responseData.equipment,
+            },
+        });
+        return delayedResponse<ResponseUpdateDude>({data: responseData});
     }
 
     public swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
@@ -157,14 +182,19 @@ export class DudeService implements IDudeService {
         dudeA.version++;
         dudeB.version++;
         this.save();
-        
+
         this.messageQueue.push({
-            type: SocketMessageType.DudeUpdated,
-            data: structuredClone(dudeA),
-        });
-        this.messageQueue.push({
-            type: SocketMessageType.DudeUpdated,
-            data: structuredClone(dudeB),
+            type: SocketMessageType.DudesUpdated,
+            data: structuredClone({
+                dudes: {
+                    [dudeA.id]: dudeA,
+                    [dudeB.id]: dudeB,
+                },
+                equipment: {
+                    ...this.findEquipmentOnDude(dudeA),
+                    ...this.findEquipmentOnDude(dudeB),
+                },
+            }),
         });
         return delayedResponse<ResponseSwapEquipmentWithOtherDude>({});
     }

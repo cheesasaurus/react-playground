@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './App.module.css';
 import { DebugBlackBox } from './components/DebugBlackBox';
 import { DialogContainer } from './components/Dialog/DialogContainer';
 import { DialogMonitorContext } from './components/Dialog/DialogContext';
 import { DialogProvider } from './components/Dialog/DialogProvider';
 import { ToDudeList } from './components/ToDudeList/DudeList';
-import { ExampleFunctionComponent } from './store/ExampleFunctionComponent';
-import { ExampleClassComponent } from './store/ExampleClassComponent';
 
 
 interface Props {

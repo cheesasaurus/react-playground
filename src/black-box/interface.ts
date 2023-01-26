@@ -44,17 +44,22 @@ export interface SocketMessageHandler {
 }
 
 
-export type MessageQueue = Array<SocketMessage>;
+export type SocketMessageQueue = Array<SocketMessage>;
 
+
+export enum SocketMessageType {
+    DudesCreated = 'DudesCreated',
+    DudesUpdated = 'DudesUpdated',
+}
 
 export interface SocketMessage {
     type: string;
     data: Object;
 }
 
-export enum SocketMessageType {
-    DudeCreated = 'DudeCreated',
-    DudeUpdated = 'DudeUpdated',
+export interface SocketMessageDataDudes {
+    dudes: DudeMap,
+    equipment: EquipmentMap,
 }
 
 
@@ -76,20 +81,25 @@ export interface IDebugService {
 
 export interface IDudeService {
     createDude(name: string): Promise<ResponseCreateDude>;
-    getDudes(): Promise<ResponseGetDudes>;
+    getAllDudes(): Promise<ResponseGetDudes>;
     getDude(dudeId: string): Promise<ResponseGetDude>;
     updateDude(dude: RequestUpdateDude): Promise<ResponseUpdateDude>;
     swapEquipmentWithOtherDude(slot: EquipmentSlot, dude1Id: string, dude2Id: string): Promise<ResponseSwapEquipmentWithOtherDude>;
 }
 
-export interface DudeApiResponseData {
+export interface DudeApiResponseDataMulti {
     dudes: DudeMap,
+    equipment: EquipmentMap,
+}
+
+export interface DudeApiResponseDataSingle {
+    dude: Dude,
     equipment: EquipmentMap,
 }
 
 export interface ResponseCreateDude {
     errors?: ServiceErrors;
-    data?: Dude;
+    data?: DudeApiResponseDataSingle;
 }
 
 export interface RequestUpdateDude {
@@ -103,17 +113,17 @@ export interface RequestUpdateDude {
 
 export interface ResponseUpdateDude {
     errors?: ServiceErrors;
-    data?: Dude;
+    data?: DudeApiResponseDataSingle;
 }
 
 export interface ResponseGetDudes {
     errors?: ServiceErrors;
-    data?: DudeApiResponseData;
+    data?: DudeApiResponseDataMulti;
 }
 
 export interface ResponseGetDude {
     errors?: ServiceErrors;
-    data?: DudeApiResponseData;
+    data?: DudeApiResponseDataSingle;
 }
 
 export interface ResponseSwapEquipmentWithOtherDude {

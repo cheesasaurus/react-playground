@@ -23,7 +23,7 @@ export const DudesThunks = {
         'db/dudes/fetchAll',
         async (notused, thunkAPI) => {
             try {
-                const response = await window.blackBox.api.dudes.getDudes();
+                const response = await window.blackBox.api.dudes.getAllDudes();
                 if (response.errors) {
                     return thunkAPI.rejectWithValue({errors: response.errors});
                 }

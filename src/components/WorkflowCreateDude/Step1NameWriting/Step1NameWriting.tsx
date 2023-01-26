@@ -35,7 +35,7 @@ export class Step1NameWriting implements Step {
             if (response.errors && response.errors.length > 0) {
                 throw Error(response.errors![0].message);
             }
-            dude = response.data!;
+            dude = response.data!.dude;
             this.context.setDudeId(dude.id);
         }
         else {
@@ -47,7 +47,7 @@ export class Step1NameWriting implements Step {
             if (response.errors && response.errors.length > 0) {
                 throw Error(response.errors![0].message);
             }
-            dude = response.data!;
+            dude = response.data!.dude;
         }
         
         if (props.onNameDetermined) {

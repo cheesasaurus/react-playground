@@ -46,7 +46,7 @@ const dbSlice = createSlice({
         amountAdded(state, action: PayloadAction<number>) {
             state.counter += action.payload;
         },
-        dudesLoaded(state, action: PayloadAction<{dudes: DudeMap, equipment: EquipmentMap}>) {
+        dudesPipedIn(state, action: PayloadAction<{dudes: DudeMap, equipment: EquipmentMap}>) {
             updateDudes(state, action.payload.dudes);
             updateEquipment(state, action.payload.equipment);
         },
@@ -59,9 +59,21 @@ const dbSlice = createSlice({
         builder.addCase(DudesThunks.fetchAll.rejected, (state, action) => {
             console.warn(action.payload);
         });
+
+        builder.addCase(DudesThunks.fetchOneById.fulfilled, (state, action) => {
+            const dude = action.payload.dude;
+            const dudes = {
+                [dude.id]: dude,
+            };
+            updateDudes(state, dudes);
+            updateEquipment(state, action.payload.equipment);
+        });
+        builder.addCase(DudesThunks.fetchOneById.rejected, (state, action) => {
+            console.warn(action.payload);
+        });
     },
 
 });
 
-export const { incremented, amountAdded, dudesLoaded } = dbSlice.actions;
+export const { incremented, amountAdded, dudesPipedIn } = dbSlice.actions;
 export const dbReducer = dbSlice.reducer;

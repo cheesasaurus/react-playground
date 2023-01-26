@@ -1,7 +1,7 @@
 import { MessageBus, Subscription } from "../utils";
 import { DudeService } from "./internal/DudeService";
 import { EquipmentService } from "./internal/EquipmentService";
-import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler, MessageQueue } from "./interface";
+import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler, SocketMessageQueue } from "./interface";
 
 // In practice, the black box would be [native code] and already available via some global variable.
 // But for this proof of concept I'm making my own in javascript.
@@ -15,10 +15,10 @@ export class BlackBox implements IBlackBox {
 
 
 class Socket implements ISocket {
-    private messageQueue: MessageQueue;
+    private messageQueue: SocketMessageQueue;
     private bus = new MessageBus<SocketMessage>();
 
-    constructor(messageQueue: MessageQueue) {
+    constructor(messageQueue: SocketMessageQueue) {
         this.messageQueue = messageQueue;
         setInterval(this.consumeQueue, 5);
     }
@@ -43,7 +43,7 @@ class Api implements IApi {
     debug: DebugService;
     dudes: DudeService;
 
-    constructor(messageQueue: MessageQueue) {
+    constructor(messageQueue: SocketMessageQueue) {
         const equipmentService = new EquipmentService();
         this.debug = new DebugService(messageQueue);
         this.dudes = new DudeService(messageQueue, equipmentService);
@@ -53,9 +53,9 @@ class Api implements IApi {
 
 
 class DebugService implements IDebugService {
-    private messageQueue: MessageQueue;
+    private messageQueue: SocketMessageQueue;
 
-    constructor(messageQueue: MessageQueue) {
+    constructor(messageQueue: SocketMessageQueue) {
         this.messageQueue = messageQueue;
     }
 
