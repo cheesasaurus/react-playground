@@ -1,12 +1,13 @@
 import styles from './DudeInfo.module.css';
 import React, { CSSProperties } from "react";
-import { Dude, EquipmentSlot } from '../../black-box/exposed/models';
+import { Dude, Equipment, EquipmentSlot } from '../../black-box/exposed/models';
 import { DragDropCommands } from '../../DragDropCommands';
 import { EquipmentTemplateLookup } from '../../black-box/internal/EquipmentTemplates/EquipmentTemplateLookup';
 
 
 interface Props {
-    dude: Dude;
+    dudeId: string;
+    equipment: Equipment|undefined,
     slot: EquipmentSlot;
     isDropTarget: boolean;
 }
@@ -28,7 +29,7 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
     private dragStart = (e: React.DragEvent<HTMLDivElement>) => {
         DragDropCommands.sendEquipmentFromDude()
             .setEquipmentSlot(this.props.slot)
-            .setDude(this.props.dude.id)
+            .setDude(this.props.dudeId)
             .attachPayloadTo(e);
     };
 
@@ -40,7 +41,7 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
             cssStyles.borderColor = 'gold';
         }
 
-        const equipment = this.props.dude.equipment[this.props.slot];
+        const equipment = this.props.equipment;
         const template = equipment ? EquipmentTemplateLookup[equipment.templateId]: undefined;
 
         return (

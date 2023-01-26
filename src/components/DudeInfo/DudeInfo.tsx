@@ -1,6 +1,6 @@
 import styles from './DudeInfo.module.css';
 import React from "react";
-import { Dude, EquipmentSlot } from "../../black-box/exposed/models";
+import { Dude, DudeMap, EquipmentMap, EquipmentSlot, EquipmentSlots } from "../../black-box/exposed/models";
 import { EquipmentSlotEl } from './EquipmentSlot';
 import { DragDropCommands, DragDropCommandTypes } from '../../DragDropCommands';
 import { connect } from 'react-redux';
@@ -15,6 +15,7 @@ interface Props {
 
 interface PropsInternal extends Props {
     dude: Dude|undefined,
+    equipment: EquipmentMap,
     loadDude: () => {};
 }
 
@@ -23,13 +24,32 @@ interface ComponentState {
     lastNameBubbled: string;
 }
 
-const mapStateToProps = (state: RootState, props: Props) => ({
-    dude: state.db.entities.dudes[props.dudeId],
-});
+const mapStateToProps = (state: RootState, props: Props) => {
+    const dude = state.db.entities.dudes[props.dudeId];
+    let equipment = findEquipmentOnDude(state, dude);
+    return {dude, equipment};
+};
 
 const mapDispatchToProps = (dispatch: AppDispatch, props: Props) => ({
     loadDude: () => dispatch(DudesThunks.fetchOneById(props.dudeId)),
 });
+
+
+// todo: put this somewhere
+function findEquipmentOnDude(state: RootState, dude: Dude): EquipmentMap {
+    const equipment: EquipmentMap = {};
+    if (dude === undefined) {
+        return equipment;
+    }
+    for (const slot of EquipmentSlots) {
+        const entry = dude.equipment[slot];
+        if (entry) {
+            equipment[entry.id] = state.db.entities.equipment[entry.id];
+        }
+    }
+    return equipment;
+}
+
 
 
 export const DudeInfo = connect(mapStateToProps, mapDispatchToProps)(
@@ -145,10 +165,12 @@ export const DudeInfo = connect(mapStateToProps, mapDispatchToProps)(
         }
 
         private renderEquipmentSlot(slot: EquipmentSlot) {
+            const dude = this.props.dude!;
             return (
                 <EquipmentSlotEl
                     slot={slot}
-                    dude={this.props.dude!}
+                    dudeId={dude.id}
+                    equipment={dude.equipment[slot]}
                     isDropTarget={slot === this.state.equipmentDropSlot}
                 />
             );
