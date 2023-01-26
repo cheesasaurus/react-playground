@@ -1,11 +1,11 @@
 import styles from './DudeList.module.css';
-import { Dude } from "../../black-box/exposed/models";
+import { Dude, UUID } from "../../black-box/exposed/models";
 import React from 'react';
 
 
 interface Props {
     dude: Dude;
-    resumeDudeCreation: (dudeId: string) => void;
+    resumeDudeCreation: (dudeId: UUID) => void;
 }
 
 interface State {

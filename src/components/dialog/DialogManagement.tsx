@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { UUID } from "../../black-box/exposed/models";
 import { MessageBus, MessageHandler, Subscription } from "../../utils";
 import { DudeInfo } from "../DudeInfo/DudeInfo";
 import { WorkflowCreateDudeContainer } from "../WorkflowCreateDude/WorkflowCreateDudeContainer";
@@ -234,7 +235,7 @@ export class DialogControl {
         });
     }
 
-    public openDudeInfo(dudeId: string): void {
+    public openDudeInfo(dudeId: UUID): void {
         const dialogId = `DudeInfo#${dudeId}`;
         const initialTitle = 'Dude Info';
 

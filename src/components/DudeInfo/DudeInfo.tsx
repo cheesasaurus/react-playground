@@ -1,6 +1,6 @@
 import styles from './DudeInfo.module.css';
 import React from "react";
-import { Dude, EquipmentMap, EquipmentSlot, EquipmentSlots } from "../../black-box/exposed/models";
+import { Dude, EquipmentMap, EquipmentSlot, EquipmentSlots, UUID } from "../../black-box/exposed/models";
 import { EquipmentSlotEl } from './EquipmentSlot';
 import { connect } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
@@ -10,7 +10,7 @@ import { dragEnded, dragStarted } from '../../store/slices/dragDrop/dragDropSlic
 
 
 interface Props {
-    dudeId: string;
+    dudeId: UUID;
     onNameDetermined?(dudeName: string): void;
 }
 

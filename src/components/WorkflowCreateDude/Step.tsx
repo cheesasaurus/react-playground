@@ -1,4 +1,5 @@
 import React from "react";
+import { UUID } from "../../black-box/exposed/models";
 import { InnerProps, State } from "./WorkflowCreateDude";
 
 
@@ -12,5 +13,5 @@ export interface Step {
 export interface StepContext {
     setState(nextState: any): any;
     transitionToNextStep(): void;
-    setDudeId(dudeId: string): void;
+    setDudeId(dudeId: UUID): void;
 }

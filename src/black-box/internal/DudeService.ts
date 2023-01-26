@@ -1,7 +1,7 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
 import { IDudeService, SocketMessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
-import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, iterateModelMap, WeaponTemplate } from "../exposed/models";
+import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, iterateModelMap, UUID, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
 import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
@@ -65,7 +65,7 @@ export class DudeService implements IDudeService {
         });
     }
 
-    public getDude(dudeId: string): Promise<ResponseGetDude> {
+    public getDude(dudeId: UUID): Promise<ResponseGetDude> {
         if (!(dudeId in this.dudes)) {
             const errors = [{
                 code: 'DoesNotExist',

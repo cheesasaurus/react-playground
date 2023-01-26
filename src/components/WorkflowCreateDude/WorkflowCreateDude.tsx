@@ -1,5 +1,5 @@
 import React from "react";
-import { Dude } from "../../black-box/exposed/models";
+import { Dude, UUID } from "../../black-box/exposed/models";
 import { Race } from "../../black-box/exposed/DudeModifierPresets/Races";
 import { NavButtonProps, Workflow } from "../Workflow/Workflow";
 import { Profession } from "../../black-box/exposed/DudeModifierPresets/Professions";
@@ -16,12 +16,12 @@ interface Props {
     dudeId?: string,
     onWorkflowCompleted?: () => void,
     onNameDetermined?: (dudeName: string) => void,
-    setDudeId: (dudeId: string) => void,
+    setDudeId: (dudeId: UUID) => void,
 }
 
 export interface InnerProps extends Props {
     dude: Dude | undefined,
-    loadDude: (dudeId: string) => void;
+    loadDude: (dudeId: UUID) => void;
 }
 
 export interface State {
@@ -53,7 +53,7 @@ const mapStateToProps = (state: RootState, props: Props) => {
 
 const mapDispatchToProps = (dispatch: AppDispatch, props: Props) => {
     return {
-        loadDude: (dudeId: string) => dispatch(DudesThunks.fetchOneById(dudeId)),
+        loadDude: (dudeId: UUID) => dispatch(DudesThunks.fetchOneById(dudeId)),
     };
 };
 
@@ -99,7 +99,7 @@ export const WorkflowCreateDude = connect(mapStateToProps, mapDispatchToProps)(
             const stepContext = {
                 setState: (newState: any) => this.setState(newState),
                 transitionToNextStep: this.startTransitionNext,
-                setDudeId: (dudeId: string) => this.props.setDudeId(dudeId),
+                setDudeId: (dudeId: UUID) => this.props.setDudeId(dudeId),
             };
             this.steps = [
                 null,

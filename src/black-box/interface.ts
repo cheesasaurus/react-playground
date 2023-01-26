@@ -1,7 +1,7 @@
 import { Subscription } from "../utils";
 import { Profession } from "./exposed/DudeModifierPresets/Professions";
 import { Race } from "./exposed/DudeModifierPresets/Races";
-import { Dude, DudeMap, EquipmentMap, EquipmentSlot } from "./exposed/models";
+import { Dude, DudeMap, EquipmentMap, EquipmentSlot, UUID } from "./exposed/models";
 
 /**
  * Some black box (for example, a game engine providing the webview),
@@ -82,7 +82,7 @@ export interface IDebugService {
 export interface IDudeService {
     createDude(name: string): Promise<ResponseCreateDude>;
     getAllDudes(): Promise<ResponseGetDudes>;
-    getDude(dudeId: string): Promise<ResponseGetDude>;
+    getDude(dudeId: UUID): Promise<ResponseGetDude>;
     updateDude(dude: RequestUpdateDude): Promise<ResponseUpdateDude>;
     swapEquipmentWithOtherDude(slot: EquipmentSlot, dude1Id: string, dude2Id: string): Promise<ResponseSwapEquipmentWithOtherDude>;
 }

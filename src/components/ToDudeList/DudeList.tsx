@@ -1,7 +1,7 @@
 import styles from './DudeList.module.css';
 import './DudeList.module.css';
 import React from "react";
-import { Dude, DudeMap } from "../../black-box/exposed/models";
+import { Dude, DudeMap, UUID } from "../../black-box/exposed/models";
 import { DudeListItem } from "./DudeListItem";
 import { DialogControlContext } from '../Dialog/DialogContext';
 import { DudeListItemCreationPending } from './DudeListItemCreationPending';
@@ -45,7 +45,7 @@ export const ToDudeList = connect(mapStateToProps, mapDispatchToProps)(
 
         private resumeDudeCreation = (dudeId?: string) => this.openDudeCreationDialog(dudeId);
 
-        private openDudeInfo = (dudeId: string) => {
+        private openDudeInfo = (dudeId: UUID) => {
             const dialogControl = this.context!;
             dialogControl.openDudeInfo(dudeId);
         };
