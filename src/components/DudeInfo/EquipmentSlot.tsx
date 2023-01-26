@@ -1,15 +1,15 @@
 import styles from './DudeInfo.module.css';
 import React, { CSSProperties } from "react";
 import { Equipment, EquipmentSlot } from '../../black-box/exposed/models';
-import { DragDropCommands } from '../../DragDropCommands';
 import { EquipmentTemplateLookup } from '../../black-box/internal/EquipmentTemplates/EquipmentTemplateLookup';
 
 
 interface Props {
-    dudeId: string;
     equipment: Equipment|undefined,
     slot: EquipmentSlot;
     isDropTarget: boolean;
+    startDraggingEquipment: (slot: EquipmentSlot) => void,
+    onDragEnd: () => void,
 }
 
 interface State {
@@ -26,11 +26,12 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
         };
     }
 
-    private dragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        DragDropCommands.sendEquipmentFromDude()
-            .setEquipmentSlot(this.props.slot)
-            .setDude(this.props.dudeId)
-            .attachPayloadTo(e);
+    private onDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+        this.props.startDraggingEquipment(this.props.slot);
+    };
+
+    private onDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+        this.props.onDragEnd();
     };
 
     public render(): React.ReactNode {
@@ -48,7 +49,8 @@ export class EquipmentSlotEl extends React.Component<Props, State> {
             <div
                 className={styles['equipment-slot']} style={cssStyles}
                 draggable
-                onDragStart={this.dragStart}
+                onDragStart={this.onDragStart}
+                onDragEnd={this.onDragEnd}
             >
                 <div>{this.renderHintIcon()}</div>
                 {template?.name}

@@ -2,21 +2,29 @@ import styles from './DudeInfo.module.css';
 import React from "react";
 import { Dude, EquipmentMap, EquipmentSlot, EquipmentSlots } from "../../black-box/exposed/models";
 import { EquipmentSlotEl } from './EquipmentSlot';
-import { DragDropCommands, DragDropCommandTypes } from '../../DragDropCommands';
 import { connect } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { DudesThunks } from '../../store/slices/db/thunks/dudes';
+import { DragPayloadSendEquipmentFromDude, DragPayloadType } from '../../store/slices/dragDrop/dragPayloads';
+import { dragEnded, dragStarted } from '../../store/slices/dragDrop/dragDropSlice';
 
 
 interface Props {
-    dudeId: string,
-    onNameDetermined?(dudeName: string): void,
+    dudeId: string;
+    onNameDetermined?(dudeName: string): void;
 }
 
 interface PropsInternal extends Props {
-    dude: Dude|undefined,
-    equipment: EquipmentMap,
-    loadDude: () => {};
+    dude: Dude|undefined;
+    equipment: EquipmentMap;
+    dragDrop: {
+        isDragging: boolean,
+        payloadType: DragPayloadType | undefined,
+        payload: any,
+    };
+    loadDude: () => void;
+    startDraggingEquipment: (slot: EquipmentSlot) => void,
+    dragEnded: () => void,
 }
 
 interface ComponentState {
@@ -27,12 +35,28 @@ interface ComponentState {
 const mapStateToProps = (state: RootState, props: Props) => {
     const dude = state.db.entities.dudes[props.dudeId];
     let equipment = findEquipmentOnDude(state, dude);
-    return {dude, equipment};
+    return {
+        dude,
+        equipment,
+        dragDrop: state.dragDrop,
+    };
 };
 
-const mapDispatchToProps = (dispatch: AppDispatch, props: Props) => ({
-    loadDude: () => dispatch(DudesThunks.fetchOneById(props.dudeId)),
-});
+const mapDispatchToProps = (dispatch: AppDispatch, props: Props) => {
+    return {
+        loadDude: () => dispatch(DudesThunks.fetchOneById(props.dudeId)),
+        startDraggingEquipment: (slot: EquipmentSlot) => {
+            dispatch(dragStarted({
+                payloadType: DragPayloadType.SendEquipmentFromDude,
+                payload: {
+                    dudeId: props.dudeId,
+                    slot: slot,
+                }
+            }));
+        },
+        dragEnded: () => dispatch(dragEnded()),
+    };
+};
 
 
 // todo: put this somewhere
@@ -92,14 +116,13 @@ export const DudeInfo = connect(mapStateToProps, mapDispatchToProps)(
 
         private onDragOver = (e: React.DragEvent<HTMLElement>) => {
             e.preventDefault();
-            // todo: doesn't work on chrome. https://stackoverflow.com/questions/9534677/html5-drag-and-drop-getdata-only-works-on-drop-event-in-chrome
-            const dat = JSON.parse(e.dataTransfer.getData('application/json'));
-            if (dat?.command === DragDropCommandTypes.SendEquipmentFromDude) {
-                if (dat.dudeId === this.props.dudeId) {
+            if (this.props.dragDrop.payloadType === DragPayloadType.SendEquipmentFromDude) {
+                const payload = this.props.dragDrop.payload as DragPayloadSendEquipmentFromDude;
+                if (payload.dudeId === this.props.dudeId) {
                     return;
                 }
                 this.setState({
-                    equipmentDropSlot: dat.slot,
+                    equipmentDropSlot: payload.slot,
                 });
                 e.dataTransfer.dropEffect = 'move';
             }
@@ -118,15 +141,17 @@ export const DudeInfo = connect(mapStateToProps, mapDispatchToProps)(
                 equipmentDropSlot: undefined,
             });
 
-            const dat = JSON.parse(e.dataTransfer.getData('application/json'));
-            if (dat?.command === DragDropCommandTypes.SendEquipmentFromDude) {
-                DragDropCommands.sendEquipmentFromDude()
-                    .fromPayload(dat)
-                    .toOtherDude(this.props.dudeId)
-                    .execute();
+            if (this.props.dragDrop.payloadType === DragPayloadType.SendEquipmentFromDude) {
+                const payload = this.props.dragDrop.payload as DragPayloadSendEquipmentFromDude;
+                if (payload.dudeId !== this.props.dudeId) {
+                    window.blackBox.api.dudes.swapEquipmentWithOtherDude(
+                        payload.slot,
+                        payload.dudeId,
+                        this.props.dudeId
+                    );
+                }
             }
         }
-
 
         public render(): React.ReactNode {
             if (!this.props.dude) {
@@ -172,9 +197,10 @@ export const DudeInfo = connect(mapStateToProps, mapDispatchToProps)(
             return (
                 <EquipmentSlotEl
                     slot={slot}
-                    dudeId={dude.id}
                     equipment={equipment}
                     isDropTarget={slot === this.state.equipmentDropSlot}
+                    startDraggingEquipment={this.props.startDraggingEquipment}
+                    onDragEnd={this.props.dragEnded}
                 />
             );
         }
