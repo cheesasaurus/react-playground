@@ -87,24 +87,26 @@ export class Tooltip extends React.Component<Props, State> {
 
         // x
         let x = e.clientX;
-        if (x + rect.width > bounds.xMax) {
-            // tooltip should be to the left of the mouse
-            x = x - rect.width - mousePadding.left;
+        const xTowardsRightOfMouse = x + mousePadding.right;
+        if (xTowardsRightOfMouse + rect.width < bounds.xMax) {
+            // tooltip can be at the right side of the mouse
+            x = xTowardsRightOfMouse;
         }
         else {
-            // tooltip should be to the right of the mouse
-            x = x + mousePadding.right;
+           // not enough room at the right side of the mouse, so put the tooltip to the left
+           x = x - rect.width - mousePadding.left;
         }
 
         // y
         let y = e.clientY;
-        if (y + rect.height > bounds.yMax) {
-            // tooltip should be above the mouse
-            y = y - rect.height - mousePadding.top;
+        const yBelowMouse = y + mousePadding.bottom;
+        if (yBelowMouse + rect.height < bounds.yMax) {
+            // tooltip can be below the mouse
+            y = yBelowMouse;
         }
         else {
-            // tooltip should be below the mouse
-            y = y + mousePadding.bottom;
+            // not enough room below the mouse, so put the tooltip above the mouse
+            y = y - rect.height - mousePadding.top;
         }
 
         return {x, y};
