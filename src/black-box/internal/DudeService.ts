@@ -37,7 +37,7 @@ export class DudeService implements IDudeService {
         }
     }
 
-    public createDude(name: string): Promise<ResponseCreateDude> {
+    public async createDude(name: string): Promise<ResponseCreateDude> {
         name = name.trim();
         const errors = this.checkNewNameErrors(name);
         if (errors.length > 0) {
@@ -65,7 +65,7 @@ export class DudeService implements IDudeService {
         });
     }
 
-    public getDude(dudeId: UUID): Promise<ResponseGetDude> {
+    public async getDude(dudeId: UUID): Promise<ResponseGetDude> {
         if (!(dudeId in this.dudes)) {
             const errors = [{
                 code: 'DoesNotExist',
@@ -83,7 +83,7 @@ export class DudeService implements IDudeService {
         return delayedResponse<ResponseGetDude>({data: responseData});
     }
 
-    public getAllDudes(): Promise<ResponseGetDudes> {
+    public async getAllDudes(): Promise<ResponseGetDudes> {
         const equipment: EquipmentMap = {};
         for (const dude of Object.values(this.dudes)) {
             const equippedEquipment = this.findEquipmentOnDude(dude);
@@ -100,7 +100,7 @@ export class DudeService implements IDudeService {
         return delayedResponse<ResponseGetDudes>({data});
     }
 
-    public updateDude(pendingDude: RequestUpdateDude): Promise<ResponseUpdateDude> {
+    public async updateDude(pendingDude: RequestUpdateDude): Promise<ResponseUpdateDude> {
 
         const errors = Array<ServiceError>();
         if (!(pendingDude.id in this.dudes)) {
@@ -131,7 +131,7 @@ export class DudeService implements IDudeService {
             dude.profession = pendingDude.profession;
         }
         if (pendingDude.finishCreation) {
-            this.finishDudeCreation(dude);
+            await this.finishDudeCreation(dude);
         }
         dude.version++;
         this.save();
@@ -152,7 +152,7 @@ export class DudeService implements IDudeService {
         return delayedResponse<ResponseUpdateDude>({data: responseData});
     }
 
-    public swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
+    public async swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
         const errors = Array<ServiceError>();
         if (!(dudeIdA in this.dudes)) {
             errors.push({
@@ -285,13 +285,13 @@ export class DudeService implements IDudeService {
         return stats;
     }
 
-    private finishDudeCreation(dude: Dude): void {
+    private async finishDudeCreation(dude: Dude): Promise<void> {
         dude.equipment = {
-            [EquipmentSlot.Weapon]: this.starterWeapon(dude)?.id,
+            [EquipmentSlot.Weapon]: (await this.starterWeapon(dude))?.id,
             [EquipmentSlot.Hat]: undefined,
-            [EquipmentSlot.Shirt]: this.equipmentService.createArmor(ArmorTemplates.starterSet.shirt).id,
-            [EquipmentSlot.Gloves]: this.equipmentService.createArmor(ArmorTemplates.starterSet.gloves).id,
-            [EquipmentSlot.Pants]: this.equipmentService.createArmor(ArmorTemplates.starterSet.pants).id,
+            [EquipmentSlot.Shirt]: (await this.equipmentService.createArmor(ArmorTemplates.starterSet.shirt))?.id,
+            [EquipmentSlot.Gloves]: (await this.equipmentService.createArmor(ArmorTemplates.starterSet.gloves))?.id,
+            [EquipmentSlot.Pants]: (await this.equipmentService.createArmor(ArmorTemplates.starterSet.pants))?.id,
             [EquipmentSlot.Boots]: undefined,
             [EquipmentSlot.Lumberjack]: undefined,
             [EquipmentSlot.Mining]: undefined,
@@ -301,7 +301,7 @@ export class DudeService implements IDudeService {
         dude.creation.completed = true;
     }
 
-    private starterWeapon(dude: Dude): Equipment|undefined {
+    private async starterWeapon(dude: Dude): Promise<Equipment|undefined> {
         const template = this.starterWeaponTemplate(dude);
         if (template) {
             return this.equipmentService.createWeapon(template);

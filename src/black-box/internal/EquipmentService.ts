@@ -24,7 +24,7 @@ export class EquipmentService {
         }
     }
 
-    public createWeapon(template: WeaponTemplate, crafterId?: number): Equipment {
+    public async createWeapon(template: WeaponTemplate, crafterId?: number): Promise<Equipment> {
         const id = window.crypto.randomUUID();
         const weapon = {
             id: id,
@@ -38,7 +38,7 @@ export class EquipmentService {
         return weapon;
     }
 
-    public createArmor(template: ArmorTemplate, crafterId?: number): Equipment {
+    public async createArmor(template: ArmorTemplate, crafterId?: number): Promise<Equipment> {
         const id = window.crypto.randomUUID();
         const armor = {
             id: id,
