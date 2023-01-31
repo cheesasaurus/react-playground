@@ -11,8 +11,7 @@ interface Props {
 
 
 interface State {
-    x: number;
-    y: number;
+    initialBoundingRect: DOMRect | undefined;
 }
 
 
@@ -24,14 +23,24 @@ export class TooltipInstance extends React.Component<Props, State> {
     public constructor(props: Props) {
         super(props);
         this.ref = React.createRef();
+        this.state = {
+            initialBoundingRect: undefined,
+        };
     }
 
     public componentDidMount(): void {
         this.root?.appendChild(this.el);
+        // trigger a re-render after the component has been added to the dom and can be properly measured
+        this.setState({
+           initialBoundingRect: this.ref.current!.getBoundingClientRect(),
+        });
     }
 
     public componentWillUnmount(): void {
         this.root?.removeChild(this.el);
+        this.setState({
+            initialBoundingRect: undefined,
+        });
     }
 
     public render(): React.ReactNode {
@@ -68,7 +77,7 @@ export class TooltipInstance extends React.Component<Props, State> {
             left: 20,
         };
 
-        if (!this.ref.current) {
+        if (!this.state.initialBoundingRect) {
             return {
                 x: mouseX + mousePadding.right,
                 y: mouseY + mousePadding.bottom,
@@ -79,9 +88,9 @@ export class TooltipInstance extends React.Component<Props, State> {
             xMin: 0,
             xMax: document.documentElement.clientWidth,
             yMin: 0,
-            yMax: document.documentElement.clientHeight, 
+            yMax: document.documentElement.clientHeight,
         };
-        const rect = this.ref.current!.getBoundingClientRect();
+        const rect = this.state.initialBoundingRect;
 
         // x
         let x;
