@@ -6,7 +6,6 @@ import { Simulation } from "../../Simulation/Simulation";
 
 const db = new GameDatabase();
 const simulation = new Simulation(db);
-simulation.pause();
 setInterval(() => simulation.tick(), 10);
 
 self.onmessage = async (e) => {

@@ -1,4 +1,4 @@
-import { UnixTimestampMilliseconds } from "../../exposed/models";
+import { SimulationData, UnixTimestampMilliseconds } from "../../exposed/models";
 import { GameDatabase } from "../db/GameDatabase";
 import { ISimulationSystem } from "./Systems/ISimulationSystem";
 import { SystemActionAssignment } from "./Systems/SystemActionAssignment";
@@ -7,9 +7,7 @@ import { SystemIdling } from "./Systems/SystemIdling";
 
 export class Simulation {
     private isTicking: boolean = false;
-    private isPaused: boolean = false;
-    private timestampOffset: number = 0;
-    private pauseTimestamp: UnixTimestampMilliseconds = 0;
+    private isReady: boolean = false;
     private systems: ISimulationSystem[];
     
 
@@ -18,30 +16,72 @@ export class Simulation {
             new SystemIdling(this.db),
             new SystemActionAssignment(this.db),
         ];
+        this.init();
+    }
+
+    private async init(): Promise<void> {
+        const data = await this.loadData();
+        if (!data.isPaused) {
+            // The simulation was stopped some other way (e.g. closing browser).
+            // We will treat it as if it was paused.
+            const now = Date.now();
+            const millisSinceLastTick = now - (data.lastTickWithOffset + data.tickOffset);
+            data.tickOffset += millisSinceLastTick;
+            data.pauseTimestamp = now;
+            this.db.simulation.put(data);
+        }
+        this.isReady = true;
+    }
+
+    private async loadData(): Promise<SimulationData> {
+        const data = await this.db.simulation.toCollection().first();
+        if (!data) {
+            throw Error('Missing simulation data');
+        }
+        return data;
+    }
+
+    private throwIfNotReady() {
+        if (!this.isReady) {
+            throw Error('Simulation is not ready');
+        }
     }
 
     public async pause(): Promise<void> {
-        if (this.isPaused) {
+        this.throwIfNotReady();
+        const data = await this.loadData();
+        if (data.isPaused) {
             return;
         }
-        this.pauseTimestamp = Date.now();
+        data.isPaused = true;
+        data.pauseTimestamp = Date.now();
+        this.db.simulation.put(data);
     }
 
     public async unPause(): Promise<void> {
-        if (!this.isPaused) {
+        this.throwIfNotReady();
+        const data = await this.loadData();
+        if (!data.isPaused) {
             return;
         }
-        this.isPaused = false;
-        const pauseDuration = Date.now() - this.pauseTimestamp;
-        this.timestampOffset += pauseDuration;
+        data.isPaused = false;
+        const pauseDuration = Date.now() - data.pauseTimestamp;
+        data.tickOffset += pauseDuration;
+        this.db.simulation.put(data);
     }
 
     public async tick(): Promise<void> {
-        if (this.isPaused || this.isTicking) {
+        if (!this.isReady || this.isTicking) {
+            return;
+        }
+        const data = await this.loadData();
+        if (data.isPaused) {
             return;
         }
         this.isTicking = true;
-        const tickTimestamp: UnixTimestampMilliseconds = Date.now() - this.timestampOffset;
+        const tickTimestamp: UnixTimestampMilliseconds = Date.now() - data.tickOffset;
+        data.lastTickWithOffset = tickTimestamp;
+        this.db.simulation.put(data);
         for (const system of this.systems) {
             await system.tick(tickTimestamp);
         }

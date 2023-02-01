@@ -179,3 +179,12 @@ export interface EquipmentMap {
     [id: UUID]: Equipment,
 }
 
+
+export interface SimulationData {
+    id: number,
+    isPaused: boolean,
+    tickOffset: number,
+    pauseTimestamp: UnixTimestampMilliseconds,
+    lastTickWithOffset: UnixTimestampMilliseconds,
+}
+
