@@ -44,9 +44,6 @@ export interface SocketMessageHandler {
 }
 
 
-export type SocketMessageQueue = Array<SocketMessage>;
-
-
 export enum SocketMessageType {
     DudesCreated = 'DudesCreated',
     DudesUpdated = 'DudesUpdated',

@@ -1,7 +1,7 @@
 import { MessageBus, Subscription } from "../utils";
 import { DudeService } from "./internal/DudeService";
 import { EquipmentService } from "./internal/EquipmentService";
-import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler, SocketMessageQueue } from "./interface";
+import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler } from "./interface";
 import { GameDatabase } from "./internal/db/GameDatabase";
 
 // In practice, the black box would be [native code] and already available via some global variable.
@@ -10,31 +10,21 @@ import { GameDatabase } from "./internal/db/GameDatabase";
 
 export class BlackBox implements IBlackBox {
     private db = new GameDatabase();
-    public socket = new Socket(this.db);
+    public socket = new Socket();
     public api = new Api(this.db);
 }
 
 
 class Socket implements ISocket {
     private bus = new MessageBus<SocketMessage>();
+    private worker = new Worker(new URL('./internal/workers/dedicated/SocketWorker.ts', import.meta.url));
 
-    constructor(private db: GameDatabase) {
-        setInterval(this.consumeQueue, 5);
-    }
-
-    private consumeQueue = async () => {
-        let message = await this.db.socketMessageQueue.toCollection().first();
-        while (message) {
-            this.db.socketMessageQueue.delete(message.id);
-            try {
-                this.bus.emit(message?.type, message);
-            }
-            catch (err) {
-                console.error(err);
-            }
-            message = await this.db.socketMessageQueue.toCollection().first();
+    constructor() {
+        this.worker.onmessage = (workerMessage: MessageEvent<SocketMessage>) => {
+            const socketMessage = workerMessage.data;
+            this.bus.emit(socketMessage?.type, socketMessage);
         }
-    };
+    }
 
     public on = (messageType: string, messageHandler: SocketMessageHandler): Subscription => {
         return this.bus.on(messageType, messageHandler);
