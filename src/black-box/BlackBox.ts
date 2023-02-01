@@ -9,27 +9,30 @@ import { GameDatabase } from "./internal/db/GameDatabase";
 
 
 export class BlackBox implements IBlackBox {
-    private messageQueue = new Array<SocketMessage>();
-    public socket = new Socket(this.messageQueue);
-    public api = new Api(this.messageQueue);
+    private db = new GameDatabase();
+    public socket = new Socket(this.db);
+    public api = new Api(this.db);
 }
 
 
 class Socket implements ISocket {
-    private messageQueue: SocketMessageQueue;
     private bus = new MessageBus<SocketMessage>();
 
-    constructor(messageQueue: SocketMessageQueue) {
-        this.messageQueue = messageQueue;
+    constructor(private db: GameDatabase) {
         setInterval(this.consumeQueue, 5);
     }
 
-    private consumeQueue = () => {
-        while (this.messageQueue.length > 0) {
-            const message = this.messageQueue.shift();
-            if (message) {
+    private consumeQueue = async () => {
+        let message = await this.db.socketMessageQueue.toCollection().first();
+        while (message) {
+            this.db.socketMessageQueue.delete(message.id);
+            try {
                 this.bus.emit(message?.type, message);
             }
+            catch (err) {
+                console.error(err);
+            }
+            message = await this.db.socketMessageQueue.toCollection().first();
         }
     };
 
@@ -44,25 +47,23 @@ class Api implements IApi {
     debug: DebugService;
     dudes: DudeService;
 
-    constructor(messageQueue: SocketMessageQueue) {
-        const db = new GameDatabase();
+    constructor(db: GameDatabase) {
         const equipmentService = new EquipmentService(db);
-        this.debug = new DebugService(messageQueue);
-        this.dudes = new DudeService(db, messageQueue, equipmentService);
+        this.debug = new DebugService(db);
+        this.dudes = new DudeService(db, equipmentService);
     }
 
 }
 
 
 class DebugService implements IDebugService {
-    private messageQueue: SocketMessageQueue;
 
-    constructor(messageQueue: SocketMessageQueue) {
-        this.messageQueue = messageQueue;
+    constructor(private db: GameDatabase) {
+
     }
 
     public async emitMessageFromBlackBox(message: SocketMessage): Promise<void> {
-        this.messageQueue.push(message);
+        await this.db.socketMessageQueue.add(message);
     }
 
 }

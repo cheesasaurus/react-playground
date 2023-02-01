@@ -11,14 +11,9 @@ import { GameDatabase } from "./db/GameDatabase";
 
 
 export class DudeService implements IDudeService {
-    private equipmentService: EquipmentService;
-    private messageQueue: SocketMessageQueue;
-    private db: GameDatabase;
 
-    constructor(db: GameDatabase, messageQueue: SocketMessageQueue, equipmentService: EquipmentService) {
-        this.db = db;
-        this.messageQueue = messageQueue;
-        this.equipmentService = equipmentService;
+    constructor(private db: GameDatabase, private equipmentService: EquipmentService) {
+
     }
 
     public async createDude(name: string): Promise<ResponseCreateDude> {
@@ -36,7 +31,7 @@ export class DudeService implements IDudeService {
             equipment: await this.findEquipmentOnDude(dude),
         });
 
-        this.messageQueue.push({
+        this.db.socketMessageQueue.add({
             id: crypto.randomUUID(),
             type: SocketMessageType.DudesCreated,
             data: {
@@ -128,7 +123,7 @@ export class DudeService implements IDudeService {
             equipment: await this.findEquipmentOnDude(dude),
         });
 
-        this.messageQueue.push({
+        this.db.socketMessageQueue.add({
             id: crypto.randomUUID(),
             type: SocketMessageType.DudesUpdated,
             data: {
@@ -169,7 +164,7 @@ export class DudeService implements IDudeService {
         dudeB.version++;
         await this.db.dudes.bulkPut([dudeA, dudeB]);
 
-        this.messageQueue.push({
+        this.db.socketMessageQueue.add({
             id: crypto.randomUUID(),
             type: SocketMessageType.DudesUpdated,
             data: structuredClone({
