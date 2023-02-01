@@ -37,6 +37,7 @@ export class DudeService implements IDudeService {
         });
 
         this.messageQueue.push({
+            id: crypto.randomUUID(),
             type: SocketMessageType.DudesCreated,
             data: {
                 dudes: {[dude.id]: responseData.dude},
@@ -126,6 +127,7 @@ export class DudeService implements IDudeService {
         });
 
         this.messageQueue.push({
+            id: crypto.randomUUID(),
             type: SocketMessageType.DudesUpdated,
             data: {
                 dudes: {[dude.id]: responseData.dude},
@@ -166,6 +168,7 @@ export class DudeService implements IDudeService {
         await this.db.dudes.bulkPut([dudeA, dudeB]);
 
         this.messageQueue.push({
+            id: crypto.randomUUID(),
             type: SocketMessageType.DudesUpdated,
             data: structuredClone({
                 dudes: {

@@ -45,6 +45,7 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
 
     requestBlackBoxToEmitTestMessage = () => {
         window.blackBox.api.debug.emitMessageFromBlackBox({
+            id: crypto.randomUUID(),
             type: 'testtest',
             data: {
                 cheese: 'cheddar',

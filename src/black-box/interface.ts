@@ -53,6 +53,7 @@ export enum SocketMessageType {
 }
 
 export interface SocketMessage {
+    id: UUID;
     type: string;
     data: Object;
 }
