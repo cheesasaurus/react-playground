@@ -1,7 +1,7 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
 import { IDudeService, SocketMessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
-import { Dude, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, UUID, WeaponTemplate } from "../exposed/models";
+import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, UUID, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
 import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
@@ -67,19 +67,21 @@ export class DudeService implements IDudeService {
     }
 
     public async getAllDudes(): Promise<ResponseGetDudes> {
-        const equipment: EquipmentMap = {};
+        const dudeMap: DudeMap = {};
+        const equipmentMap: EquipmentMap = {};
 
         const dudes = await this.db.dudes.toArray();
         for (const dude of dudes) {
+            dudeMap[dude.id] = dude;
             const equippedEquipment = await this.findEquipmentOnDude(dude);
-            for (const eq of Object.values(equippedEquipment)) {
-                equipment[eq.id] = eq;
+            for (const equipment of Object.values(equippedEquipment)) {
+                equipmentMap[equipment.id] = equipment;
             }
         }
 
         const data = structuredClone({
-            dudes: dudes,
-            equipment: equipment,
+            dudes: dudeMap,
+            equipment: equipmentMap,
         });
 
         return delayedResponse<ResponseGetDudes>({data});
