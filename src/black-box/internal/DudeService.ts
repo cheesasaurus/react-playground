@@ -50,7 +50,7 @@ export class DudeService implements IDudeService {
 
         const responseData = structuredClone({
             dude: dude,
-            equipment: this.findEquipmentOnDude(dude),
+            equipment: await this.findEquipmentOnDude(dude),
         });
 
         this.messageQueue.push({
@@ -78,7 +78,7 @@ export class DudeService implements IDudeService {
 
         const responseData = structuredClone({
             dude: dude,
-            equipment: this.findEquipmentOnDude(dude),
+            equipment: await this.findEquipmentOnDude(dude),
         });
         return delayedResponse<ResponseGetDude>({data: responseData});
     }
@@ -86,7 +86,7 @@ export class DudeService implements IDudeService {
     public async getAllDudes(): Promise<ResponseGetDudes> {
         const equipment: EquipmentMap = {};
         for (const dude of Object.values(this.dudes)) {
-            const equippedEquipment = this.findEquipmentOnDude(dude);
+            const equippedEquipment = await this.findEquipmentOnDude(dude);
             for (const eq of Object.values(equippedEquipment)) {
                 equipment[eq.id] = eq;
             }
@@ -139,7 +139,7 @@ export class DudeService implements IDudeService {
 
         const responseData = structuredClone({
             dude: dude,
-            equipment: this.findEquipmentOnDude(dude),
+            equipment: await this.findEquipmentOnDude(dude),
         });
 
         this.messageQueue.push({
@@ -189,8 +189,8 @@ export class DudeService implements IDudeService {
                     [dudeB.id]: dudeB,
                 },
                 equipment: {
-                    ...this.findEquipmentOnDude(dudeA),
-                    ...this.findEquipmentOnDude(dudeB),
+                    ...await this.findEquipmentOnDude(dudeA),
+                    ...await this.findEquipmentOnDude(dudeB),
                 },
             }),
         });
@@ -354,12 +354,15 @@ export class DudeService implements IDudeService {
         }
     }
 
-    private findEquipmentOnDude(dude: Dude): EquipmentMap {
+    private async findEquipmentOnDude(dude: Dude): Promise<EquipmentMap> {
         const equipment: EquipmentMap = {};
         for (const slot of EquipmentSlots) {
             const equipmentId = dude.equipment[slot];
             if (equipmentId) {
-                equipment[equipmentId] = this.equipmentService.getSingleEquipment(equipmentId);
+                const instance = await this.equipmentService.getSingleEquipment(equipmentId);
+                if (instance) {
+                    equipment[equipmentId] = instance;
+                }
             }
         }
         return equipment;

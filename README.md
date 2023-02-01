@@ -14,6 +14,23 @@ Other things to look into after core stuff:
 - storybook. https://storybook.js.org/
 - testing. https://reactjs.org/docs/testing.html
 
+# Persistence
+
+The game runs entirely in the browser with no external services. IndexedDB is used for data persistence.
+
+Why IndexedDB?
+- W3C abaondoned web sql a long time ago. Don't use it.
+- If possible, daemon(s) should run separately from the UI (main) thread.
+    - This means [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API).
+- Web Storage (localStorage, sessionStorage) can't be used in Workers.
+- This means one option left: IndexedDB.
+
+The IndexedDB API is a disgusting portal to callback hell. So [Dexie.js](https://dexie.org/) is being used as a wrapper.
+- Promises! (means async/await)
+- Plays nicely with TypeScript.
+- Decent documentation.
+- It's free (looking at you, RxDB 🙄).
+- Seems to be fairly popular compared to other options.
 
 # Getting Started with Create React App
 

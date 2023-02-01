@@ -1,59 +1,40 @@
-import { ArmorTemplate, Equipment, EquipmentMap, EquipmentSlot, EquipmentType, UUID, WeaponTemplate } from "../exposed/models";
+import { ArmorTemplate, Equipment, EquipmentSlot, EquipmentType, UUID, WeaponTemplate } from "../exposed/models";
+import { GameDatabase } from "./db/GameDatabase";
 
 
 export class EquipmentService {
-    private localStorageKey = 'db.equipment';
-    private entries: EquipmentMap = {};
+    private db: GameDatabase;
 
-    public constructor() {
-        this.load();
-    }
-
-    private save(): void {
-        const obj = {
-            entries: this.entries,
-        };
-        localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
-    }
-
-    private load(): void {
-        const saved = localStorage.getItem(this.localStorageKey);
-        if (saved) {
-            const obj = JSON.parse(saved);
-            this.entries = obj.entries;
-        }
+    public constructor(db: GameDatabase) {
+        this.db = db;
     }
 
     public async createWeapon(template: WeaponTemplate, crafterId?: number): Promise<Equipment> {
-        const id = window.crypto.randomUUID();
         const weapon = {
-            id: id,
+            id: window.crypto.randomUUID(),
             type: EquipmentType.Weapon,
             slot: EquipmentSlot.Weapon,
             templateId: template.id,
             crafterId: crafterId,
         };
-        this.entries[id] = weapon;
-        this.save();
+        this.db.equipment.add(weapon);
         return weapon;
     }
 
     public async createArmor(template: ArmorTemplate, crafterId?: number): Promise<Equipment> {
-        const id = window.crypto.randomUUID();
         const armor = {
-            id: id,
+            id: window.crypto.randomUUID(),
             type: EquipmentType.Armor,
             slot: template.slot,
             templateId: template.id,
             crafterId: crafterId,
         };
-        this.entries[id] = armor;
-        this.save();
+        this.db.equipment.add(armor);
         return armor;
     }
 
-    public getSingleEquipment(id: UUID): Equipment {
-        return this.entries[id];
+    public async getSingleEquipment(id: UUID): Promise<Equipment|undefined> {
+        return this.db.equipment.get(id);
     }
 
 }
