@@ -1,52 +1,35 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "./EquipmentService";
 import { IDudeService, SocketMessageQueue, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
-import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, iterateModelMap, UUID, WeaponTemplate } from "../exposed/models";
+import { Dude, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, UUID, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
 import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
 import { ArmorTemplates } from "./EquipmentTemplates/ArmorTemplates";
 import { WeaponTemplates } from "./EquipmentTemplates/WeaponTemplates";
+import { GameDatabase } from "./db/GameDatabase";
 
 
 export class DudeService implements IDudeService {
-    private dudes: DudeMap = {};
-    private localStorageKey = 'db.dudes';
     private equipmentService: EquipmentService;
     private messageQueue: SocketMessageQueue;
+    private db: GameDatabase;
 
-    constructor(messageQueue: SocketMessageQueue, equipmentService: EquipmentService) {
+    constructor(db: GameDatabase, messageQueue: SocketMessageQueue, equipmentService: EquipmentService) {
+        this.db = db;
         this.messageQueue = messageQueue;
         this.equipmentService = equipmentService;
-        this.load();
-    }
-
-    private save(): void {
-        // todo: maybe IndexedDB instead of localStorage
-        const obj = {
-            entries: this.dudes,
-        };
-        localStorage.setItem(this.localStorageKey, JSON.stringify(obj));
-    }
-
-    private load(): void {
-        const saved = localStorage.getItem(this.localStorageKey);
-        if (saved) {
-            const obj = JSON.parse(saved);
-            this.dudes = obj.entries;
-        }
     }
 
     public async createDude(name: string): Promise<ResponseCreateDude> {
         name = name.trim();
-        const errors = this.checkNewNameErrors(name);
+        const errors = await this.checkNewNameErrors(name);
         if (errors.length > 0) {
             return delayedResponse<ResponseCreateDude>({errors});
         }
 
         const dude = this.newDude(name);
-        this.dudes[dude.id] = dude;
-        this.save();
+        await this.db.dudes.add(dude);
 
         const responseData = structuredClone({
             dude: dude,
@@ -66,15 +49,14 @@ export class DudeService implements IDudeService {
     }
 
     public async getDude(dudeId: UUID): Promise<ResponseGetDude> {
-        if (!(dudeId in this.dudes)) {
+        const dude = await this.db.dudes.get(dudeId);
+        if (!dude) {
             const errors = [{
                 code: 'DoesNotExist',
                 message: 'The Dude does not exist.',
             }];
             return delayedResponse<ResponseGetDude>({errors});
         }
-        
-        const dude = this.dudes[dudeId];
 
         const responseData = structuredClone({
             dude: dude,
@@ -85,7 +67,9 @@ export class DudeService implements IDudeService {
 
     public async getAllDudes(): Promise<ResponseGetDudes> {
         const equipment: EquipmentMap = {};
-        for (const dude of Object.values(this.dudes)) {
+
+        const dudes = await this.db.dudes.toArray();
+        for (const dude of dudes) {
             const equippedEquipment = await this.findEquipmentOnDude(dude);
             for (const eq of Object.values(equippedEquipment)) {
                 equipment[eq.id] = eq;
@@ -93,7 +77,7 @@ export class DudeService implements IDudeService {
         }
 
         const data = structuredClone({
-            dudes: this.dudes,
+            dudes: dudes,
             equipment: equipment,
         });
 
@@ -101,9 +85,9 @@ export class DudeService implements IDudeService {
     }
 
     public async updateDude(pendingDude: RequestUpdateDude): Promise<ResponseUpdateDude> {
-
         const errors = Array<ServiceError>();
-        if (!(pendingDude.id in this.dudes)) {
+        let dude = await this.db.dudes.get(pendingDude.id);        
+        if (!dude) {
             errors.push({
                 code: 'DoesNotExist',
                 message: 'The Dude does not exist.'
@@ -117,7 +101,7 @@ export class DudeService implements IDudeService {
             return delayedResponse<ResponseUpdateDude>({errors});
         }
 
-        const dude = this.dudes[pendingDude.id];
+        dude = dude as Dude;
         if (pendingDude.creationStep) {
             dude.creation.step = pendingDude.creationStep;
         }
@@ -134,8 +118,7 @@ export class DudeService implements IDudeService {
             await this.finishDudeCreation(dude);
         }
         dude.version++;
-        this.save();
-
+        await this.db.dudes.put(dude);
 
         const responseData = structuredClone({
             dude: dude,
@@ -154,13 +137,14 @@ export class DudeService implements IDudeService {
 
     public async swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
         const errors = Array<ServiceError>();
-        if (!(dudeIdA in this.dudes)) {
+        let [dudeA, dudeB] = await this.db.dudes.bulkGet([dudeIdA, dudeIdB]);
+        if (!dudeA) {
             errors.push({
                 code: 'DoesNotExist',
                 message: 'The first Dude does not exist.',
             });
         }
-        if (!(dudeIdB in this.dudes)) {
+        if (!dudeB) {
             errors.push({
                 code: 'DoesNotExist',
                 message: 'The second Dude does not exist.',
@@ -170,8 +154,8 @@ export class DudeService implements IDudeService {
             return delayedResponse<ResponseSwapEquipmentWithOtherDude>({errors});
         }
 
-        const dudeA = this.dudes[dudeIdA];
-        const dudeB = this.dudes[dudeIdB];
+        dudeA = dudeA as Dude;
+        dudeB = dudeB as Dude;
 
         const detached = dudeA.equipment[slot];
         dudeA.equipment[slot] = dudeB.equipment[slot];
@@ -179,7 +163,7 @@ export class DudeService implements IDudeService {
 
         dudeA.version++;
         dudeB.version++;
-        this.save();
+        await this.db.dudes.bulkPut([dudeA, dudeB]);
 
         this.messageQueue.push({
             type: SocketMessageType.DudesUpdated,
@@ -197,9 +181,9 @@ export class DudeService implements IDudeService {
         return delayedResponse<ResponseSwapEquipmentWithOtherDude>({});
     }
 
-    private checkNewNameErrors(name: string): Array<ServiceError> {
+    private async checkNewNameErrors(name: string): Promise<Array<ServiceError>> {
         const errors = [];
-        if (this.isNameTaken(name)) {
+        if (await this.isNameTaken(name)) {
             errors.push({
                 code: 'NameTaken',
                 message: 'That name is already taken.',
@@ -231,13 +215,12 @@ export class DudeService implements IDudeService {
         return errors;
     }
 
-    private isNameTaken(name: string): boolean {
-        for (const dude of iterateModelMap(this.dudes)) {
-            if (name === dude.name) {
-                return true;
-            }
-        }
-        return false;
+    private async isNameTaken(name: string): Promise<boolean> {
+        const count = await this.db.dudes.where('name')
+            .equalsIgnoreCase(name)
+            .count();
+
+        return count > 0;
     }
 
     private newDude(name: string): Dude {

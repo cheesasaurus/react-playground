@@ -48,7 +48,7 @@ class Api implements IApi {
         const db = new GameDatabase();
         const equipmentService = new EquipmentService(db);
         this.debug = new DebugService(messageQueue);
-        this.dudes = new DudeService(messageQueue, equipmentService);
+        this.dudes = new DudeService(db, messageQueue, equipmentService);
     }
 
 }
