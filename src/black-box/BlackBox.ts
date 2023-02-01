@@ -3,6 +3,7 @@ import { DudeService } from "./internal/DudeService";
 import { EquipmentService } from "./internal/EquipmentService";
 import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler } from "./interface";
 import { GameDatabase } from "./internal/db/GameDatabase";
+import { SimulationService } from "./internal/SimulationService";
 
 // In practice, the black box would be [native code] and already available via some global variable.
 // But for this proof of concept I'm making my own in javascript.
@@ -36,11 +37,13 @@ class Socket implements ISocket {
 class Api implements IApi {
     debug: DebugService;
     dudes: DudeService;
+    simulation: SimulationService;
 
     constructor(db: GameDatabase) {
         const equipmentService = new EquipmentService(db);
         this.debug = new DebugService(db);
         this.dudes = new DudeService(db, equipmentService);
+        this.simulation = new SimulationService();
     }
 
 }

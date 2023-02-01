@@ -36,6 +36,7 @@ export interface ISocket {
 export interface IApi {
     debug: IDebugService;
     dudes: IDudeService;
+    simulation: ISimulationService;
 }
 
 
@@ -72,6 +73,11 @@ export type ServiceErrors = ServiceError[];
 
 export interface IDebugService {
     emitMessageFromBlackBox(message: SocketMessage): Promise<void>;
+}
+
+export interface ISimulationService {
+    play(): Promise<void>;
+    pause(): Promise<void>;
 }
 
 

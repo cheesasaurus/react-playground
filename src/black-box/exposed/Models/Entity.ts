@@ -1,10 +1,11 @@
+import { UUID } from "../models";
 
 
-export enum EntityTypes {
+export enum EntityType {
     Dude = 'Dude',
 }
 
 export interface Entity {
-    type: string,
-    id: string,
+    type: EntityType,
+    id: UUID,
 }

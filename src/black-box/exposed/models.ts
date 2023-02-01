@@ -16,6 +16,8 @@ export function *iterateModelMap<Model>(modelMap: ModelMap<Model>): Generator<Mo
 
 export type UUID = string;
 
+export type UnixTimestampMilliseconds = number;
+
 
 export enum EquipmentSlot {
     Weapon = 'weapon',
@@ -76,7 +78,7 @@ export interface Dude {
         [EquipmentSlot.Skinning]: UUID | undefined,
     },
     stats: DudeStatMap,
-    actionId: number | undefined,
+    actionId: UUID | undefined,
 }
 
 export interface DudeStat {
