@@ -1,7 +1,10 @@
 import { SimulationData, UnixTimestampMilliseconds } from "../../exposed/models";
 import { GameDatabase } from "../db/GameDatabase";
+import { ModelTracker } from "./ModelTracker";
 import { ISimulationSystem } from "./Systems/ISimulationSystem";
 import { SystemActionAssignment } from "./Systems/SystemActionAssignment";
+import { SystemActionChaining } from "./Systems/SystemActionChaining";
+import { SystemActionPruning } from "./Systems/SystemActionPruning";
 import { SystemIdling } from "./Systems/SystemIdling";
 
 
@@ -14,6 +17,8 @@ export class Simulation {
     public constructor(private db: GameDatabase) {
         this.systems = [
             new SystemIdling(this.db),
+            new SystemActionChaining(this.db),
+            new SystemActionPruning(this.db),
             new SystemActionAssignment(this.db),
         ];
         this.init();
@@ -79,11 +84,15 @@ export class Simulation {
             return;
         }
         this.isTicking = true;
+
         const tickTimestamp: UnixTimestampMilliseconds = Date.now() - data.tickOffset;
         data.lastTickWithOffset = tickTimestamp;
         this.db.simulation.put(data);
+
+        const modelTracker = new ModelTracker();
+
         for (const system of this.systems) {
-            await system.tick(tickTimestamp);
+            await system.tick(tickTimestamp, modelTracker);
         }
         this.isTicking = false;
     }

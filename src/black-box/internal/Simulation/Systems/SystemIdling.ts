@@ -1,4 +1,5 @@
 import { GameDatabase } from "../../db/GameDatabase";
+import { ModelTracker } from "../ModelTracker";
 import { ISimulationSystem } from "./ISimulationSystem";
 
 
@@ -11,7 +12,7 @@ export class SystemIdling implements ISimulationSystem {
 
     }
 
-    async tick(tickTimestamp: number): Promise<void> {
+    async tick(tickTimestamp: number, modelTracker: ModelTracker): Promise<void> {
         // todo
     }
     
