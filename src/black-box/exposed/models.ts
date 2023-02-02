@@ -78,7 +78,7 @@ export interface Dude {
         [EquipmentSlot.Skinning]: UUID | undefined,
     },
     stats: DudeStatMap,
-    actionId: UUID | undefined,
+    actionId: UUID,
 }
 
 export interface DudeStat {

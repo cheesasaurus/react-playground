@@ -1,5 +1,5 @@
 import { Dude, UUID } from "../../../exposed/models";
-import { Action, ActionStatus } from "../../../exposed/Models/Action";
+import { Action, ActionNone, ActionStatus } from "../../../exposed/Models/Action";
 import { EntityType } from "../../../exposed/Models/Entity";
 import { GameDatabase } from "../../db/GameDatabase";
 import { ModelTracker } from "../ModelTracker";
@@ -17,12 +17,12 @@ export class SystemActionPruning implements ISimulationSystem {
 
     public async tick(tickTimestamp: number, modelTracker: ModelTracker): Promise<void> {
         const db = this.db;
-        db.transaction('rw', [db.actions, db.dudes], async () => {
+        await db.transaction('rw', [db.actions, db.dudes], async () => {
             const actions = await this.findActionsToDelete();
 
             const dudeSources = await this.findDudeSources(actions);
             for (const dude of dudeSources) {
-                dude.actionId = undefined;
+                dude.actionId = ActionNone.id;
                 dude.version++;
             }
             await db.dudes.bulkPut(dudeSources);

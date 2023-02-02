@@ -1,5 +1,5 @@
 import { UnixTimestampMilliseconds, UUID } from "../models";
-import { Entity } from "./Entity";
+import { Entity, EntityNone } from "./Entity";
 
 
 export interface Action {
@@ -34,6 +34,23 @@ export const ActionZoneDebug = {
 export enum ActionType {
     Idling = 'Idling',
     Attacking = 'Attacking',
+    None = 'None',
+}
+
+/**
+ * Represents "no action" since indexeddb can't index undefined/null
+ */
+export const ActionNone: Action = {
+    id: 'f7925c95-524d-4114-94ba-2f9ffe0b189d',
+    type: ActionType.None,
+    timeStart: 0,
+    timeComplete: 0,
+    initiator: EntityNone,
+    source: EntityNone,
+    target: EntityNone,
+    zone: '',
+    status: ActionStatus.Pending,
+    data: {},
 }
 
 

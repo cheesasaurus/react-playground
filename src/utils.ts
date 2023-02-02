@@ -1,5 +1,15 @@
 
 /**
+ * Get a random int between `min` and `max`, inclusive
+ */
+export function randomInt(min: number, max: number) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    const distinctPossibilityCount = 1 + max - min;
+    return min + Math.floor(Math.random() * distinctPossibilityCount);
+}
+
+/**
  * Format a number with a sign
  * 
  * EXAMPLES

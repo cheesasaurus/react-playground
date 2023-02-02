@@ -8,6 +8,7 @@ import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets
 import { ArmorTemplates } from "./EquipmentTemplates/ArmorTemplates";
 import { WeaponTemplates } from "./EquipmentTemplates/WeaponTemplates";
 import { GameDatabase } from "./db/GameDatabase";
+import { ActionNone } from "../exposed/Models/Action";
 
 
 export class DudeService implements IDudeService {
@@ -249,7 +250,7 @@ export class DudeService implements IDudeService {
                 [EquipmentSlot.Skinning]: undefined,
             },
             stats: this.newDudeStats(),
-            actionId: undefined,
+            actionId: ActionNone.id,
             version: 1,
         };
     }

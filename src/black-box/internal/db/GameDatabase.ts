@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 import { Dude, Equipment, SimulationData, UUID } from '../../exposed/models';
-import { Action } from '../../exposed/Models/Action';
+import { Action, ActionNone } from '../../exposed/Models/Action';
 import { SocketMessage } from '../../interface';
 
 export class GameDatabase extends Dexie {
@@ -13,8 +13,8 @@ export class GameDatabase extends Dexie {
     constructor() {
         super('GameDatabase');
         // https://dexie.org/docs/Version/Version.stores()
-        this.version(5).stores({
-            dudes: 'id, &name',
+        this.version(6).stores({
+            dudes: 'id, &name, actionId',
             equipment: 'id',
             actions: 'id, timeComplete, status',
             socketMessageQueue: 'id',
@@ -29,7 +29,7 @@ export class GameDatabase extends Dexie {
     private async populate() {
         const simulationData = await this.simulation.toCollection().first();
         if (!simulationData) {
-            this.simulation.add({
+            await this.simulation.add({
                 id: 1,
                 isPaused: true,
                 tickOffset: 0,
@@ -37,6 +37,8 @@ export class GameDatabase extends Dexie {
                 lastTickWithOffset: 0,
             });
         }
+
+        await this.actions.put(ActionNone);
     }
 
 }
