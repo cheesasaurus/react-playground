@@ -18,10 +18,10 @@ export class BlackBox implements IBlackBox {
 
 class Socket implements ISocket {
     private bus = new MessageBus<SocketMessage>();
-    private worker = new Worker(new URL('./internal/workers/dedicated/SocketWorker.ts', import.meta.url));
+    private worker = new SharedWorker(new URL('./internal/workers/shared/SocketWorker.ts', import.meta.url));
 
     constructor() {
-        this.worker.onmessage = (workerMessage: MessageEvent<SocketMessage>) => {
+        this.worker.port.onmessage = (workerMessage: MessageEvent<SocketMessage>) => {
             const socketMessage = workerMessage.data;
             this.bus.emit(socketMessage?.type, socketMessage);
         }
