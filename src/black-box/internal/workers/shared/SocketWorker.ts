@@ -2,7 +2,7 @@ import { GameDatabase } from "../../db/GameDatabase"
 
 
 /* eslint-disable no-restricted-globals */
-// declare var self: SharedWorkerGlobalScope;
+declare var self: SharedWorkerGlobalScope;
 
 
 const db = new GameDatabase();
@@ -28,7 +28,7 @@ async function consumeQueue() {
     }
 }
 
-onconnect = (e) => {
+self.onconnect = (e) => {
     e.ports.forEach(port => {
         ports.push(port);
         port.start();

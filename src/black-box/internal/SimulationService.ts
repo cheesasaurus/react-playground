@@ -1,14 +1,14 @@
 import { ISimulationService } from "../interface";
 
 export class SimulationService implements ISimulationService {
-    private worker = new Worker(new URL('./workers/dedicated/SimulationWorker.ts', import.meta.url));
+    private worker = new SharedWorker(new URL('./workers/shared/SimulationWorker.ts', import.meta.url));
 
     private busy: boolean = false;
     private ackPlay?: () => void;
     private ackPause?: () => void;
 
     constructor() {
-        this.worker.onmessage = (message) => {
+        this.worker.port.onmessage = (message) => {
             switch (message.data) {
                 case 'PlaySuccess':
                     if (this.ackPlay) {
@@ -33,7 +33,7 @@ export class SimulationService implements ISimulationService {
             throw Error('SimulationService is busy.');
         }
         this.busy = true;
-        this.worker.postMessage('Play');
+        this.worker.port.postMessage('Play');
         return new Promise((resolve, reject) => {
             this.ackPlay = resolve;
         });
@@ -44,7 +44,7 @@ export class SimulationService implements ISimulationService {
             throw Error('SimulationService is busy.');
         }
         this.busy = true;
-        this.worker.postMessage('Pause');
+        this.worker.port.postMessage('Pause');
         return new Promise((resolve, reject) => {
             this.ackPause = resolve;
         });
