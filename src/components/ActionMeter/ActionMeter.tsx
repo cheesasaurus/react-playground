@@ -23,7 +23,6 @@ export function ActionMeter(props: Props): JSX.Element {
         <div className={styles['meter']}>
             <div className={styles['meter-filler']} style={{width: `${percent}%`}}></div>
             <span className={styles['meter-text']}>
-                {/*props.action?.id*/}
                 {actionDescription}
             </span>
         </div>
@@ -31,7 +30,7 @@ export function ActionMeter(props: Props): JSX.Element {
 }
 
 function computePercent(now: number, simulation: SimulationState, action: Action|undefined) {
-    if (!action) {
+    if (!action || action.type === ActionType.None) {
         return 0;
     }
     const start = action.timeStart;
