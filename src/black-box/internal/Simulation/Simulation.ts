@@ -61,45 +61,61 @@ export class Simulation {
 
     public async pause(): Promise<void> {
         this.throwIfNotReady();
-        const data = await this.loadData();
-        if (data.isPaused) {
-            return;
-        }
-        data.isPaused = true;
-        data.pauseTimestamp = Date.now();
-        await this.putData(data);
+        const db = this.db;
+        await db.transaction('rw', [db.simulation, db.socketMessageQueue], async () => {
+            const data = await this.loadData();
+            if (data.isPaused) {
+                return;
+            }
+            data.isPaused = true;
+            data.pauseTimestamp = Date.now();
+            await this.putData(data);
+        });
     }
 
     public async unPause(): Promise<void> {
         this.throwIfNotReady();
-        const data = await this.loadData();
-        if (!data.isPaused) {
-            return;
-        }
-        data.isPaused = false;
-        const pauseDuration = Date.now() - data.pauseTimestamp;
-        data.tickOffset += pauseDuration;
-        await this.putData(data);
+        const db = this.db;
+        await db.transaction('rw', [db.simulation, db.socketMessageQueue], async () => {
+            const data = await this.loadData();
+            if (!data.isPaused) {
+                return;
+            }
+            data.isPaused = false;
+            const pauseDuration = Date.now() - data.pauseTimestamp;
+            data.tickOffset += pauseDuration;
+            await this.putData(data);
+        });
     }
 
     public async tick(): Promise<void> {
         if (!this.isReady || this.isTicking) {
             return;
         }
-        const data = await this.loadData();
-        if (data.isPaused) {
+
+        let tickTimestamp: UnixTimestampMilliseconds;
+
+        const db = this.db;
+        const shouldDoTick = await db.transaction('rw', [db.simulation], async () => {
+            const data = await this.loadData();
+            if (data.isPaused) {
+                return false;
+            }
+            this.isTicking = true;
+            tickTimestamp = Date.now() - data.tickOffset;
+            data.lastTickWithOffset = tickTimestamp;
+            await this.db.simulation.put(data);
+            return true;
+        });
+
+        if (!shouldDoTick) {
             return;
         }
-        this.isTicking = true;
-
-        const tickTimestamp: UnixTimestampMilliseconds = Date.now() - data.tickOffset;
-        data.lastTickWithOffset = tickTimestamp;
-        this.db.simulation.put(data);
 
         const modelTracker = new ModelTracker();
 
         for (const system of this.systems) {
-            await system.tick(tickTimestamp, modelTracker);
+            await system.tick(tickTimestamp!, modelTracker);
         }
         this.isTicking = false;
     }
