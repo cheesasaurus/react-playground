@@ -100,6 +100,7 @@ export class Simulation {
         }
 
         let tickTimestamp: UnixTimestampMilliseconds;
+        this.isTicking = true;
 
         const db = this.db;
         const shouldDoTick = await db.transaction('rw', [db.simulation], async () => {
@@ -107,7 +108,6 @@ export class Simulation {
             if (data.isPaused) {
                 return false;
             }
-            this.isTicking = true;
             tickTimestamp = Date.now() - data.tickOffset;
             data.lastTickWithOffset = tickTimestamp;
             await this.db.simulation.put(data);
@@ -115,6 +115,7 @@ export class Simulation {
         });
 
         if (!shouldDoTick) {
+            this.isTicking = false;
             return;
         }
 
