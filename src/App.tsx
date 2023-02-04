@@ -4,6 +4,7 @@ import { DebugBlackBox } from './components/DebugBlackBox';
 import { DialogContainer } from './components/Dialog/DialogContainer';
 import { DialogMonitorContext } from './components/Dialog/DialogContext';
 import { DialogProvider } from './components/Dialog/DialogProvider';
+import { SimulationControl } from './components/SimulationControl/SimulationControl';
 import { ToDudeList } from './components/ToDudeList/DudeList';
 
 
@@ -39,6 +40,7 @@ export class App extends React.Component<Props, State> {
                     
                 </main>
                 <footer className={styles['footer']}>
+                    <SimulationControl/>
                     debug &nbsp;
                     <DebugBlackBox />
                 </footer>

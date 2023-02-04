@@ -79,33 +79,8 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
     pingWorker = () => {
         this.exampleWorker?.postMessage('ping');
     };
-
-    simulationPlay = async () => {
-        this.setState({
-            simulationRequestPending: true,
-        });
-        await window.blackBox.api.simulation.play();
-        this.setState({
-            simulationRequestPending: false,
-            simulationPaused: false,
-        });
-    };
-
-    simulationPause = async () => {
-        this.setState({
-            simulationRequestPending: true,
-        });
-        await window.blackBox.api.simulation.pause();
-        this.setState({
-            simulationRequestPending: false,
-            simulationPaused: true,
-        });
-    }
     
     render(): React.ReactNode {
-        const disablePlayBtn = this.state.simulationRequestPending || !this.state.simulationPaused;
-        const disablePauseBtn = this.state.simulationRequestPending || this.state.simulationPaused;
-
         return (
             <>
                 <button onClick={this.requestBlackBoxToEmitTestMessage}>
@@ -119,12 +94,6 @@ export class DebugBlackBox extends React.Component<IProps, IState> {
                 </button>
                 <button onClick={this.openDebugDialogB}>
                     open dialog B
-                </button>
-                <button onClick={this.simulationPlay} disabled={disablePlayBtn}>
-                    simulation: play
-                </button>
-                <button onClick={this.simulationPause} disabled={disablePauseBtn}>
-                    simulation: pause
                 </button>
             </>
         )
