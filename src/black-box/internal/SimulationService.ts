@@ -1,4 +1,5 @@
-import { ISimulationService } from "../interface";
+import { ISimulationService, ResponseGetSimulationData } from "../interface";
+import { GameDatabase } from "./db/GameDatabase";
 
 export class SimulationService implements ISimulationService {
     private worker = new SharedWorker(new URL('./workers/shared/SimulationWorker.ts', import.meta.url));
@@ -7,7 +8,7 @@ export class SimulationService implements ISimulationService {
     private ackPlay?: () => void;
     private ackPause?: () => void;
 
-    constructor() {
+    constructor(private db: GameDatabase) {
         this.worker.port.onmessage = (message) => {
             switch (message.data) {
                 case 'PlaySuccess':
@@ -48,6 +49,19 @@ export class SimulationService implements ISimulationService {
         return new Promise((resolve, reject) => {
             this.ackPause = resolve;
         });
+    }
+
+    public async getSimulationData(): Promise<ResponseGetSimulationData> {
+        const data = await this.db.simulation.toCollection().first();
+        if (!data) {
+            return {
+                errors: [{
+                    code: 'DoesNotExist',
+                    message: 'Missing simulation data',
+                }],
+            };
+        }
+        return { data };
     }
 
 }

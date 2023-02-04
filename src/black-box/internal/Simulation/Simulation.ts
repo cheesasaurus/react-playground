@@ -35,7 +35,7 @@ export class Simulation {
             data.tickOffset += millisSinceLastTick;
             data.pauseTimestamp = now;
             data.isPaused = true;
-            this.db.simulation.put(data);
+            await this.putData(data);
         }
         this.isReady = true;
     }
@@ -46,6 +46,11 @@ export class Simulation {
             throw Error('Missing simulation data');
         }
         return data;
+    }
+
+    private async putData(data: SimulationData): Promise<void> {
+        await this.db.simulation.put(data);
+        await this.pushStatusToSocketMessageQueue(data);
     }
 
     private throwIfNotReady() {
@@ -62,8 +67,7 @@ export class Simulation {
         }
         data.isPaused = true;
         data.pauseTimestamp = Date.now();
-        this.db.simulation.put(data);
-        this.pushStatusToSocketMessageQueue(data);        
+        await this.putData(data);
     }
 
     public async unPause(): Promise<void> {
@@ -75,8 +79,7 @@ export class Simulation {
         data.isPaused = false;
         const pauseDuration = Date.now() - data.pauseTimestamp;
         data.tickOffset += pauseDuration;
-        this.db.simulation.put(data);
-        this.pushStatusToSocketMessageQueue(data);
+        await this.putData(data);
     }
 
     public async tick(): Promise<void> {
@@ -101,8 +104,8 @@ export class Simulation {
         this.isTicking = false;
     }
 
-    private pushStatusToSocketMessageQueue(data: SimulationData) {
-        this.db.socketMessageQueue.add({
+    private async pushStatusToSocketMessageQueue(data: SimulationData) {
+        await this.db.socketMessageQueue.add({
             id: crypto.randomUUID(),
             type: SocketMessageType.SimulationStatus,
             data: {

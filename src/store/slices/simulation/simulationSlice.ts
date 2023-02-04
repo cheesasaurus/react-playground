@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SimulationData, UnixTimestampMilliseconds } from "../../../black-box/exposed/models";
+import { SimulationThunks } from "./SimulationThunks";
 
 
 interface State {
@@ -14,16 +15,28 @@ const initialState: State = {
     pauseTimestamp: 0,
 };
 
+
+function updateSimulationData(stateDraft: State, fresh: SimulationData) {
+    stateDraft.isPaused = fresh.isPaused;
+    stateDraft.tickOffset = fresh.tickOffset;
+    stateDraft.pauseTimestamp = fresh.pauseTimestamp;
+}
+
 const simulationSlice = createSlice({
     name: 'simulation',
     initialState,
     reducers: {
         simulationUpdated(state, action: PayloadAction<SimulationData>) {
-            const data = action.payload;
-            state.isPaused = data.isPaused;
-            state.tickOffset = data.tickOffset;
-            state.pauseTimestamp = data.pauseTimestamp;
+            updateSimulationData(state, action.payload);
         }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(SimulationThunks.fetchData.fulfilled, (state, action) => {
+            updateSimulationData(state, action.payload);
+        });
+        builder.addCase(SimulationThunks.fetchData.rejected, (state, action) => {
+            console.warn(action.payload);
+        });
     },
 });
 

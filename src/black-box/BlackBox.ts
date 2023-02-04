@@ -43,7 +43,7 @@ class Api implements IApi {
         const equipmentService = new EquipmentService(db);
         this.debug = new DebugService(db);
         this.dudes = new DudeService(db, equipmentService);
-        this.simulation = new SimulationService();
+        this.simulation = new SimulationService(db);
     }
 
 }

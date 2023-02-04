@@ -83,6 +83,12 @@ export interface IDebugService {
 export interface ISimulationService {
     play(): Promise<void>;
     pause(): Promise<void>;
+    getSimulationData(): Promise<ResponseGetSimulationData>;
+}
+
+export interface ResponseGetSimulationData {
+    errors?: ServiceErrors;
+    data?: SimulationData;
 }
 
 

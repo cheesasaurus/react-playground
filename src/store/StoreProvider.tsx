@@ -4,6 +4,7 @@ import { SocketMessage, SocketMessageDataDudes, SocketMessageDataSimulation, Soc
 import { Subscriptions } from "../utils";
 import { dudesPipedIn } from "./slices/db/dbSlice";
 import { simulationUpdated } from "./slices/simulation/simulationSlice";
+import { SimulationThunks } from "./slices/simulation/SimulationThunks";
 import { store } from './store';
 
 
@@ -21,6 +22,8 @@ export class StoreProvider extends React.Component<Props> {
             window.blackBox.socket.on(SocketMessageType.SimulationStatus, this.pipeInSimulationStatus),
         ];
         subs.forEach(sub => this.subscriptions.add(sub));
+
+        store.dispatch(SimulationThunks.fetchData());
     }
 
     public componentWillUnmount(): void {
