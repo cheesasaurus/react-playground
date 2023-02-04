@@ -3,20 +3,20 @@ import { SimulationData, UnixTimestampMilliseconds } from "../../../black-box/ex
 import { SimulationThunks } from "./SimulationThunks";
 
 
-interface State {
+export interface SimulationState {
     isPaused: boolean;
     tickOffset: number;
     pauseTimestamp: UnixTimestampMilliseconds,
 }
 
-const initialState: State = {
+const initialState: SimulationState = {
     isPaused: true,
     tickOffset: 0,
     pauseTimestamp: 0,
 };
 
 
-function updateSimulationData(stateDraft: State, fresh: SimulationData) {
+function updateSimulationData(stateDraft: SimulationState, fresh: SimulationData) {
     stateDraft.isPaused = fresh.isPaused;
     stateDraft.tickOffset = fresh.tickOffset;
     stateDraft.pauseTimestamp = fresh.pauseTimestamp;

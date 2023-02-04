@@ -8,6 +8,8 @@ import { DudeListItemCreationPending } from './DudeListItemCreationPending';
 import { connect } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { DudesThunks } from '../../store/slices/db/thunks/dudes';
+import { ActionMap } from '../../black-box/exposed/Models/Action';
+import { SimulationState } from '../../store/slices/simulation/simulationSlice';
 
 
 interface Props {
@@ -16,12 +18,16 @@ interface Props {
 
 interface InnerProps extends Props {
     dudes: DudeMap;
+    actions: ActionMap;
+    simulation: SimulationState;
     loadDudes: () => void;
 }
 
 
 const mapStateToProps = (state: RootState, ownProps: Props) => ({
     dudes: state.db.entities.dudes,
+    actions: state.db.entities.actions,
+    simulation: state.simulation,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
@@ -101,6 +107,8 @@ export const ToDudeList = connect(mapStateToProps, mapDispatchToProps)(
                 <DudeListItem
                     key={dude.id}
                     dude={dude}
+                    simulation={this.props.simulation}
+                    action={this.props.actions[dude.actionId]}
                     openDudeInfo={this.openDudeInfo}
                 />
             );
