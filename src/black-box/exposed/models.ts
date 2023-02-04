@@ -2,11 +2,20 @@ import { Profession } from "./DudeModifierPresets/Professions";
 import { Race } from "./DudeModifierPresets/Races";
 import { DudeStatModifier, DudeStatType } from "./DudeStats";
 
-export interface ModelMap<Model> {
+
+export type UUID = string;
+
+export type UnixTimestampMilliseconds = number;
+
+export interface IModel {
+    id: UUID,
+}
+
+export interface ModelMap<Model extends IModel> {
     [key: number|string]: Model;
 }
 
-export function *iterateModelMap<Model>(modelMap: ModelMap<Model>): Generator<Model> {
+export function *iterateModelMap<Model extends IModel>(modelMap: ModelMap<Model>): Generator<Model> {
     for (const key in modelMap) {
         if (modelMap.hasOwnProperty(key)) {
             yield modelMap[key];
@@ -14,10 +23,15 @@ export function *iterateModelMap<Model>(modelMap: ModelMap<Model>): Generator<Mo
     }
 }
 
-export type UUID = string;
-
-export type UnixTimestampMilliseconds = number;
-
+export function createModelMap<Model extends IModel>(modelArray: Array<Model|undefined>): ModelMap<Model> {
+    const map: ModelMap<Model> = {};
+    for (const model of modelArray) {
+        if (model) {
+            map[model.id] = model;
+        }
+    }
+    return map;
+}
 
 export enum EquipmentSlot {
     Weapon = 'weapon',
@@ -175,7 +189,7 @@ export interface Equipment {
     crafterId?: number,
 }
 
-export interface EquipmentMap {
+export interface EquipmentMap extends ModelMap<Equipment> {
     [id: UUID]: Equipment,
 }
 

@@ -50,6 +50,7 @@ export enum SocketMessageType {
     DudesCreated = 'DudesCreated',
     DudesUpdated = 'DudesUpdated',
     SimulationStatus = 'SimulationStatus',
+    Models = 'Models',
 }
 
 export interface SocketMessage {

@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DudeMap, EquipmentMap } from '../../../black-box/exposed/models';
 import { ActionMap } from '../../../black-box/exposed/Models/Action';
-import { SocketMessageDataDudes } from '../../../black-box/interface';
+import { SocketMessageDataDudes, SocketMessageDataModels } from '../../../black-box/interface';
 import { DudesThunks } from './thunks/dudes';
 
 
@@ -61,6 +61,17 @@ const dbSlice = createSlice({
             updateEquipment(state, action.payload.equipment);
             updateActions(state, action.payload.actions);
         },
+        modelsPipedIn(state, action: PayloadAction<SocketMessageDataModels>) {
+            const updatedModels = action.payload.updated;
+            updateDudes(state, updatedModels.dudes);
+            updateEquipment(state, updatedModels.equipment);
+            updateActions(state, updatedModels.actions);
+
+            const deleted = action.payload.deleted;
+            deleted.dudes.forEach(id => delete state.entities.dudes[id]);
+            deleted.equipment.forEach(id => delete state.entities.equipment[id]);
+            deleted.actions.forEach(id => delete state.entities.actions[id]);
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(DudesThunks.fetchAll.fulfilled, (state, action) => {
@@ -88,5 +99,5 @@ const dbSlice = createSlice({
 
 });
 
-export const { incremented, amountAdded, dudesPipedIn } = dbSlice.actions;
+export const { incremented, amountAdded, dudesPipedIn, modelsPipedIn } = dbSlice.actions;
 export const dbReducer = dbSlice.reducer;

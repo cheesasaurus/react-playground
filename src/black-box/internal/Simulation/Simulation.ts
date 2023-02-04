@@ -1,11 +1,13 @@
 import { SimulationData, UnixTimestampMilliseconds } from "../../exposed/models";
 import { SocketMessageDataSimulation, SocketMessageType } from "../../interface";
 import { GameDatabase } from "../db/GameDatabase";
+import { SocketMessageService } from "../services/SocketMessageService";
 import { ModelTracker } from "./ModelTracker";
 import { ISimulationSystem } from "./Systems/ISimulationSystem";
 import { SystemActionAssignment } from "./Systems/SystemActionAssignment";
 import { SystemActionChaining } from "./Systems/SystemActionChaining";
 import { SystemActionPruning } from "./Systems/SystemActionPruning";
+import { SystemBroadCastModelChanges } from "./Systems/SystemBroadcastModelChanges";
 import { SystemIdling } from "./Systems/SystemIdling";
 
 
@@ -15,12 +17,16 @@ export class Simulation {
     private systems: ISimulationSystem[];
     
 
-    public constructor(private db: GameDatabase) {
+    public constructor(
+        private db: GameDatabase,
+        private socketMessageService: SocketMessageService,
+    ) {
         this.systems = [
             new SystemIdling(this.db),
             new SystemActionChaining(this.db),
             new SystemActionPruning(this.db),
             new SystemActionAssignment(this.db),
+            new SystemBroadCastModelChanges(this.socketMessageService),
         ];
         this.init();
     }

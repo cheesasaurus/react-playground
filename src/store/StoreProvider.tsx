@@ -1,8 +1,8 @@
 import React from "react";
 import { Provider } from "react-redux";
-import { SocketMessage, SocketMessageDataDudes, SocketMessageDataSimulation, SocketMessageType } from "../black-box/interface";
+import { SocketMessage, SocketMessageDataDudes, SocketMessageDataModels, SocketMessageDataSimulation, SocketMessageType } from "../black-box/interface";
 import { Subscriptions } from "../utils";
-import { dudesPipedIn } from "./slices/db/dbSlice";
+import { dudesPipedIn, modelsPipedIn } from "./slices/db/dbSlice";
 import { simulationUpdated } from "./slices/simulation/simulationSlice";
 import { SimulationThunks } from "./slices/simulation/SimulationThunks";
 import { store } from './store';
@@ -20,6 +20,7 @@ export class StoreProvider extends React.Component<Props> {
             window.blackBox.socket.on(SocketMessageType.DudesCreated, this.pipeInDudes),
             window.blackBox.socket.on(SocketMessageType.DudesUpdated, this.pipeInDudes),
             window.blackBox.socket.on(SocketMessageType.SimulationStatus, this.pipeInSimulationStatus),
+            window.blackBox.socket.on(SocketMessageType.Models, this.pipeInModels),
         ];
         subs.forEach(sub => this.subscriptions.add(sub));
 
@@ -46,6 +47,11 @@ export class StoreProvider extends React.Component<Props> {
     private pipeInSimulationStatus = (message: SocketMessage) => {
         const data = message.data as SocketMessageDataSimulation;
         store.dispatch(simulationUpdated(data.simulation));
+    }
+
+    private pipeInModels = (message: SocketMessage) => {
+        const data = message.data as SocketMessageDataModels;
+        store.dispatch(modelsPipedIn(data));
     }
 
 }

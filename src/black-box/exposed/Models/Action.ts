@@ -1,4 +1,4 @@
-import { UnixTimestampMilliseconds, UUID } from "../models";
+import { ModelMap, UnixTimestampMilliseconds, UUID } from "../models";
 import { Entity, EntityNone } from "./Entity";
 
 
@@ -15,7 +15,7 @@ export interface Action {
     data: unknown,
 }
 
-export interface ActionMap {
+export interface ActionMap extends ModelMap<Action> {
     [id: UUID]: Action,
 }
 
