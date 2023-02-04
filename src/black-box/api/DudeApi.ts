@@ -1,17 +1,17 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
-import { EquipmentService } from "./EquipmentService";
-import { IDudeService, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ServiceError, SocketMessageType } from "../interface";
+import { EquipmentService } from "../internal/services/EquipmentService";
+import { IDudeApi, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ApiError, SocketMessageType } from "../interface";
 import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, UUID, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
 import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
-import { ArmorTemplates } from "./EquipmentTemplates/ArmorTemplates";
-import { WeaponTemplates } from "./EquipmentTemplates/WeaponTemplates";
-import { GameDatabase } from "./db/GameDatabase";
+import { ArmorTemplates } from "../internal/EquipmentTemplates/ArmorTemplates";
+import { WeaponTemplates } from "../internal/EquipmentTemplates/WeaponTemplates";
+import { GameDatabase } from "../internal/db/GameDatabase";
 import { ActionMap, ActionNone } from "../exposed/Models/Action";
 
 
-export class DudeService implements IDudeService {
+export class DudeApi implements IDudeApi {
 
     constructor(private db: GameDatabase, private equipmentService: EquipmentService) {
 
@@ -88,7 +88,7 @@ export class DudeService implements IDudeService {
     }
 
     public async updateDude(pendingDude: RequestUpdateDude): Promise<ResponseUpdateDude> {
-        const errors = Array<ServiceError>();
+        const errors = Array<ApiError>();
         let dude = await this.db.dudes.get(pendingDude.id);        
         if (!dude) {
             errors.push({
@@ -142,7 +142,7 @@ export class DudeService implements IDudeService {
     }
 
     public async swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
-        const errors = Array<ServiceError>();
+        const errors = Array<ApiError>();
         let [dudeA, dudeB] = await this.db.dudes.bulkGet([dudeIdA, dudeIdB]);
         if (!dudeA) {
             errors.push({
@@ -189,7 +189,7 @@ export class DudeService implements IDudeService {
         return delayedResponse<ResponseSwapEquipmentWithOtherDude>({});
     }
 
-    private async checkNewNameErrors(name: string): Promise<Array<ServiceError>> {
+    private async checkNewNameErrors(name: string): Promise<Array<ApiError>> {
         const errors = [];
         if (await this.isNameTaken(name)) {
             errors.push({
@@ -201,7 +201,7 @@ export class DudeService implements IDudeService {
         return errors;
     }
 
-    private checkNameErrors(name: string): Array<ServiceError> {
+    private checkNameErrors(name: string): Array<ApiError> {
         const errors = [];
 
         const minLength = 3;

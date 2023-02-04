@@ -1,9 +1,9 @@
 import { MessageBus, Subscription } from "../utils";
-import { DudeService } from "./internal/DudeService";
-import { EquipmentService } from "./internal/EquipmentService";
-import { IApi, IBlackBox, IDebugService, ISocket, SocketMessage, SocketMessageHandler } from "./interface";
+import { DudeApi } from "./api/DudeApi";
+import { EquipmentService } from "./internal/services/EquipmentService";
+import { IApi, IBlackBox, IDebugApi, ISocket, SocketMessage, SocketMessageHandler } from "./interface";
 import { GameDatabase } from "./internal/db/GameDatabase";
-import { SimulationService } from "./internal/SimulationService";
+import { SimulationApi } from "./api/SimulationApi";
 
 // In practice, the black box would be [native code] and already available via some global variable.
 // But for this proof of concept I'm making my own in javascript.
@@ -36,20 +36,20 @@ class Socket implements ISocket {
 
 class Api implements IApi {
     debug: DebugService;
-    dudes: DudeService;
-    simulation: SimulationService;
+    dudes: DudeApi;
+    simulation: SimulationApi;
 
     constructor(db: GameDatabase) {
         const equipmentService = new EquipmentService(db);
         this.debug = new DebugService(db);
-        this.dudes = new DudeService(db, equipmentService);
-        this.simulation = new SimulationService(db);
+        this.dudes = new DudeApi(db, equipmentService);
+        this.simulation = new SimulationApi(db);
     }
 
 }
 
 
-class DebugService implements IDebugService {
+class DebugService implements IDebugApi {
 
     constructor(private db: GameDatabase) {
 

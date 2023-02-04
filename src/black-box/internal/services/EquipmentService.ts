@@ -1,5 +1,5 @@
-import { ArmorTemplate, Equipment, EquipmentSlot, EquipmentType, UUID, WeaponTemplate } from "../exposed/models";
-import { GameDatabase } from "./db/GameDatabase";
+import { ArmorTemplate, Equipment, EquipmentSlot, EquipmentType, UUID, WeaponTemplate } from "../../exposed/models";
+import { GameDatabase } from "../db/GameDatabase";
 
 
 export class EquipmentService {
@@ -17,7 +17,7 @@ export class EquipmentService {
             templateId: template.id,
             crafterId: crafterId,
         };
-        this.db.equipment.add(weapon);
+        await this.db.equipment.add(weapon);
         return weapon;
     }
 
@@ -29,7 +29,7 @@ export class EquipmentService {
             templateId: template.id,
             crafterId: crafterId,
         };
-        this.db.equipment.add(armor);
+        await this.db.equipment.add(armor);
         return armor;
     }
 

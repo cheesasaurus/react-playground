@@ -35,9 +35,9 @@ export interface ISocket {
 
 
 export interface IApi {
-    debug: IDebugService;
-    dudes: IDudeService;
-    simulation: ISimulationService;
+    debug: IDebugApi;
+    dudes: IDudeApi;
+    simulation: ISimulationApi;
 }
 
 
@@ -68,35 +68,48 @@ export interface SocketMessageDataSimulation {
     simulation: SimulationData,
 }
 
+export interface SocketMessageDataModels {
+    updated: {
+        dudes: DudeMap,
+        equipment: EquipmentMap,
+        actions: ActionMap,
+    },
+    deleted: {
+        dudes: UUID[],
+        equipment: UUID[],
+        actions: UUID[],
+    },
+}
 
-export interface ServiceError {
+
+export interface ApiError {
     code: string;
     message: string;
     detail?: string;
 }
 
-export type ServiceErrors = ServiceError[];
+export type ApiErrors = ApiError[];
 
 
-export interface IDebugService {
+export interface IDebugApi {
     emitMessageFromBlackBox(message: SocketMessage): Promise<void>;
 }
 
-export interface ISimulationService {
+export interface ISimulationApi {
     play(): Promise<void>;
     pause(): Promise<void>;
     getSimulationData(): Promise<ResponseGetSimulationData>;
 }
 
 export interface ResponseGetSimulationData {
-    errors?: ServiceErrors;
+    errors?: ApiErrors;
     data?: SimulationData;
 }
 
 
 // Dude service ///////////////////////////////////////////////////////////////////////
 
-export interface IDudeService {
+export interface IDudeApi {
     createDude(name: string): Promise<ResponseCreateDude>;
     getAllDudes(): Promise<ResponseGetDudes>;
     getDude(dudeId: UUID): Promise<ResponseGetDude>;
@@ -117,7 +130,7 @@ export interface DudeApiResponseDataSingle {
 }
 
 export interface ResponseCreateDude {
-    errors?: ServiceErrors;
+    errors?: ApiErrors;
     data?: DudeApiResponseDataSingle;
 }
 
@@ -131,21 +144,21 @@ export interface RequestUpdateDude {
 }
 
 export interface ResponseUpdateDude {
-    errors?: ServiceErrors;
+    errors?: ApiErrors;
     data?: DudeApiResponseDataSingle;
 }
 
 export interface ResponseGetDudes {
-    errors?: ServiceErrors;
+    errors?: ApiErrors;
     data?: DudeApiResponseDataMulti;
 }
 
 export interface ResponseGetDude {
-    errors?: ServiceErrors;
+    errors?: ApiErrors;
     data?: DudeApiResponseDataSingle;
 }
 
 export interface ResponseSwapEquipmentWithOtherDude {
-    errors?: ServiceErrors;
+    errors?: ApiErrors;
 }
 

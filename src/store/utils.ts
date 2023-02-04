@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ServiceErrors } from "../black-box/interface";
+import { ApiErrors } from "../black-box/interface";
 
 /**
  * https://redux-toolkit.js.org/usage/usage-with-typescript#defining-a-pre-typed-createasyncthunk
@@ -29,7 +29,7 @@ interface RejectValue {
     /**
      * errors received from the black box response
      */
-    errors?: ServiceErrors;
+    errors?: ApiErrors;
 
     /**
      * any error thrown while executing the thunk

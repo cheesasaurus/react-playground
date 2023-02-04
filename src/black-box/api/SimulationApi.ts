@@ -1,8 +1,8 @@
-import { ISimulationService, ResponseGetSimulationData } from "../interface";
-import { GameDatabase } from "./db/GameDatabase";
+import { ISimulationApi, ResponseGetSimulationData } from "../interface";
+import { GameDatabase } from "../internal/db/GameDatabase";
 
-export class SimulationService implements ISimulationService {
-    private worker = new SharedWorker(new URL('./workers/shared/SimulationWorker.ts', import.meta.url));
+export class SimulationApi implements ISimulationApi {
+    private worker = new SharedWorker(new URL('../internal/workers/shared/SimulationWorker.ts', import.meta.url));
 
     private busy: boolean = false;
     private ackPlay?: () => void;
