@@ -19,15 +19,19 @@ export class SystemActionPruning implements ISimulationSystem {
         const db = this.db;
         await db.transaction('rw', [db.actions, db.dudes], async () => {
             const actions = await this.findActionsToDelete();
+            const actionIds = actions.map(action => action.id);
+            const actionIdSet = new Set(actionIds);
 
             const dudeSources = await this.findDudeSources(actions);
             for (const dude of dudeSources) {
+                if (!actionIdSet.has(dude.actionId)) {
+                    // the dude already has another action assigned.
+                    continue;
+                }
                 dude.actionId = ActionNone.id;
                 dude.version++;
             }
             await db.dudes.bulkPut(dudeSources);
-
-            const actionIds = actions.map(action => action.id);
             await db.actions.bulkDelete(actionIds);
 
             actions.forEach(action => modelTracker.deletedAction(action.id));
