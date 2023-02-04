@@ -8,7 +8,7 @@ import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets
 import { ArmorTemplates } from "./EquipmentTemplates/ArmorTemplates";
 import { WeaponTemplates } from "./EquipmentTemplates/WeaponTemplates";
 import { GameDatabase } from "./db/GameDatabase";
-import { ActionNone } from "../exposed/Models/Action";
+import { ActionMap, ActionNone } from "../exposed/Models/Action";
 
 
 export class DudeService implements IDudeService {
@@ -30,6 +30,7 @@ export class DudeService implements IDudeService {
         const responseData = structuredClone({
             dude: dude,
             equipment: await this.findEquipmentOnDude(dude),
+            actions: await this.findActionsOnDudes([dude]),
         });
 
         this.db.socketMessageQueue.add({
@@ -38,6 +39,7 @@ export class DudeService implements IDudeService {
             data: {
                 dudes: {[dude.id]: responseData.dude},
                 equipment: responseData.equipment,
+                actions: responseData.actions,
             },
         });
         return delayedResponse<ResponseCreateDude>({
@@ -58,6 +60,7 @@ export class DudeService implements IDudeService {
         const responseData = structuredClone({
             dude: dude,
             equipment: await this.findEquipmentOnDude(dude),
+            actions: await this.findActionsOnDudes([dude]),
         });
         return delayedResponse<ResponseGetDude>({data: responseData});
     }
@@ -78,6 +81,7 @@ export class DudeService implements IDudeService {
         const data = structuredClone({
             dudes: dudeMap,
             equipment: equipmentMap,
+            actions: await this.findActionsOnDudes(dudes),
         });
 
         return delayedResponse<ResponseGetDudes>({data});
@@ -122,6 +126,7 @@ export class DudeService implements IDudeService {
         const responseData = structuredClone({
             dude: dude,
             equipment: await this.findEquipmentOnDude(dude),
+            actions: await this.findActionsOnDudes([dude]),
         });
 
         this.db.socketMessageQueue.add({
@@ -130,6 +135,7 @@ export class DudeService implements IDudeService {
             data: {
                 dudes: {[dude.id]: responseData.dude},
                 equipment: responseData.equipment,
+                actions: responseData.actions,
             },
         });
         return delayedResponse<ResponseUpdateDude>({data: responseData});
@@ -177,6 +183,7 @@ export class DudeService implements IDudeService {
                     ...await this.findEquipmentOnDude(dudeA),
                     ...await this.findEquipmentOnDude(dudeB),
                 },
+                actions: await this.findActionsOnDudes([dudeA, dudeB]),
             }),
         });
         return delayedResponse<ResponseSwapEquipmentWithOtherDude>({});
@@ -350,6 +357,18 @@ export class DudeService implements IDudeService {
             }
         }
         return equipment;
+    }
+
+    private async findActionsOnDudes(dudes: Dude[]): Promise<ActionMap> {
+        const actionMap: ActionMap = {};
+        const actionIds = dudes.map(dude => dude.actionId);
+        const actions = await this.db.actions.bulkGet(actionIds);
+        for (const action of actions) {
+            if (action) {
+                actionMap[action.id] = action;
+            }
+        }
+        return actionMap;
     }
 
 }

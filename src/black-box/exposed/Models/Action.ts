@@ -15,6 +15,10 @@ export interface Action {
     data: unknown,
 }
 
+export interface ActionMap {
+    [id: UUID]: Action,
+}
+
 export enum ActionStatus {
     Pending = 'Pending',
     Error = 'Error',

@@ -2,6 +2,7 @@ import { Subscription } from "../utils";
 import { Profession } from "./exposed/DudeModifierPresets/Professions";
 import { Race } from "./exposed/DudeModifierPresets/Races";
 import { Dude, DudeMap, EquipmentMap, EquipmentSlot, SimulationData, UUID } from "./exposed/models";
+import { ActionMap } from "./exposed/Models/Action";
 
 /**
  * Some black box (for example, a game engine providing the webview),
@@ -60,6 +61,7 @@ export interface SocketMessage {
 export interface SocketMessageDataDudes {
     dudes: DudeMap,
     equipment: EquipmentMap,
+    actions: ActionMap,
 }
 
 export interface SocketMessageDataSimulation {
@@ -105,11 +107,13 @@ export interface IDudeService {
 export interface DudeApiResponseDataMulti {
     dudes: DudeMap,
     equipment: EquipmentMap,
+    actions: ActionMap,
 }
 
 export interface DudeApiResponseDataSingle {
     dude: Dude,
     equipment: EquipmentMap,
+    actions: ActionMap,
 }
 
 export interface ResponseCreateDude {
@@ -144,6 +148,4 @@ export interface ResponseGetDude {
 export interface ResponseSwapEquipmentWithOtherDude {
     errors?: ServiceErrors;
 }
-
-
 
