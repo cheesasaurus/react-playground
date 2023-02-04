@@ -1,3 +1,4 @@
+import { PseudoThread } from "../../../../utils";
 import { GameDatabase } from "../../db/GameDatabase";
 import { Simulation } from "../../Simulation/Simulation";
 
@@ -6,6 +7,9 @@ import { Simulation } from "../../Simulation/Simulation";
 declare var self: SharedWorkerGlobalScope;
 
 const ports = new Array<MessagePort>();
+const inputThread = new PseudoThread();
+inputThread.start();
+
 const db = new GameDatabase();
 const simulation = new Simulation(db);
 setInterval(() => simulation.tick(), 10);
@@ -17,12 +21,16 @@ self.onconnect = (e) => {
         port.onmessage = async (e) => {
             switch (e.data) {
                 case 'Pause':
-                    await simulation.pause();
-                    port.postMessage('PauseSuccess');
+                    inputThread.push(async () => {
+                        await simulation.pause();
+                        port.postMessage('PauseSuccess');
+                    });
                     return;
                 case 'Play':
-                    await simulation.unPause();
-                    port.postMessage('PlaySuccess');
+                    inputThread.push(async () => {
+                        await simulation.unPause();
+                        port.postMessage('PlaySuccess');
+                    });
                     return;
             }
         }        

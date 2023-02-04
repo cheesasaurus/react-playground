@@ -115,3 +115,38 @@ export class MessageBus<Message> {
     }
 
 }
+
+
+type AsyncTask = () => Promise<void>;
+export class PseudoThread {
+    private queue = new Array<AsyncTask>();
+    private ticking = false;
+    private intervalHandle: ReturnType<typeof setInterval> | undefined;
+
+    public push(task: AsyncTask) {
+        this.queue.push(task);
+    }
+
+    public start() {
+        this.intervalHandle = setInterval(() => {
+            if (!this.ticking) {
+                this.tick();
+            }
+        }, 7);
+    }
+
+    public kill() {
+        this.queue = [];
+        clearInterval(this.intervalHandle);
+    }
+
+    private async tick() {
+        this.ticking = true;
+        while (this.queue.length > 0) {
+            const task = this.queue.shift();
+            await task!();
+        }
+        this.ticking = false;
+    }
+
+}
