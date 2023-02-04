@@ -1,4 +1,5 @@
 import { SimulationData, UnixTimestampMilliseconds } from "../../exposed/models";
+import { SocketMessageDataSimulation, SocketMessageType } from "../../interface";
 import { GameDatabase } from "../db/GameDatabase";
 import { ModelTracker } from "./ModelTracker";
 import { ISimulationSystem } from "./Systems/ISimulationSystem";
@@ -33,6 +34,7 @@ export class Simulation {
             const millisSinceLastTick = now - (data.lastTickWithOffset + data.tickOffset);
             data.tickOffset += millisSinceLastTick;
             data.pauseTimestamp = now;
+            data.isPaused = true;
             this.db.simulation.put(data);
         }
         this.isReady = true;
@@ -61,6 +63,7 @@ export class Simulation {
         data.isPaused = true;
         data.pauseTimestamp = Date.now();
         this.db.simulation.put(data);
+        this.pushStatusToSocketMessageQueue(data);        
     }
 
     public async unPause(): Promise<void> {
@@ -73,6 +76,7 @@ export class Simulation {
         const pauseDuration = Date.now() - data.pauseTimestamp;
         data.tickOffset += pauseDuration;
         this.db.simulation.put(data);
+        this.pushStatusToSocketMessageQueue(data);
     }
 
     public async tick(): Promise<void> {
@@ -95,6 +99,16 @@ export class Simulation {
             await system.tick(tickTimestamp, modelTracker);
         }
         this.isTicking = false;
+    }
+
+    private pushStatusToSocketMessageQueue(data: SimulationData) {
+        this.db.socketMessageQueue.add({
+            id: crypto.randomUUID(),
+            type: SocketMessageType.SimulationStatus,
+            data: {
+                simulation: data,
+            } as SocketMessageDataSimulation,
+        });
     }
 
 }

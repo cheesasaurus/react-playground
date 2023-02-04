@@ -1,7 +1,7 @@
 import { Subscription } from "../utils";
 import { Profession } from "./exposed/DudeModifierPresets/Professions";
 import { Race } from "./exposed/DudeModifierPresets/Races";
-import { Dude, DudeMap, EquipmentMap, EquipmentSlot, UUID } from "./exposed/models";
+import { Dude, DudeMap, EquipmentMap, EquipmentSlot, SimulationData, UUID } from "./exposed/models";
 
 /**
  * Some black box (for example, a game engine providing the webview),
@@ -48,6 +48,7 @@ export interface SocketMessageHandler {
 export enum SocketMessageType {
     DudesCreated = 'DudesCreated',
     DudesUpdated = 'DudesUpdated',
+    SimulationStatus = 'SimulationStatus',
 }
 
 export interface SocketMessage {
@@ -59,6 +60,10 @@ export interface SocketMessage {
 export interface SocketMessageDataDudes {
     dudes: DudeMap,
     equipment: EquipmentMap,
+}
+
+export interface SocketMessageDataSimulation {
+    simulation: SimulationData,
 }
 
 
