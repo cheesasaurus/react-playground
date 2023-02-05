@@ -1,14 +1,14 @@
 import { DudeStatTypes } from "../exposed/DudeStats";
 import { EquipmentService } from "../internal/services/EquipmentService";
-import { IDudeApi, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ApiError, SocketMessageType } from "../interface";
-import { Dude, DudeMap, DudeStatMap, Equipment, EquipmentMap, EquipmentSlot, EquipmentSlots, UUID, WeaponTemplate } from "../exposed/models";
+import { IDudeApi, RequestUpdateDude, ResponseCreateDude, ResponseGetDude, ResponseGetDudes, ResponseSwapEquipmentWithOtherDude, ResponseUpdateDude, ApiError } from "../interface";
+import { Dude, DudeStatMap, Equipment, EquipmentSlot, UUID, WeaponTemplate } from "../exposed/models";
 import { delayedResponse } from "./service-utils";
 import { Race, RacePresetsMap } from "../exposed/DudeModifierPresets/Races";
 import { Profession, ProfessionPresetsMap } from "../exposed/DudeModifierPresets/Professions";
 import { ArmorTemplates } from "../internal/EquipmentTemplates/ArmorTemplates";
 import { WeaponTemplates } from "../internal/EquipmentTemplates/WeaponTemplates";
 import { GameDatabase } from "../internal/db/GameDatabase";
-import { ActionMap, ActionNone } from "../exposed/Models/Action";
+import { ActionNone } from "../exposed/Models/Action";
 import { DudeService } from "../internal/services/DudeService";
 import { SocketMessageService } from "../internal/services/SocketMessageService";
 
@@ -34,23 +34,14 @@ export class DudeApi implements IDudeApi {
         const dude = this.newDude(name);
         await this.db.dudes.add(dude);
 
-        const responseData = structuredClone({
-            dude: dude,
-            equipment: await this.findEquipmentOnDude(dude),
-            actions: await this.findActionsOnDudes([dude]),
-        });
-
-        this.db.socketMessageQueue.add({
-            id: crypto.randomUUID(),
-            type: SocketMessageType.DudesCreated,
-            data: {
-                dudes: {[dude.id]: responseData.dude},
-                equipment: responseData.equipment,
-                actions: responseData.actions,
-            },
-        });
+        const snapshot = await this.dudeService.getSnapshot([dude.id]);
+        this.socketMessageService.dudesCreated(snapshot);
         return delayedResponse<ResponseCreateDude>({
-            data: responseData,
+            data: {
+                dude: dude,
+                equipment: snapshot.equipment,
+                actions: snapshot.actions,
+            },
         });
     }
 
@@ -64,34 +55,20 @@ export class DudeApi implements IDudeApi {
             return delayedResponse<ResponseGetDude>({errors});
         }
 
-        const responseData = structuredClone({
-            dude: dude,
-            equipment: await this.findEquipmentOnDude(dude),
-            actions: await this.findActionsOnDudes([dude]),
+        return delayedResponse<ResponseGetDude>({
+            data: {
+                dude: dude,
+                equipment: await this.dudeService.findEquipmentOnDudes([dude]),
+                actions: await this.dudeService.findCurrentActions([dude]),
+            }
         });
-        return delayedResponse<ResponseGetDude>({data: responseData});
     }
 
     public async getAllDudes(): Promise<ResponseGetDudes> {
-        const dudeMap: DudeMap = {};
-        const equipmentMap: EquipmentMap = {};
-
-        const dudes = await this.db.dudes.toArray();
-        for (const dude of dudes) {
-            dudeMap[dude.id] = dude;
-            const equippedEquipment = await this.findEquipmentOnDude(dude);
-            for (const equipment of Object.values(equippedEquipment)) {
-                equipmentMap[equipment.id] = equipment;
-            }
-        }
-
-        const data = structuredClone({
-            dudes: dudeMap,
-            equipment: equipmentMap,
-            actions: await this.findActionsOnDudes(dudes),
+        const dudeIds = await this.db.dudes.toCollection().primaryKeys();
+        return delayedResponse<ResponseGetDudes>({
+            data: await this.dudeService.getSnapshot(dudeIds),
         });
-
-        return delayedResponse<ResponseGetDudes>({data});
     }
 
     public async updateDude(pendingDude: RequestUpdateDude): Promise<ResponseUpdateDude> {
@@ -130,22 +107,16 @@ export class DudeApi implements IDudeApi {
         dude.version++;
         await this.db.dudes.put(dude);
 
-        const responseData = structuredClone({
-            dude: dude,
-            equipment: await this.findEquipmentOnDude(dude),
-            actions: await this.findActionsOnDudes([dude]),
-        });
+        const snapshot = await this.dudeService.getSnapshot([dude.id]);
+        this.socketMessageService.dudesUpdated(snapshot);
 
-        this.db.socketMessageQueue.add({
-            id: crypto.randomUUID(),
-            type: SocketMessageType.DudesUpdated,
+        return delayedResponse<ResponseUpdateDude>({
             data: {
-                dudes: {[dude.id]: responseData.dude},
-                equipment: responseData.equipment,
-                actions: responseData.actions,
+                dude: dude,
+                equipment: snapshot.equipment,
+                actions: snapshot.actions,
             },
         });
-        return delayedResponse<ResponseUpdateDude>({data: responseData});
     }
 
     public async swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
@@ -347,32 +318,6 @@ export class DudeApi implements IDudeApi {
         for (const modifier of professionModifiers) {
             dude.stats[modifier.type].level.boosted += modifier.magnitude;
         }
-    }
-
-    private async findEquipmentOnDude(dude: Dude): Promise<EquipmentMap> {
-        const equipment: EquipmentMap = {};
-        for (const slot of EquipmentSlots) {
-            const equipmentId = dude.equipment[slot];
-            if (equipmentId) {
-                const instance = await this.equipmentService.getSingleEquipment(equipmentId);
-                if (instance) {
-                    equipment[equipmentId] = instance;
-                }
-            }
-        }
-        return equipment;
-    }
-
-    private async findActionsOnDudes(dudes: Dude[]): Promise<ActionMap> {
-        const actionMap: ActionMap = {};
-        const actionIds = dudes.map(dude => dude.actionId);
-        const actions = await this.db.actions.bulkGet(actionIds);
-        for (const action of actions) {
-            if (action) {
-                actionMap[action.id] = action;
-            }
-        }
-        return actionMap;
     }
 
 }

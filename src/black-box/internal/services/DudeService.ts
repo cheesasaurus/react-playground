@@ -30,7 +30,7 @@ export class DudeService {
         const actionIds = new Array<UUID>();
         for (const dude of dudes) {
             if (dude) {
-                actionIds.push(dude.id);
+                actionIds.push(dude.actionId);
             }
         }
         const actions = await this.db.actions.bulkGet(actionIds);
