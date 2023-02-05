@@ -1,6 +1,7 @@
-import { createModelMap } from "../../exposed/models";
+import { createModelMap, UUID } from "../../exposed/models";
 import { SocketMessageDataModels, SocketMessageType } from "../../interface";
 import { GameDatabase } from "../db/GameDatabase";
+import { DudesSnapshot } from "../models/DudesSnapshot";
 import { ModelTracker } from "../Simulation/ModelTracker";
 
 export class SocketMessageService {
@@ -33,6 +34,14 @@ export class SocketMessageService {
             id: crypto.randomUUID(),
             type: SocketMessageType.Models,
             data: messageData,
+        });
+    }
+
+    public async dudesUpdated(dudesSnapshot: DudesSnapshot) {
+        this.db.socketMessageQueue.add({
+            id: crypto.randomUUID(),
+            type: SocketMessageType.DudesUpdated,
+            data: dudesSnapshot,
         });
     }
 

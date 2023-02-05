@@ -9,11 +9,18 @@ import { ArmorTemplates } from "../internal/EquipmentTemplates/ArmorTemplates";
 import { WeaponTemplates } from "../internal/EquipmentTemplates/WeaponTemplates";
 import { GameDatabase } from "../internal/db/GameDatabase";
 import { ActionMap, ActionNone } from "../exposed/Models/Action";
+import { DudeService } from "../internal/services/DudeService";
+import { SocketMessageService } from "../internal/services/SocketMessageService";
 
 
 export class DudeApi implements IDudeApi {
 
-    constructor(private db: GameDatabase, private equipmentService: EquipmentService) {
+    constructor(
+        private db: GameDatabase,
+        private equipmentService: EquipmentService,
+        private dudeService: DudeService,
+        private socketMessageService: SocketMessageService,
+    ) {
 
     }
 
@@ -142,50 +149,47 @@ export class DudeApi implements IDudeApi {
     }
 
     public async swapEquipmentWithOtherDude(slot: EquipmentSlot, dudeIdA: string, dudeIdB: string): Promise<ResponseSwapEquipmentWithOtherDude> {
-        const errors = Array<ApiError>();
-        let [dudeA, dudeB] = await this.db.dudes.bulkGet([dudeIdA, dudeIdB]);
-        if (!dudeA) {
-            errors.push({
-                code: 'DoesNotExist',
-                message: 'The first Dude does not exist.',
-            });
-        }
-        if (!dudeB) {
-            errors.push({
-                code: 'DoesNotExist',
-                message: 'The second Dude does not exist.',
-            });
-        }
+        const db = this.db;
+        let dudeA, dudeB;
+        const errors = await db.transaction('rw', [db.dudes], async () => {
+            const errors = Array<ApiError>();
+            [dudeA, dudeB] = await db.dudes.bulkGet([dudeIdA, dudeIdB]);
+            if (!dudeA) {
+                errors.push({
+                    code: 'DoesNotExist',
+                    message: 'The first Dude does not exist.',
+                });
+            }
+            if (!dudeB) {
+                errors.push({
+                    code: 'DoesNotExist',
+                    message: 'The second Dude does not exist.',
+                });
+            }
+            if (errors.length > 0) {
+                return errors;
+            }
+    
+            dudeA = dudeA as Dude;
+            dudeB = dudeB as Dude;
+    
+            const detached = dudeA.equipment[slot];
+            dudeA.equipment[slot] = dudeB.equipment[slot];
+            dudeB.equipment[slot] = detached;
+    
+            dudeA.version++;
+            dudeB.version++;
+            await db.dudes.bulkPut([dudeA, dudeB]);
+    
+            return errors;
+        });
+
         if (errors.length > 0) {
             return delayedResponse<ResponseSwapEquipmentWithOtherDude>({errors});
         }
 
-        dudeA = dudeA as Dude;
-        dudeB = dudeB as Dude;
-
-        const detached = dudeA.equipment[slot];
-        dudeA.equipment[slot] = dudeB.equipment[slot];
-        dudeB.equipment[slot] = detached;
-
-        dudeA.version++;
-        dudeB.version++;
-        await this.db.dudes.bulkPut([dudeA, dudeB]);
-
-        this.db.socketMessageQueue.add({
-            id: crypto.randomUUID(),
-            type: SocketMessageType.DudesUpdated,
-            data: structuredClone({
-                dudes: {
-                    [dudeA.id]: dudeA,
-                    [dudeB.id]: dudeB,
-                },
-                equipment: {
-                    ...await this.findEquipmentOnDude(dudeA),
-                    ...await this.findEquipmentOnDude(dudeB),
-                },
-                actions: await this.findActionsOnDudes([dudeA, dudeB]),
-            }),
-        });
+        const snapshot = await this.dudeService.getSnapshot([dudeIdA, dudeIdB]);
+        this.socketMessageService.dudesUpdated(snapshot);
         return delayedResponse<ResponseSwapEquipmentWithOtherDude>({});
     }
 
