@@ -11,6 +11,7 @@ import { GameDatabase } from "../internal/db/GameDatabase";
 import { ActionNone } from "../exposed/Models/Action";
 import { DudeService } from "../internal/services/DudeService";
 import { SocketMessageService } from "../internal/services/SocketMessageService";
+import { DudeNameService } from "../internal/services/DudeNameService";
 
 
 export class DudeApi implements IDudeApi {
@@ -19,6 +20,7 @@ export class DudeApi implements IDudeApi {
         private db: GameDatabase,
         private equipmentService: EquipmentService,
         private dudeService: DudeService,
+        private dudeNameService: DudeNameService,
         private socketMessageService: SocketMessageService,
     ) {
 
@@ -26,7 +28,7 @@ export class DudeApi implements IDudeApi {
 
     public async createDude(name: string): Promise<ResponseCreateDude> {
         name = name.trim();
-        const errors = await this.checkNewNameErrors(name);
+        const errors = await this.dudeNameService.checkName(name);
         if (errors.length > 0) {
             return delayedResponse<ResponseCreateDude>({errors});
         }
@@ -79,10 +81,11 @@ export class DudeApi implements IDudeApi {
                 code: 'DoesNotExist',
                 message: 'The Dude does not exist.'
             });
+            return delayedResponse<ResponseUpdateDude>({errors});
         }
-        if (pendingDude.name !== undefined) {
+        if (pendingDude.name !== undefined && pendingDude.name !== dude.name) {
             pendingDude.name = pendingDude.name.trim();
-            errors.push(...this.checkNameErrors(pendingDude.name));
+            errors.push(...await this.dudeNameService.checkName(pendingDude.name));
         }
         if (errors.length > 0) {
             return delayedResponse<ResponseUpdateDude>({errors});
@@ -162,48 +165,6 @@ export class DudeApi implements IDudeApi {
         const snapshot = await this.dudeService.getSnapshot([dudeIdA, dudeIdB]);
         this.socketMessageService.dudesUpdated(snapshot);
         return delayedResponse<ResponseSwapEquipmentWithOtherDude>({});
-    }
-
-    private async checkNewNameErrors(name: string): Promise<Array<ApiError>> {
-        const errors = [];
-        if (await this.isNameTaken(name)) {
-            errors.push({
-                code: 'NameTaken',
-                message: 'That name is already taken.',
-            });
-        }
-        errors.push(...this.checkNameErrors(name));
-        return errors;
-    }
-
-    private checkNameErrors(name: string): Array<ApiError> {
-        const errors = [];
-
-        const minLength = 3;
-        if (name.length < minLength) {
-            errors.push({
-                code: 'NameTooShort',
-                message: `The name must be at least ${minLength} characters long.`,
-            });
-        }
-
-        const maxLength = 30;
-        if (name.length > maxLength) {
-            errors.push({
-                code: 'NameTooLong',
-                message: `The name cannot be more than ${maxLength} characters long.`,
-            });
-        }
-
-        return errors;
-    }
-
-    private async isNameTaken(name: string): Promise<boolean> {
-        const count = await this.db.dudes.where('name')
-            .equalsIgnoreCase(name)
-            .count();
-
-        return count > 0;
     }
 
     private newDude(name: string): Dude {

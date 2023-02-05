@@ -6,6 +6,7 @@ import { GameDatabase } from "./internal/db/GameDatabase";
 import { SimulationApi } from "./api/SimulationApi";
 import { DudeService } from "./internal/services/DudeService";
 import { SocketMessageService } from "./internal/services/SocketMessageService";
+import { DudeNameService } from "./internal/services/DudeNameService";
 
 // In practice, the black box would be [native code] and already available via some global variable.
 // But for this proof of concept I'm making my own in javascript.
@@ -44,9 +45,10 @@ class Api implements IApi {
     constructor(db: GameDatabase) {
         const equipmentService = new EquipmentService(db);
         const dudeService = new DudeService(db);
+        const dudeNameService = new DudeNameService(db);
         const socketMessageService = new SocketMessageService(db);
         this.debug = new DebugService(db);
-        this.dudes = new DudeApi(db, equipmentService, dudeService, socketMessageService);
+        this.dudes = new DudeApi(db, equipmentService, dudeService, dudeNameService, socketMessageService);
         this.simulation = new SimulationApi(db);
     }
 
