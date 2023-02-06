@@ -4,8 +4,8 @@ import { DudeStatModifier, DudeStatType } from "./DudeStats";
 
 
 export type UUID = string;
-
 export type UnixTimestampMilliseconds = number;
+export type Integer = number;
 
 export interface IModel {
     id: UUID,

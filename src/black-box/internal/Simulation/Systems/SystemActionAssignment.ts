@@ -5,6 +5,7 @@ import { Dude, UnixTimestampMilliseconds } from "../../../exposed/models";
 import { Ability } from "../../../exposed/Models/Ability";
 import { Action, ActionDataIdling, ActionNone, ActionStatus, ActionType, TargetSelectionType } from "../../../exposed/Models/Action";
 import { Entity, EntityNone, EntityType } from "../../../exposed/Models/Entity";
+import { randomlySelect } from "../../../exposed/Models/RandomlySelectable";
 import { GameDatabase } from "../../db/GameDatabase";
 import { ModelTracker } from "../ModelTracker";
 import { ISimulationSystem } from "./ISimulationSystem";
@@ -68,22 +69,9 @@ export class SystemActionAssignment implements ISimulationSystem {
     }
 
     private async selectAbility(dude: Dude): Promise<Ability> {
-        let weightSum = 0;
-        const weightedSelection = [];
-        for (const option of IdlingAbilityOptions) {
-            // todo: don't choose options on cooldown
-            weightSum += option.weight;
-            weightedSelection.push({
-                upperInclusive: weightSum,
-                option: option,
-            });
-        }
-        const rolledInt = randomInt(1, weightSum);
-        const selection = weightedSelection.find(e => rolledInt <= e.upperInclusive);
-        if (!selection) {
-            throw Error('Failed to select an option');
-        }
-        return Abilities[selection.option.id];
+        // todo: filter out options on cooldown
+        const abilityId = randomlySelect(IdlingAbilityOptions);
+        return Abilities[abilityId];
     }
 
     private async selectTarget(dude: Dude, ability: Ability): Promise<Entity> {
