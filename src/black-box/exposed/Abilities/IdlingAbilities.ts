@@ -1,31 +1,28 @@
-import { UUID } from "../models";
-import { TargetSelectionType } from "./Action";
+import { createModelMap } from "../models";
+import { Ability } from "../Models/Ability";
+import { TargetSelectionType } from "../Models/Action";
+import { RandomlySelectable } from "../Models/RandomlySelectable";
 
-
-export interface ActionDataIdling {
-    option: UUID,
-}
-
-
-export interface IdlingOption {
-    id: UUID,
-    description: {
-        present: string,
-        past: string,
+export const IdlingAbilityOptions: RandomlySelectable[] = [
+    {
+        id: '989d95ae-aea3-4b5a-8260-06bf049c0a3c',
+        weight: 1,
     },
-    possibleTargets: TargetSelectionType[],
-    weight: number,
-    durationMillis: number,
-    cooldownMillis: number,
-    chainInto: UUID[], // next options to choose if action is successful
-}
+    {
+        id: 'bc84e61d-c8e8-4da0-b96f-f34d2dde1f79',
+        weight: 1,
+    },
+    {
+        id: '364687cc-26d6-45db-bf7a-936f17d86435',
+        weight: 1,
+    },
+    {
+        id: 'b55047ed-ad6d-4868-9ba7-b204948baa79',
+        weight: 1,
+    },
+];
 
-interface IdlingOptionMap {
-    [id: UUID]: IdlingOption,
-}
-
-
-export const IdlingOptionsInitial: IdlingOption[] = [
+export const IdlingAbilities = createModelMap<Ability>([
     {
         id: '989d95ae-aea3-4b5a-8260-06bf049c0a3c',
         description: {
@@ -33,10 +30,16 @@ export const IdlingOptionsInitial: IdlingOption[] = [
             past: '{sourceName} picked his nose.',
         },
         possibleTargets: [TargetSelectionType.Self],
-        weight: 1,
         durationMillis: 3000,
         cooldownMillis: 10000,
-        chainInto: ['778ae508-5bf6-4919-8b3b-c917e7539e76'],
+        onComplete: {
+            immediatelyChainInto: [
+                {
+                    id: '778ae508-5bf6-4919-8b3b-c917e7539e76',
+                    weight: 1,
+                }
+            ],
+        },
     },
     {
         id: 'bc84e61d-c8e8-4da0-b96f-f34d2dde1f79',
@@ -45,10 +48,8 @@ export const IdlingOptionsInitial: IdlingOption[] = [
             past: '{sourceName} twiddled his thumbs.',
         },
         possibleTargets: [TargetSelectionType.Self],
-        weight: 1,
         durationMillis: 3000,
         cooldownMillis: 10000,
-        chainInto: [],
     },
     {
         id: '364687cc-26d6-45db-bf7a-936f17d86435',
@@ -57,10 +58,8 @@ export const IdlingOptionsInitial: IdlingOption[] = [
             past: '{sourceName} admired a squirrel running up a tree.',
         },
         possibleTargets: [TargetSelectionType.Self],
-        weight: 1,
         durationMillis: 3000,
         cooldownMillis: 10000,
-        chainInto: [],
     },
     {
         id: 'b55047ed-ad6d-4868-9ba7-b204948baa79',
@@ -69,16 +68,9 @@ export const IdlingOptionsInitial: IdlingOption[] = [
             past: '{sourceName} ate a snack.',
         },
         possibleTargets: [TargetSelectionType.Self],
-        weight: 1,
         durationMillis: 3000,
         cooldownMillis: 10000,
-        chainInto: [],
     },
-
-];
-
-
-export const IdlingOptionsFollowup: IdlingOption[] = [
     {
         id: '778ae508-5bf6-4919-8b3b-c917e7539e76',
         description: {
@@ -86,15 +78,16 @@ export const IdlingOptionsFollowup: IdlingOption[] = [
             past: '{sourceName} flicked a booger at {targetName}.',
         },
         possibleTargets: [TargetSelectionType.Ally, TargetSelectionType.Enemy],
-        weight: 1,
         durationMillis: 3000,
         cooldownMillis: 10000,
-        chainInto: [],
+        onComplete: {
+            spawnProjectiles: [{
+                target: TargetSelectionType.ChainSame,
+                accuracyFactor: 1,
+                damageFactor: 1,
+                speedFactor: 1,
+                projectileTemplate: '7796600d-767d-429a-944c-59fba2568828',
+            }],
+        }
     },
-];
-
-
-export const IdlingOptions: IdlingOptionMap = {};
-const registerOption = (option: IdlingOption) => IdlingOptions[option.id] = option;
-IdlingOptionsInitial.forEach(registerOption);
-IdlingOptionsFollowup.forEach(registerOption);
+]);

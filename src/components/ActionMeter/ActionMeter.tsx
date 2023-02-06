@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Action, ActionType } from '../../black-box/exposed/Models/Action';
-import { ActionDataIdling, IdlingOptions } from '../../black-box/exposed/Models/ActionTypeIdling';
+import { Abilities } from '../../black-box/exposed/Abilities/Abilities';
+import { Action, ActionDataIdling, ActionType } from '../../black-box/exposed/Models/Action';
 import { SimulationState } from '../../store/slices/simulation/simulationSlice';
 import { useInterval } from '../hooks';
 import styles from './ActionMeter.module.css';
@@ -58,8 +58,8 @@ function describeAction(action: Action|undefined) {
     }
     if (action.type === ActionType.Idling) {
         const data = action.data as ActionDataIdling;
-        const option = IdlingOptions[data.option];
-        return option.description.present;
+        const ability = Abilities[data.abilityId];
+        return ability.description.present;
     }
     return 'Unknown action';
 }

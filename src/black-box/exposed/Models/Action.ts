@@ -39,6 +39,9 @@ export enum ActionType {
     Idling = 'Idling',
     Attacking = 'Attacking',
     None = 'None',
+    MeleeAttackHitting = 'MeleeAttackHitting',
+    MeleeAttackMissing = 'MeleeAttackMissing',
+    ProjectileTraveling = 'ProjectileTraveling',
 }
 
 /**
@@ -63,4 +66,8 @@ export enum TargetSelectionType {
     Ally = 'Ally',
     Enemy = 'Enemy',
     ChainSame = 'ChainSame',
+}
+
+export interface ActionDataIdling {
+    abilityId: UUID,
 }

@@ -1,7 +1,9 @@
 import { randomInt } from "../../../../utils";
+import { Abilities } from "../../../exposed/Abilities/Abilities";
+import { IdlingAbilityOptions } from "../../../exposed/Abilities/IdlingAbilities";
 import { Dude, UnixTimestampMilliseconds } from "../../../exposed/models";
-import { Action, ActionNone, ActionStatus, ActionType, TargetSelectionType } from "../../../exposed/Models/Action";
-import { ActionDataIdling, IdlingOption, IdlingOptionsInitial } from "../../../exposed/Models/ActionTypeIdling";
+import { Ability } from "../../../exposed/Models/Ability";
+import { Action, ActionDataIdling, ActionNone, ActionStatus, ActionType, TargetSelectionType } from "../../../exposed/Models/Action";
 import { Entity, EntityNone, EntityType } from "../../../exposed/Models/Entity";
 import { GameDatabase } from "../../db/GameDatabase";
 import { ModelTracker } from "../ModelTracker";
@@ -44,7 +46,7 @@ export class SystemActionAssignment implements ISimulationSystem {
     }
 
     private async prepareAction(tickTimestamp: UnixTimestampMilliseconds, dude: Dude): Promise<Action> {
-        const option = await this.selectOption(dude);
+        const ability = await this.selectAbility(dude);
         const entitySelf = {
             type: EntityType.Dude,
             id: dude.id,
@@ -53,22 +55,22 @@ export class SystemActionAssignment implements ISimulationSystem {
             id: crypto.randomUUID(),
             type: ActionType.Idling,
             timeStart: tickTimestamp,
-            timeComplete: tickTimestamp + option.durationMillis,
+            timeComplete: tickTimestamp + ability.durationMillis,
             initiator: entitySelf,
             source: entitySelf,
-            target: await this.selectTarget(dude, option),
+            target: await this.selectTarget(dude, ability),
             zone: '',
             status: ActionStatus.Pending,
             data: {
-                option: option.id,
+                abilityId: ability.id,
             } as ActionDataIdling,
         };
     }
 
-    private async selectOption(dude: Dude): Promise<IdlingOption> {
+    private async selectAbility(dude: Dude): Promise<Ability> {
         let weightSum = 0;
         const weightedSelection = [];
-        for (const option of IdlingOptionsInitial) {
+        for (const option of IdlingAbilityOptions) {
             // todo: don't choose options on cooldown
             weightSum += option.weight;
             weightedSelection.push({
@@ -81,11 +83,11 @@ export class SystemActionAssignment implements ISimulationSystem {
         if (!selection) {
             throw Error('Failed to select an option');
         }
-        return selection.option;
+        return Abilities[selection.option.id];
     }
 
-    private async selectTarget(dude: Dude, option: IdlingOption): Promise<Entity> {
-        if (option.possibleTargets.includes(TargetSelectionType.Self)) {
+    private async selectTarget(dude: Dude, ability: Ability): Promise<Entity> {
+        if (ability.possibleTargets.includes(TargetSelectionType.Self)) {
             return {
                 type: EntityType.Dude,
                 id: dude.id,
